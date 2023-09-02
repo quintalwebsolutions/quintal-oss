@@ -1,12 +1,12 @@
-name: "Collect coverage from all packages"
+name: Collect coverage from all packages
 
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: Placeholder
       shell: bash
       run: echo placeholder
-    # - name: Upload @quintal/result coverage to Codecov
+    # - name: Upload @quintal/result coverage to Codecov # or codacy?
     #   uses: codecov/codecov-action@v2
     #   with:
     #     files: ./packages/react-form/.coverage/coverage-final.json

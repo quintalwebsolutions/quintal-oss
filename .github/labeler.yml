@@ -1,2 +1,5 @@
 @quintal/result:
   - packages/result/*
+
+@quintal/config:
+  - packages/config/*

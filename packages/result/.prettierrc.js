@@ -1,1 +1,1 @@
-module.exports = require("@quintal/config/prettier");
+module.exports = require('@quintal/config/prettier');

@@ -2,7 +2,7 @@ export type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
 export function ok<T>(value: T): Result<T, never>;
 export function ok(): Result<void, never>;
-export function ok<T>(value?: T): Result<T | void, never> {
+export function ok<T>(value?: T): Result<T | undefined, never> {
   return { ok: true, value };
 }
 
@@ -21,7 +21,7 @@ export function resultWrap<T>(func: () => T): Result<T, unknown> {
 }
 
 export async function asyncResultWrap<T>(
-  func: () => Promise<T>
+  func: () => Promise<T>,
 ): Promise<Result<T, unknown>> {
   try {
     const value = await func();

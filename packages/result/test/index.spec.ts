@@ -1,34 +1,35 @@
-import { describe, it, expect } from "vitest";
-import { ok, err, resultWrap, asyncResultWrap, Result } from "../src/index";
-import { expectTypeOf } from "expect-type";
+import { describe, it, expect } from 'vitest';
+import { expectTypeOf } from 'expect-type';
+import type { Result } from '../src/index';
+import { ok, err, resultWrap, asyncResultWrap } from '../src/index';
 
-function throws(): boolean {
-  throw new Error("This is an error");
+function throwSync(): boolean {
+  throw new Error('This is an error');
+}
+
+function noThrowSync(): boolean {
   return false;
 }
 
-function noThrow(): boolean {
-  return false;
+// eslint-disable-next-line @typescript-eslint/require-await -- This test requires the function to be async
+async function throwAsync(): Promise<boolean> {
+  throw new Error('This is an async error');
 }
 
-async function throwsAsync(): Promise<boolean> {
-  throw new Error("This is an async error");
-  return false;
-}
-
+// eslint-disable-next-line @typescript-eslint/require-await -- This test requires the function to be async
 async function noThrowAsync(): Promise<boolean> {
   return false;
 }
 
-describe("result", () => {
-  it("uses type narrowing to extract the value", () => {
-    const okResult = ok("value");
+describe('result', () => {
+  it('uses type narrowing to extract the value', () => {
+    const okResult = ok('value');
     expectTypeOf(okResult).toMatchTypeOf<Result<string, never>>();
 
-    const errResult = err("error");
+    const errResult = err('error');
     expectTypeOf(errResult).toMatchTypeOf<Result<never, string>>();
 
-    const unknownResult = resultWrap(throws);
+    const unknownResult = resultWrap(throwSync);
     expectTypeOf(unknownResult).not.toMatchTypeOf<{ ok: true }>();
     expectTypeOf(unknownResult).not.toMatchTypeOf<{ ok: false }>();
     expectTypeOf(unknownResult).toMatchTypeOf<{ ok: boolean }>();
@@ -42,27 +43,27 @@ describe("result", () => {
     }
   });
 
-  it("returns an error state from a throwing function", () => {
-    const okResult = resultWrap(noThrow);
+  it('returns an error state from a throwing function', () => {
+    const okResult = resultWrap(noThrowSync);
     expect(okResult.ok).toBeTruthy();
     if (okResult.ok) expect(okResult.value).toBeFalsy();
 
-    const errResult = resultWrap(throws);
+    const errResult = resultWrap(throwSync);
     expect(errResult.ok).toBeFalsy();
     if (!errResult.ok)
-      expect(errResult.error).toStrictEqual(new Error("This is an error"));
+      expect(errResult.error).toStrictEqual(new Error('This is an error'));
   });
 
-  it("returns an error state from a throwing async function", async () => {
+  it('returns an error state from a throwing async function', async () => {
     const okResult = await asyncResultWrap(noThrowAsync);
     expect(okResult.ok).toBeTruthy();
     if (okResult.ok) expect(okResult.value).toBeFalsy();
 
-    const errResult = await asyncResultWrap(throwsAsync);
+    const errResult = await asyncResultWrap(throwAsync);
     expect(errResult.ok).toBeFalsy();
     if (!errResult.ok)
       expect(errResult.error).toStrictEqual(
-        new Error("This is an async error")
+        new Error('This is an async error'),
       );
   });
 });

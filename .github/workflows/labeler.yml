@@ -3,6 +3,9 @@ name: Pull Request Labeler
 on:
   - pull_request_target
 
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
 jobs:
   labeler:
     runs-on: ubuntu-latest

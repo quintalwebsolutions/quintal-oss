@@ -3,6 +3,9 @@ name: Check
 on:
   - push
 
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
 jobs:
   check:
     name: Check

@@ -20,7 +20,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Lint
-        run: pnpm lint
+        run: pnpm lint:check
 
       - name: Test
         run: pnpm test

@@ -3,3 +3,6 @@
 
 @quintal/config:
   - packages/config/*
+
+@quintal/table-engine:
+  - packages/table-engine/*

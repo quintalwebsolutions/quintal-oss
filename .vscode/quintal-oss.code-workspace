@@ -1,0 +1,32 @@
+{
+  "folders": [
+    {
+      "name": "ROOT",
+      "path": ".."
+    },
+    {
+      "name": "@quintal/config",
+      "path": "../packages/config"
+    },
+    {
+      "name": "@quintal/result",
+      "path": "../packages/result"
+    }
+  ],
+  "extensions": {
+    "recommendations": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+  },
+  "settings": {
+    "colorize.languages": [
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact"
+    ],
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    },
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true
+  }
+}

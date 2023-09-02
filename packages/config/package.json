@@ -1,5 +1,6 @@
 {
   "name": "@quintal/config",
+  "version": "0.0.0",
   "files": [
     "eslint.js",
     "prettier.js"

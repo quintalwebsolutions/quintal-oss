@@ -1,0 +1,16 @@
+{
+  "name": "@quintal/config",
+  "files": [
+    "eslint.js",
+    "prettier.js"
+  ],
+  "scripts": {
+    "clean": "shx rm -rf .turbo node_modules",
+    "lint": "pnpm lint:fix",
+    "lint:check": "eslint .",
+    "lint:fix": "pnpm lint:check --fix"
+  },
+  "dependencies": {
+    "eslint": "8.48.0"
+  }
+}

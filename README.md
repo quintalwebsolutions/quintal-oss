@@ -1,1 +1,1 @@
-# quintal-oss
+# Quintal Open Source Software

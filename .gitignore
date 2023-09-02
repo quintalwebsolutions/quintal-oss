@@ -1,0 +1,18 @@
+# Dependencies
+node_modules
+
+# Testing
+.coverage
+
+# Build
+dist
+
+# Logs
+*.log*
+
+# Turbo
+.turbo
+
+# Misc
+.DS_Store
+.idea

@@ -1,5 +1,5 @@
 ---
-"@quintal/table-engine": patch
+"@quintal/table-engine-react": patch
 ---
 
 Init package

@@ -30,3 +30,8 @@ runs:
     - name: Install dependencies
       shell: bash
       run: pnpm install --frozen-lockfile
+
+    - name: Set up turborepo cache
+      uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      with:
+        cache-prefix: turbo_

@@ -5,6 +5,10 @@
       "path": ".."
     },
     {
+      "name": "@quintal/table-engine-react",
+      "path": "../packages/table-engine-react"
+    },
+    {
       "name": "@quintal/config",
       "path": "../packages/config"
     },

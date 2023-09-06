@@ -1,6 +1,7 @@
 const { resolve } = require('node:path');
 const { defineConfig } = require('vite');
 const dts = require('vite-plugin-dts');
+const react = require('@vitejs/plugin-react');
 
 const fileName = {
   es: `index.mjs`,
@@ -29,5 +30,5 @@ module.exports = defineConfig({
       reportsDirectory: '.coverage',
     },
   },
-  plugins: [dts()],
+  plugins: [react(), dts({ rollupTypes: true })],
 });

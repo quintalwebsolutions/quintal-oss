@@ -1,5 +1,4 @@
-import { describe, it, expect } from 'vitest';
-import { expectTypeOf } from 'expect-type';
+import { describe, it, expect, expectTypeOf } from 'vitest';
 import type { Result } from '../src/index';
 import { ok, err, resultWrap, asyncResultWrap } from '../src/index';
 

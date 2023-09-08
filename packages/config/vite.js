@@ -13,7 +13,7 @@ const formats = Object.keys(fileName);
 module.exports = defineConfig({
   build: {
     lib: {
-      entry: resolve(process.cwd(), 'src/index.ts'),
+      entry: resolve(process.cwd(), 'src', 'index.ts'),
       name: '@quintal/result',
       formats,
       fileName: (format) => fileName[format],

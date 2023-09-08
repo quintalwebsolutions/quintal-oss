@@ -42,7 +42,7 @@ describe('result', () => {
     }
   });
 
-  it('returns an error state from a throwing function', () => {
+  it('returns an error state from a wrapped throwing function', () => {
     const okResult = resultWrap(noThrowSync);
     expect(okResult.ok).toBeTruthy();
     if (okResult.ok) expect(okResult.value).toBeFalsy();
@@ -53,7 +53,7 @@ describe('result', () => {
       expect(errResult.error).toStrictEqual(new Error('This is an error'));
   });
 
-  it('returns an error state from a throwing async function', async () => {
+  it('returns an error state from a wrapped throwing async function', async () => {
     const okResult = await asyncResultWrap(noThrowAsync);
     expect(okResult.ok).toBeTruthy();
     if (okResult.ok) expect(okResult.value).toBeFalsy();

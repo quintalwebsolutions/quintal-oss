@@ -32,6 +32,7 @@
     "isolatedModules": true,
 
     "jsx": "react-jsx",
+    "target": "es2015",
 
     "noErrorTruncation": true,
 

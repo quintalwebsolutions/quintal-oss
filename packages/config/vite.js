@@ -29,6 +29,7 @@ module.exports = defineConfig({
       include: ['src/**/*.ts'],
       reportsDirectory: '.coverage',
     },
+    environment: 'happy-dom',
   },
   plugins: [react(), dts({ rollupTypes: true })],
 });

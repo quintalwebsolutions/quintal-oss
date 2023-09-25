@@ -7,9 +7,8 @@ import type {
   Many,
   UnwrapValue,
   Value,
-  UnwrapValues,
 } from '../src';
-import { useForm } from '../src';
+import { textPlugin, numberPlugin, useForm } from '../src';
 
 type Ser = 'serialized';
 type Opt = 'optional';
@@ -198,7 +197,7 @@ describe('useForm', () => {
       manyNested: Many<Obj>;
     };
 
-    expectTypeOf<UnwrapValues<Values>>().toEqualTypeOf<{
+    expectTypeOf<UnwrapValue<Values>>().toEqualTypeOf<{
       requiredString: string;
       requiredNumber: number;
       requiredBoolean: boolean;
@@ -223,7 +222,7 @@ describe('useForm', () => {
       manyNested: ObjI[];
     }>();
 
-    expectTypeOf<UnwrapValues<Values, 'serialized'>>().toEqualTypeOf<{
+    expectTypeOf<UnwrapValue<Values, 'serialized'>>().toEqualTypeOf<{
       requiredString: string;
       requiredNumber: number;
       requiredBoolean: boolean;
@@ -248,7 +247,20 @@ describe('useForm', () => {
       manyNested: ObjS;
     }>();
 
-    const { result } = renderHook(() => useForm<Values>({}));
+    const { result } = renderHook(() =>
+      useForm<Values>({
+        fields: {
+          requiredString: textPlugin<Values>({}),
+          // @ts-expect-error number plugin does not fit with raw number because it serializes to string
+          requiredNumber: numberPlugin<Values>({}),
+
+          requiredStringValue: textPlugin<Values>({}),
+          requiredNumberValue: numberPlugin<Values>({}),
+
+          // TODO add other plugins
+        },
+      }),
+    );
 
     expectTypeOf(result.current).toEqualTypeOf<{
       form: FormProps;

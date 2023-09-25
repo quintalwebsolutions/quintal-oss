@@ -1,27 +1,22 @@
-// import type { ButtonProps, FormProps } from '../lib';
-// import type { Values } from '../lib/values';
+import type {
+  ButtonProps,
+  FormProps,
+  Config,
+  Values,
+  FieldProps,
+  UnwrapValue,
+} from '../lib';
 
-// type Form = {
-//   form: FormProps;
-//   submitButton: ButtonProps;
-//   resetButton: ButtonProps;
-// };
-
-// type ButtonConfig = {
-//   /** Optional, the text displayed on the button */
-//   label?: string;
-//   /** Optional, the text displayed on the button while the form is performing an arbitrary action */
-//   isLoadingLabel?: string;
-//   /** Optional, the text displayed on the button while the form is submitting */
-//   isSubmittingLabel?: string;
-// };
-
-// type Config = {
-//   /** Optional, configures the form's submit button */
-//   submitButton?: ButtonConfig;
-//   /** Optional, configures the form's reset button */
-//   resetButton?: ButtonConfig;
-// };
+type Form<TValues extends Values> = {
+  form: FormProps;
+  submitButton: ButtonProps;
+  resetButton: ButtonProps;
+  fields: {
+    [FieldName in keyof TValues]: FieldProps<
+      UnwrapValue<TValues[FieldName], 'serialized'>
+    >;
+  };
+};
 
 export function useForm(
   // config: Config,

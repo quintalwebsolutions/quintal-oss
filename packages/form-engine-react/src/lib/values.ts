@@ -24,6 +24,14 @@ export type Value<
   __empty__: 'empty' extends keyof TValueArgs ? TValueArgs['empty'] : null;
 };
 
+export type AnyValue = {
+  __internal__: unknown;
+  __serialized__: unknown;
+  __empty__: unknown;
+};
+
+export type Values = Record<string, unknown>;
+
 type ValueFlag = 'serialized' | 'optional';
 export type UnwrapValue<
   T,
@@ -61,12 +69,3 @@ export type UnwrapValue<
   : 'optional' extends TValueFlag
   ? T | null
   : T;
-
-export type Values = Record<string, unknown>;
-
-export type UnwrapValues<
-  TValues extends Values,
-  TValueFlag extends ValueFlag = never,
-> = {
-  [TFieldName in keyof TValues]: UnwrapValue<TValues[TFieldName], TValueFlag>;
-};

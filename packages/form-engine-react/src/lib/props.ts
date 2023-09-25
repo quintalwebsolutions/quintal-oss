@@ -1,6 +1,10 @@
 import type { ComponentProps } from 'react';
 
 type MaybeDomEvent = (e?: { preventDefault: () => void }) => void;
+type MaybeDomChangeEvent = (e?: {
+  preventDefault: () => void;
+  target: { value: string };
+}) => void;
 
 type FormComponentProps<
   TNativeKey extends keyof React.JSX.IntrinsicElements,
@@ -17,8 +21,8 @@ export type FormProps = FormComponentProps<
     onReset: MaybeDomEvent;
   },
   {
-    onSubmit: MaybeDomEvent;
-    onReset: MaybeDomEvent;
+    onSubmit: () => void;
+    onReset: () => void;
     errors: string[];
     isLoading: boolean;
   }
@@ -37,6 +41,20 @@ export type ButtonProps = FormComponentProps<
     isDisabled: boolean;
     isLoading: boolean;
     type: 'submit' | 'reset' | 'button';
-    onClick: MaybeDomEvent;
+    onClick: () => void;
+  }
+>;
+
+// TODO have 'input', 'label', and 'description' keys under register
+export type FieldProps<TTargetValue> = FormComponentProps<
+  'input',
+  {
+    onBlur: MaybeDomEvent;
+    onChange: MaybeDomChangeEvent;
+  },
+  {
+    onBlur: () => void;
+    onChange: (targetValue: TTargetValue) => void;
+    errors: string[];
   }
 >;

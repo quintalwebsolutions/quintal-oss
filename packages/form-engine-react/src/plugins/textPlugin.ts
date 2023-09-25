@@ -1,10 +1,12 @@
-import type { Plugin, PluginObject, PluginValue } from '../lib';
+import type { Plugin, StringValidation, ValueFromPlugin } from '../lib';
+import { createPlugin, validateStringField } from '../lib';
 
-export type TextPlugin = Plugin<string>;
+export type TextPlugin = Plugin<string, { validation: StringValidation }>;
 
-export type TextPluginValue = PluginValue<TextPlugin>;
+export type TextPluginValue = ValueFromPlugin<TextPlugin>;
 
-export const textPlugin: PluginObject<TextPlugin> = {
+export const textPlugin = createPlugin<TextPlugin>({
   parse: (value) => value || null,
   serialize: (value) => value ?? '',
-};
+  validate: validateStringField,
+});

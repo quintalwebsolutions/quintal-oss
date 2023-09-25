@@ -19,6 +19,10 @@
     {
       "name": "@quintal/result",
       "path": "../packages/result"
+    },
+    {
+      "name": "@quintal/use-async-reducer",
+      "path": "../packages/use-async-reducer"
     }
   ],
   "extensions": {

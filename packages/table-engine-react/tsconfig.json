@@ -4,5 +4,5 @@
     "rootDir": "."
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "dist", ".coverage"]
+  "exclude": [".coverage", ".turbo", "dist", "node_modules"]
 }

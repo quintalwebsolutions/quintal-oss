@@ -84,9 +84,7 @@ describe('useAsyncReducer', () => {
       }),
     );
 
-    expect(result.current.isInitialized).toBeFalsy();
-    await waitFor(() => expect(result.current.isInitialized).toBeTruthy());
-
+    expect(result.current.isInitialized).toBeTruthy();
     if (result.current.isInitialized) {
       await act(() => {
         result.current.actions.add(1);
@@ -124,7 +122,7 @@ describe('useAsyncReducer', () => {
       }),
     );
 
-    await waitFor(() => expect(result.current.isInitialized).toBeTruthy());
+    expect(result.current.isInitialized).toBeTruthy();
     if (result.current.isInitialized) {
       await act(() => {
         result.current.actions.increment();
@@ -172,6 +170,57 @@ describe('useAsyncReducer', () => {
       // Expect all pending actions to have run
       expect(result.current.state.count).toBe(12);
     }
+  });
+
+  it('correctly types the state initialization process', () => {
+    type State = { hi: string };
+    const objectStateFactory = (): State => ({ hi: 'mom' });
+    const objectState = objectStateFactory();
+    // eslint-disable-next-line @typescript-eslint/require-await -- test
+    const promiseStateFactory: () => Promise<State> = async () => ({
+      hi: 'mom',
+    });
+    const promiseState = promiseStateFactory();
+
+    const { result: objectResult } = renderHook(() =>
+      useAsyncReducer(objectState, {}),
+    );
+
+    const { result: promiseResult } = renderHook(() =>
+      useAsyncReducer(promiseState, {}),
+    );
+
+    const { result: factoryResult } = renderHook(() =>
+      useAsyncReducer(objectStateFactory, {}),
+    );
+
+    const { result: asyncFactoryResult } = renderHook(() =>
+      useAsyncReducer(promiseStateFactory, {}),
+    );
+
+    expectTypeOf(objectResult.current)
+      .toHaveProperty('state')
+      .toEqualTypeOf<State>();
+    expectTypeOf(objectResult.current)
+      .toHaveProperty('isInitialized')
+      .toEqualTypeOf<true>();
+
+    expectTypeOf(promiseResult.current).not.toHaveProperty('state');
+    expectTypeOf(promiseResult.current)
+      .toHaveProperty('isInitialized')
+      .toEqualTypeOf<boolean>();
+
+    expectTypeOf(factoryResult.current)
+      .toHaveProperty('state')
+      .toEqualTypeOf<State>();
+    expectTypeOf(factoryResult.current)
+      .toHaveProperty('isInitialized')
+      .toEqualTypeOf<true>();
+
+    expectTypeOf(asyncFactoryResult.current).not.toHaveProperty('state');
+    expectTypeOf(asyncFactoryResult.current)
+      .toHaveProperty('isInitialized')
+      .toEqualTypeOf<boolean>();
   });
 
   it('allows the inital state to be an object, a promise, a sync factory, and an async factory', async () => {
@@ -228,10 +277,13 @@ describe('useAsyncReducer', () => {
       }),
     );
 
+    expect(objectResult.current.isInitialized).toBeTruthy();
+    expect(promiseResult.current.isInitialized).toBeFalsy();
+    expect(factoryResult.current.isInitialized).toBeTruthy();
+    expect(asyncFactoryResult.current.isInitialized).toBeFalsy();
+
     await waitFor(() => {
-      expect(objectResult.current.isInitialized).toBeTruthy();
       expect(promiseResult.current.isInitialized).toBeTruthy();
-      expect(factoryResult.current.isInitialized).toBeTruthy();
       expect(asyncFactoryResult.current.isInitialized).toBeTruthy();
     });
 

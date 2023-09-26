@@ -63,13 +63,29 @@ export function useAsyncReducer<
   initialStateFactory: InitialStateFactory<TState>,
   inputActions: TActions,
 ): State<TState, TActions> {
-  const [state, setState] = useState<TState | null>(null);
-  const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const initialStateMaybePromise: MaybePromise<TState> = useMemo(
+    () =>
+      typeof initialStateFactory === 'function'
+        ? (initialStateFactory as () => MaybePromise<TState>)()
+        : initialStateFactory,
+    [initialStateFactory],
+  );
+
+  const initialState: TState | null = useMemo(
+    () =>
+      isPromise(initialStateMaybePromise) ? null : initialStateMaybePromise,
+    [],
+  );
+
+  const [state, setState] = useState<TState | null>(initialState);
+  const [isInitialized, setIsInitialized] = useState<boolean>(
+    initialState !== null,
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error<TState> | null>(null);
 
-  const initialStateRef = useRef<TState | null>(null);
-  const stateRef = useRef<TState | null>(null);
+  const initialStateRef = useRef<TState | null>(initialState);
+  const stateRef = useRef<TState | null>(initialState);
   const actionQueueRef = useRef<Action<TState>[]>([]);
   const isLoadingRef = useRef<boolean>(false);
 
@@ -142,9 +158,7 @@ export function useAsyncReducer<
   );
 
   /** The actions object returned to the user that proxies the user-defined actions */
-  const actions: OutputActions<TState, TActions> = useMemo<
-    OutputActions<TState, TActions>
-  >(
+  const actions = useMemo<OutputActions<TState, TActions>>(
     () =>
       Object.entries(inputActions).reduce(
         (prev, [actionKey, execute]) => {
@@ -161,21 +175,26 @@ export function useAsyncReducer<
 
   /** If initial state is changed, reset the hook state */
   useEffect(() => {
-    pushToActionQueue({
-      name: 'Initialize / Reset',
-      execute: async () => {
-        const initialState: TState = await (typeof initialStateFactory ===
-        'function'
-          ? (initialStateFactory as () => MaybePromise<TState>)()
-          : initialStateFactory);
-
-        initialStateRef.current = initialState;
-        setIsInitialized(true);
-        return initialState;
-      },
-      args: [],
-    });
-  }, [initialStateFactory]);
+    if (isPromise(initialStateMaybePromise))
+      pushToActionQueue({
+        name: 'Async Initialize / Reset',
+        execute: async () => {
+          initialStateRef.current = await initialStateMaybePromise;
+          setIsInitialized(true);
+          return initialStateRef.current;
+        },
+        args: [],
+      });
+    else
+      pushToActionQueue({
+        name: 'Initialize / Reset',
+        execute: () => {
+          initialStateRef.current = initialStateMaybePromise;
+          return initialStateRef.current;
+        },
+        args: [],
+      });
+  }, [initialStateMaybePromise]);
 
   if (isInitialized)
     return {

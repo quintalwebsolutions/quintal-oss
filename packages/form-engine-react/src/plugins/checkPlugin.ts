@@ -1,4 +1,5 @@
-import type { Plugin, PluginObject, ValueFromPlugin } from '../lib';
+import { createPlugin } from '../lib';
+import type { Plugin, ValueFromPlugin } from '../lib';
 
 export type CheckPlugin = Plugin<
   boolean | 'indeterminate',
@@ -7,6 +8,4 @@ export type CheckPlugin = Plugin<
 
 export type CheckPluginValue = ValueFromPlugin<CheckPlugin>;
 
-export const checkPlugin: PluginObject<CheckPlugin> = {
-  defaultInitialValue: false,
-};
+export const checkPlugin = createPlugin<CheckPlugin>({ emptyValue: false });

@@ -1,5 +1,5 @@
 import { FieldState } from './fieldState';
-import type { AnyPlugin, CreatedPlugin } from './plugin';
+import type { AnyPlugin, RuntimePlugin } from './plugin';
 import type { MaybePromise } from './util';
 import type { Values } from './values';
 
@@ -28,7 +28,7 @@ export type Validation<
 };
 
 export async function validateField(
-  createdPlugin: CreatedPlugin<AnyPlugin, Values>,
+  createdPlugin: RuntimePlugin<AnyPlugin, Values>,
   fieldState: FieldState,
   value: unknown,
   values: Values,

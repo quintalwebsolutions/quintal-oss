@@ -1,26 +1,13 @@
-import type {
-  ButtonProps,
-  FormProps,
-  Config,
-  Values,
-  FieldProps,
-  UnwrapValue,
-} from '../lib';
+import type { Config, Values } from '../lib';
+import type { Form } from './useFormProps';
+import { useFormProps } from './useFormProps';
+import { useFormState } from './useFormState';
+import { useInitialState } from './useInitialState';
 
-type Form<TValues extends Values> = {
-  form: FormProps;
-  submitButton: ButtonProps;
-  resetButton: ButtonProps;
-  fields: {
-    [FieldName in keyof TValues]: FieldProps<
-      UnwrapValue<TValues[FieldName], 'serialized'>
-    >;
-  };
-};
-
-export function useForm(
-  // config: Config,
-): null {
-  // console.log(config);
-  return null;
+export function useForm<TValues extends Values>(
+  config: Config<TValues>,
+): Form<TValues> {
+  const initialState = useInitialState(config);
+  const formState = useFormState(config, initialState);
+  return useFormProps(formState.isInitialized ? formState.state : initialState);
 }

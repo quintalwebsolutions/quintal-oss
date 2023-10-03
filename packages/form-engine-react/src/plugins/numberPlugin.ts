@@ -3,7 +3,11 @@ import { validateNumberField, createPlugin } from '../lib';
 
 export type NumberPlugin = Plugin<
   number,
-  { serializedValue: string; validation: NumberValidation }
+  {
+    serializedValue: string;
+    validation: NumberValidation;
+    options: { placeholder?: string };
+  }
 >;
 
 export type NumberPluginValue = ValueFromPlugin<NumberPlugin>;

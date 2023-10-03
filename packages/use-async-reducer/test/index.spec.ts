@@ -48,13 +48,9 @@ describe('useAsyncReducer', () => {
 
     expectTypeOf(result.current.actions.add).returns.toBeVoid();
     expectTypeOf(result.current.actions.addSync).returns.toBeVoid();
-    expectTypeOf(result.current).not.toHaveProperty('state');
-
-    if (result.current.isInitialized) {
-      expectTypeOf(result.current).toHaveProperty('state');
-      expectTypeOf(result.current.state).not.toHaveProperty('random');
-      expectTypeOf(result.current.actions).not.toHaveProperty('reset');
-    }
+    expectTypeOf(result.current).toHaveProperty('state');
+    expectTypeOf(result.current.state).not.toHaveProperty('random');
+    expectTypeOf(result.current.actions).not.toHaveProperty('reset');
 
     if (false as boolean) {
       // @ts-expect-error Missing parameter type
@@ -85,19 +81,17 @@ describe('useAsyncReducer', () => {
     );
 
     expect(result.current.isInitialized).toBeTruthy();
-    if (result.current.isInitialized) {
-      await act(() => {
-        result.current.actions.add(1);
-        result.current.actions.add(2);
-      });
-      expect(result.current.state.count).toBe(3);
+    await act(() => {
+      result.current.actions.add(1);
+      result.current.actions.add(2);
+    });
+    expect(result.current.state.count).toBe(3);
 
-      await act(() => {
-        result.current.actions.addAsync(3);
-        result.current.actions.divide(3);
-      });
-      expect(result.current.state.count).toBe(2);
-    }
+    await act(() => {
+      result.current.actions.addAsync(3);
+      result.current.actions.divide(3);
+    });
+    expect(result.current.state.count).toBe(2);
   });
 
   it('exposes functionality to rerun action queue after a failed action', async () => {
@@ -123,53 +117,51 @@ describe('useAsyncReducer', () => {
     );
 
     expect(result.current.isInitialized).toBeTruthy();
-    if (result.current.isInitialized) {
-      await act(() => {
-        result.current.actions.increment();
-        result.current.actions.increment();
-        result.current.actions.set(10);
-        result.current.actions.increment();
-        result.current.actions.decrement();
-        result.current.actions.increment();
-        result.current.actions.increment();
-      });
+    await act(() => {
+      result.current.actions.increment();
+      result.current.actions.increment();
+      result.current.actions.set(10);
+      result.current.actions.increment();
+      result.current.actions.decrement();
+      result.current.actions.increment();
+      result.current.actions.increment();
+    });
 
-      // Expect the queue to have halted after the first error
-      expect(result.current.state.count).toBe(2);
-      expect(result.current.error?.message).toBe('Error: Set error');
-      expect(result.current.error?.pendingActions).toHaveLength(4);
-      expect(result.current.error?.action.name).toBe('set');
-      expect(result.current.error?.action.args).toHaveLength(1);
-      expect(result.current.error?.action.args[0]).toBe(10);
+    // Expect the queue to have halted after the first error
+    expect(result.current.state.count).toBe(2);
+    expect(result.current.error?.message).toBe('Error: Set error');
+    expect(result.current.error?.pendingActions).toHaveLength(4);
+    expect(result.current.error?.action.name).toBe('set');
+    expect(result.current.error?.action.args).toHaveLength(1);
+    expect(result.current.error?.action.args[0]).toBe(10);
 
-      shouldFail = false;
-      await act(() => {
-        result.current.error?.runFailedAction();
-      });
+    shouldFail = false;
+    await act(() => {
+      result.current.error?.runFailedAction();
+    });
 
-      // Expect only the failed action to have run
-      expect(result.current.state.count).toBe(10);
+    // Expect only the failed action to have run
+    expect(result.current.state.count).toBe(10);
 
-      shouldFail = true;
-      await act(() => {
-        result.current.error?.runPendingActions();
-      });
+    shouldFail = true;
+    await act(() => {
+      result.current.error?.runPendingActions();
+    });
 
-      // Expect the queue to have halted after the second error
-      expect(result.current.state.count).toBe(11);
-      expect(result.current.error?.message).toBe('Error: Decrement error');
-      expect(result.current.error?.pendingActions).toHaveLength(2);
-      expect(result.current.error?.action.name).toBe('decrement');
-      expect(result.current.error?.action.args).toHaveLength(0);
+    // Expect the queue to have halted after the second error
+    expect(result.current.state.count).toBe(11);
+    expect(result.current.error?.message).toBe('Error: Decrement error');
+    expect(result.current.error?.pendingActions).toHaveLength(2);
+    expect(result.current.error?.action.name).toBe('decrement');
+    expect(result.current.error?.action.args).toHaveLength(0);
 
-      shouldFail = false;
-      await act(() => {
-        result.current.error?.runAllActions();
-      });
+    shouldFail = false;
+    await act(() => {
+      result.current.error?.runAllActions();
+    });
 
-      // Expect all pending actions to have run
-      expect(result.current.state.count).toBe(12);
-    }
+    // Expect all pending actions to have run
+    expect(result.current.state.count).toBe(12);
   });
 
   it('correctly types the state initialization process', () => {
@@ -288,9 +280,7 @@ describe('useAsyncReducer', () => {
     });
 
     if (
-      objectResult.current.isInitialized &&
       promiseResult.current.isInitialized &&
-      factoryResult.current.isInitialized &&
       asyncFactoryResult.current.isInitialized
     ) {
       expectTypeOf(objectResult.current.state).toEqualTypeOf<State>();

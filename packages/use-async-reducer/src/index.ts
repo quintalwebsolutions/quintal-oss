@@ -1,10 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+/** Represents a value that may or may not be a Promise */
 type MaybePromise<T> = T | Promise<T>;
-type InitialStateFactory<TState> =
-  | MaybePromise<TState>
-  | (() => MaybePromise<TState>);
 
+/** Convert from an initial state factory into the state type it generates */
+export type UnwrapInitialStateFactory<T> = T extends Promise<infer TState>
+  ? TState
+  : T extends () => Promise<infer TState>
+  ? TState
+  : T extends () => infer TState
+  ? TState
+  : T;
+
+/** Check whether or not the given MaybePromise is a Promise */
 function isPromise<T>(obj: MaybePromise<T>): obj is Promise<T> {
   return typeof obj !== 'string' && String(obj) === '[object Promise]';
 }
@@ -12,15 +20,26 @@ function isPromise<T>(obj: MaybePromise<T>): obj is Promise<T> {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- any is applicable here
 type Args = any[];
 
-type ActionState<TState> = { currentState: TState; initialState: TState };
+type ActionState<TState> = {
+  currentState: TState;
+  initialState: TState;
+};
 
-/** Object used to define the reducer's actions. The first argument is the current state and all following arguments are user-defined. */
+/**
+ * Object used to define the reducer's actions.
+ * The first argument is the current internal state,
+ * all following arguments are user-defined.
+ */
 export type InputActions<TState> = Record<
   string,
   (state: ActionState<TState>, ...args: Args) => MaybePromise<TState>
 >;
 
-/** Object used to consume the reducer's actions. The parameters are inferred from the input actions object, dropping the first argument (current state). */
+/**
+ * Object used to consume the reducer actions.
+ * The parameters are inferred from the input actions object,
+ * dropping the first argument (current internal state).
+ */
 export type OutputActions<TState, TActions extends InputActions<TState>> = {
   [TActionKey in keyof TActions]: (
     ...args: Parameters<TActions[TActionKey]> extends [
@@ -32,11 +51,11 @@ export type OutputActions<TState, TActions extends InputActions<TState>> = {
   ) => void;
 };
 
-/** Internal object that represents an action that is (pending to be) executed. */
+/** Internal object that represents an action that may be pending to be executed. */
 export type Action<TState> = {
   name: string;
-  execute: (...args: Args) => MaybePromise<TState>;
   args: Args;
+  execute: (...args: Args) => MaybePromise<TState>;
 };
 
 /** Object that returns an error that may have occurred during the execution of an action. */
@@ -49,45 +68,71 @@ export type Error<TState> = {
   runAllActions: () => void;
 };
 
-/** State object returned from hook */
-export type State<TState, TActions extends InputActions<TState>> = {
+type StateBase<TState, TActions extends InputActions<TState>> = {
   actions: OutputActions<TState, TActions>;
   isLoading: boolean;
   error: Error<TState> | null;
-} & ({ isInitialized: true; state: TState } | { isInitialized: false });
+};
+type StateInitialized<TState> = {
+  isInitialized: true;
+  state: TState;
+};
+type StateUninitialized = { isInitialized: false };
+
+/**
+ * State object returned from the hook.
+ * When the initial state is a `Promise` or a `() => Promise`,
+ * The returned state contains a check to see if the state object has initialized.
+ */
+export type UseAsyncReducerState<
+  TInitialStateFactory,
+  TActions extends InputActions<
+    UnwrapInitialStateFactory<TInitialStateFactory>
+  >,
+> = StateBase<UnwrapInitialStateFactory<TInitialStateFactory>, TActions> &
+  (
+    | StateInitialized<UnwrapInitialStateFactory<TInitialStateFactory>>
+    | (TInitialStateFactory extends Promise<unknown> | (() => Promise<unknown>)
+        ? StateUninitialized
+        : never)
+  );
 
 export function useAsyncReducer<
-  TState,
-  TActions extends InputActions<TState> = InputActions<TState>,
+  TInitialStateFactory,
+  TActions extends InputActions<
+    UnwrapInitialStateFactory<TInitialStateFactory>
+  >,
 >(
-  initialStateFactory: InitialStateFactory<TState>,
+  initialStateFactory: TInitialStateFactory,
   inputActions: TActions,
-): State<TState, TActions> {
+): UseAsyncReducerState<TInitialStateFactory, TActions> {
+  type TState = UnwrapInitialStateFactory<TInitialStateFactory>;
+
+  // Reduce `initialStateFactory` into something that is `MaybePromise<TState>`
   const initialStateMaybePromise: MaybePromise<TState> = useMemo(
     () =>
       typeof initialStateFactory === 'function'
         ? (initialStateFactory as () => MaybePromise<TState>)()
-        : initialStateFactory,
+        : (initialStateFactory as MaybePromise<TState>),
     [initialStateFactory],
   );
 
-  const initialState: TState | null = useMemo(
+  // Define the initial state on initial load, which is `null` if `initialStateMaybePromise` is a `Promise`
+  const initialState = useMemo(
     () =>
       isPromise(initialStateMaybePromise) ? null : initialStateMaybePromise,
     [],
   );
 
-  const [state, setState] = useState<TState | null>(initialState);
-  const [isInitialized, setIsInitialized] = useState<boolean>(
-    initialState !== null,
-  );
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [state, setState] = useState(initialState);
+  const [isInitialized, setIsInitialized] = useState(initialState !== null);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error<TState> | null>(null);
 
-  const initialStateRef = useRef<TState | null>(initialState);
-  const stateRef = useRef<TState | null>(initialState);
+  const initialStateRef = useRef(initialState);
+  const stateRef = useRef(initialState);
   const actionQueueRef = useRef<Action<TState>[]>([]);
-  const isLoadingRef = useRef<boolean>(false);
+  const isLoadingRef = useRef(false);
 
   /** Execute the next action from the queue */
   const popActionQueue = useCallback(() => {
@@ -161,9 +206,9 @@ export function useAsyncReducer<
   const actions = useMemo<OutputActions<TState, TActions>>(
     () =>
       Object.entries(inputActions).reduce(
-        (prev, [actionKey, execute]) => {
-          prev[actionKey as keyof TActions] = (...args) => {
-            const action: Action<TState> = { name: actionKey, execute, args };
+        (prev, [name, execute]) => {
+          prev[name as keyof TActions] = (...args) => {
+            const action: Action<TState> = { name, execute, args };
             pushToActionQueue(action);
           };
           return prev;
@@ -196,14 +241,12 @@ export function useAsyncReducer<
       });
   }, [initialStateMaybePromise]);
 
-  if (isInitialized)
-    return {
-      isInitialized,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- the `null` annotation only exists to represent an uninitialized state
-      state: state!,
-      actions,
-      isLoading,
-      error,
-    };
-  return { isInitialized, actions, isLoading, error };
+  return {
+    isInitialized,
+    state,
+    actions,
+    isLoading,
+    error,
+    // TODO fix lazy cast
+  } as UseAsyncReducerState<TInitialStateFactory, TActions>;
 }

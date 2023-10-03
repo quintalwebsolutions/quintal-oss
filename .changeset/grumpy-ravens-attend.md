@@ -1,6 +1,6 @@
 ---
 "@quintal/form-engine-react": patch
-"@quintal/config": patch
+"@quintal/use-async-reducer": patch
 ---
 
 Init package

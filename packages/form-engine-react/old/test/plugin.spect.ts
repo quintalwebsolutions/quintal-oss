@@ -1,21 +1,38 @@
-import type { ComponentProps } from 'react';
-import { describe, expectTypeOf, it } from 'vitest';
-import type { Plugin, PluginConfig, TextInputPlugin } from '../src';
+import { it, describe, expectTypeOf } from 'vitest';
+import type {
+  CheckPlugin,
+  NumberPlugin,
+  NumberValidation,
+  Plugin,
+  PluginObject,
+  StringValidation,
+  TextPlugin,
+  Validation,
+  Values,
+} from '../src';
+import type { MaybePromise } from '../src/lib/util';
+import type { SelectPlugin } from '../src/plugins/selectPlugin';
 
 describe('plugin', () => {
-  it('exposes a suite of built-in plugins', () => {
-    expectTypeOf<TextInputPlugin>().toMatchTypeOf<{
-      value: string;
+  it('Allows the user to create a plugin with an internal value type, and optionally the serialized value type and empty type', () => {
+    type Arbitrary = 'arbitrary';
+    type ArbitraryPlugin = Plugin<Arbitrary>;
+    expectTypeOf<ArbitraryPlugin>().toEqualTypeOf<{
+      internalValue: Arbitrary;
+      serializedValue: Arbitrary;
       emptyValue: null;
-      // validation: StringValidation;
-      validation: any;
-      options: {
-        placeholder?: string;
-      };
-      props: {
-        input: ComponentProps<'input'>;
-        label: ComponentProps<'label'>;
-      };
+      validation: Record<string, never>;
+      options: Record<string, never>;
+      internalOptions: Record<string, never>;
+    }>();
+
+    expectTypeOf<TextPlugin>().toEqualTypeOf<{
+      internalValue: string;
+      serializedValue: string;
+      emptyValue: null;
+      validation: StringValidation;
+      options: { placeholder?: string | undefined };
+      internalOptions: Record<string, never>;
     }>();
 
     expectTypeOf<NumberPlugin>().toEqualTypeOf<{
@@ -44,6 +61,17 @@ describe('plugin', () => {
       validation: Record<string, never>;
       options: { placeholder?: string | undefined };
       internalOptions: { options: { value: string; label?: string }[] };
+    }>();
+
+    type ArbitraryPluginObject = PluginObject<ArbitraryPlugin>;
+    expectTypeOf<ArbitraryPluginObject>().toEqualTypeOf<{
+      emptyValue?: null;
+      parse?: (value: Arbitrary) => Arbitrary | null;
+      serialize: (value: Arbitrary | null) => Arbitrary;
+      validate?: (
+        value: Arbitrary | null,
+        validation: Validation<ArbitraryPlugin, Values>,
+      ) => MaybePromise<string[]>;
     }>();
 
     type TextPluginObject = PluginObject<TextPlugin>;
@@ -88,25 +116,6 @@ describe('plugin', () => {
         value: string | null,
         validation: Validation<SelectPlugin, Values>,
       ) => MaybePromise<string[]>;
-    }>();
-  });
-
-  it('allows the user to define a custom plugin with sensible defaults', () => {
-    type Arbitrary = 'arbitrary';
-    type ArbitraryPlugin = Plugin<Arbitrary>;
-    type ArbitraryPluginConfig = PluginConfig<ArbitraryPlugin>;
-
-    expectTypeOf<ArbitraryPlugin>().toEqualTypeOf<{
-      value: 'arbitrary';
-      emptyValue: null;
-      validation: Record<string, never>;
-      options: Record<string, never>;
-      props: Record<string, never>;
-    }>();
-
-    expectTypeOf<ArbitraryPluginConfig>().toEqualTypeOf<{
-      emptyValue?: null;
-      getProps?: (fieldState, actions) => Record<string, never>;
     }>();
   });
 });

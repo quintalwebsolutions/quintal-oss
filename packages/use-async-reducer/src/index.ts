@@ -247,6 +247,6 @@ export function useAsyncReducer<
     actions,
     isLoading,
     error,
-    // TODO fix lazy cast
+    // TODO fix this lazy cast
   } as UseAsyncReducerState<TInitialStateFactory, TActions>;
 }

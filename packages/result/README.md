@@ -72,3 +72,6 @@ Not only did we, with a very minor code overhead, make the first code snippet a
 lot safer (we anticipate that the database may throw an unexpected error), we
 don't disrupt the control flow by explicitly throwing an error, making for more
 performant code.
+
+An added benefit is that the result type is serializable, so it can be used in
+client-server communication aswell!

@@ -16,12 +16,12 @@ export type DefinePluginArgs<TPluginArgs extends PluginArgs> = TPluginArgs;
 type GetKey<
   TPluginArgs extends PluginArgs,
   TKey extends keyof TPluginArgs,
-  TIfFalse = Record<string, never>,
+  TDefault = Record<string, never>,
 > = TKey extends keyof TPluginArgs
   ? string extends keyof TPluginArgs
-    ? TIfFalse
+    ? TDefault
     : TPluginArgs[TKey]
-  : TIfFalse;
+  : TDefault;
 
 export type Plugin<
   TValue,

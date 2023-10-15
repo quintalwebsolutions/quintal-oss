@@ -1,9 +1,20 @@
 # @quintal/form-engine-react
 
+## Roadmap
+
+- Support for popular schema validation libraries:
+  - [Valibot](https://github.com/fabian-hiller/valibot)
+  - [Zod](https://zod.dev/)
+  - [Ajv.JS](https://ajv.js.org/)
+  - [Joi](https://joi.dev/)
+  - [Yup](https://github.com/jquense/yup)
+
+## Paradigms
+
 This form engine supports multiple form use cases and applies them intelligently
 when and where necessary, even mixing paradigms within the same form.
 
-## Tracked, Controlled Form Elements
+### Tracked, Controlled Form Elements
 
 Form elements that have a `value` and `onChange` prop to capture changes and
 keep the field value in sync with the internal state.
@@ -18,7 +29,7 @@ You are opted into this paradigm when you pass a `transform` function
 configuration option to a form field, since this is the only reason you would
 want to use this paradigm.
 
-## Tracked, Uncontrolled Form Elements
+### Tracked, Uncontrolled Form Elements
 
 Form elements that have an `onChange` prop, but no `value` prop. Their value is
 tracked, but it cannot be programmatically updated.
@@ -30,14 +41,14 @@ tracked, but it cannot be programmatically updated.
 
 This is the default paradigm.
 
-## Untracked, Uncontrolled Form Elements
+### Untracked, Uncontrolled Form Elements
 
 Form elements that have neither an `onChange`, nor a `value` prop. They are
-completely at the mercy of the html gods.
+completely at the mercy of the HTML gods.
 
 - Pros: An input is only rendered once, and it enables progressive enhancement
-  if the entire form is untracked & uncontrolled, doesn't affect the rest of the
-  form.
+  if the entire form is untracked & uncontrolled. Editing a form input doesn't
+  affect the rest of the form.
 - Cons: Can only validate after a server round trip, no way to programmatically
   react to the input value changing.
 

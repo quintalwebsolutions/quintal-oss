@@ -11,14 +11,6 @@ const fileName = {
 const formats = Object.keys(fileName);
 
 module.exports = defineConfig({
-  define: {
-    __REACT_DEVTOOLS_GLOBAL_HOOK__: {
-      supportsFiber: true,
-      inject() {},
-      onCommitFiberRoot() {},
-      onCommitFiberUnmount() {},
-    },
-  },
   build: {
     lib: {
       entry: resolve(process.cwd(), 'src', 'index.ts'),

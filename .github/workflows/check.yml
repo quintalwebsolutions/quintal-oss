@@ -11,8 +11,8 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Branch
-        uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Setup
         uses: ./.github/actions/setup

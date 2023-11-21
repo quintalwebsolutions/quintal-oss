@@ -16,7 +16,6 @@ export function resultWrap<T>(func: () => T): Result<T, unknown> {
     const value = func();
     return ok(value);
   } catch (e) {
-    // console.error(e);
     return err(e);
   }
 }
@@ -28,7 +27,22 @@ export async function asyncResultWrap<T>(
     const value = await func();
     return ok(value);
   } catch (e) {
-    // console.error(e);
     return err(e);
   }
+}
+
+export function runResult<T1, T2, E1, E2>(
+  result: Result<T1, E1>,
+  run: (value: T1) => Result<T2, E2>,
+): Result<T2, E1 | E2> {
+  if (!result.ok) return result;
+  return run(result.value);
+}
+
+export async function asyncRunResult<T1, T2, E1, E2>(
+  result: Result<T1, E1>,
+  run: (value: T1) => AsyncResult<T2, E2>,
+): AsyncResult<T2, E1 | E2> {
+  if (!result.ok) return result;
+  return run(result.value);
 }

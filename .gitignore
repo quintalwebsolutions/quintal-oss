@@ -3,8 +3,9 @@ node_modules
 
 # Testing
 .coverage
+.coverage-ts
 
-# Build
+# Build output
 dist
 
 # Logs

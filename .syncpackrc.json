@@ -1,0 +1,43 @@
+{
+  "$schema": "https://unpkg.com/syncpack@11.2.1/dist/schema.json",
+  "customTypes": {},
+  "dependencyTypes": ["dev", "prod"],
+  "filter": ".",
+  "indent": "  ",
+  "semverGroups": [],
+  "semverRange": "",
+  "sortAz": [
+    "contributors",
+    "dependencies",
+    "devDependencies",
+    "keywords",
+    "peerDependencies",
+    "resolutions",
+    "scripts"
+  ],
+  "sortFirst": [
+    "name",
+    "description",
+    "version",
+    "author",
+    "main",
+    "module",
+    "types",
+    "files",
+    "scripts",
+    "engines",
+    "packageManager",
+    "peerDependencies",
+    "dependencies",
+    "devDependencies"
+  ],
+  "source": ["package.json", "packages/*/package.json"],
+  "versionGroups": [
+    {
+      "label": "Internal",
+      "packages": ["**"],
+      "dependencies": ["@quintal/*"],
+      "pinVersion": "workspace:*"
+    }
+  ]
+}

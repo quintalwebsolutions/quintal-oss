@@ -13,6 +13,9 @@ module.exports = {
   rules: {
     '@typescript-eslint/consistent-type-definitions': ['warn', 'type'],
     'prefer-named-capture-group': 'off',
+    '@typescript-eslint/naming-convention': 'off', // TODO check how to configure this
+    '@typescript-eslint/prefer-reduce-type-parameter': 'off', // TODO check if this is justified, reduce is just weird
+    '@typescript-eslint/no-confusing-void-expression': 'off',
     'unicorn/filename-case': [
       'error',
       {

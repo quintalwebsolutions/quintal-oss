@@ -2,29 +2,40 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Base",
   "compilerOptions": {
-    "strict": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": false,
     "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
     "noImplicitReturns": true,
-    "noPropertyAccessFromIndexSignature": true,
+    "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "strict": true,
 
     "baseUrl": ".",
     "module": "ESNext",
     "moduleResolution": "Node",
     "paths": {
-      "@/*": ["src/*"]
+      "@": ["./src"],
+      "@/*": ["./src/*"]
     },
     "resolveJsonModule": true,
     "rootDir": ".",
 
+    "declaration": true,
+    "declarationMap": true,
     "downlevelIteration": true,
-    "noEmit": true,
+    "importHelpers": true,
+    "newLine": "lf",
+    "noEmit": false,
+    "outDir": "./dist",
+    "removeComments": false,
+    "sourceMap": true,
 
     "allowJs": false,
+    "checkJs": false,
 
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -32,11 +43,16 @@
     "isolatedModules": true,
 
     "jsx": "react-jsx",
-    "target": "es2015",
+    "lib": ["ES6"],
+    "target": "ES6",
+    "useDefineForClassFields": true,
+
+    "composite": false,
 
     "noErrorTruncation": true,
 
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "preserveWatchOutput": true
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]

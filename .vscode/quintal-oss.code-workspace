@@ -25,12 +25,21 @@
     "recommendations": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
   },
   "settings": {
+    "search.exclude": {
+      "**/node_modules": true,
+      "pnpm-lock.yaml": true,
+      "**/dist": true,
+      "**/.coverage": true,
+      "**/.next": true,
+      "**/.turbo": true
+    },
     "colorize.languages": [
       "javascript",
       "javascriptreact",
       "typescript",
       "typescriptreact"
     ],
+    "npm.packageManager": "pnpm",
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": true
     },

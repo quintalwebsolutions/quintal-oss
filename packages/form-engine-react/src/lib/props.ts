@@ -1,4 +1,9 @@
-import type { ComponentProps, JSXElementConstructor } from 'react';
+import type {
+  ComponentProps,
+  FormEventHandler,
+  JSXElementConstructor,
+  ReactNode,
+} from 'react';
 
 type ToggleAutoComplete = 'off' | 'on';
 
@@ -116,12 +121,51 @@ export type DefineComponentProps<
   TProps extends ComponentProps<TComponent>,
 > = TProps;
 
+export type FormProps = DefineComponentProps<
+  'form',
+  {
+    id: string;
+    name: string;
+    autoComplete: ToggleAutoComplete;
+    children: ReactNode;
+  } & (
+    | {
+        onSubmit: FormEventHandler<HTMLFormElement>;
+        onReset: FormEventHandler<HTMLFormElement>;
+        action?: never;
+      }
+    | {
+        onSubmit?: never;
+        onReset?: never;
+        // TODO fix action typing
+        // action: (formData: FormData) => void;
+        action: string;
+      }
+  )
+>;
+
+export type ButtonProps = DefineComponentProps<
+  'button',
+  {
+    disabled: boolean;
+    form: string;
+    type: 'submit' | 'reset' | 'button';
+    children: string;
+  }
+>;
+
 export type LabelProps = DefineComponentProps<
   'label',
-  { htmlFor: string; children: string }
+  {
+    htmlFor: string;
+    children: string;
+  }
 >;
 
 export type DescriptionProps = DefineComponentProps<
   'p',
-  { id: string; children: string }
+  {
+    id: string;
+    children: string;
+  }
 >;

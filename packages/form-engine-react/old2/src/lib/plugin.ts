@@ -1,4 +1,4 @@
-import type { AnyFields } from './fields';
+import type { AnyFields } from '../../../src/lib/fields';
 
 type PluginArgs = {
   /** Optional: How an empty value should be represented. Default: `null` */

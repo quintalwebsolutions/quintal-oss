@@ -1,4 +1,4 @@
-import type { AnyPlugin } from './plugin';
+import type { AnyPlugin } from '../../old2/src/lib/plugin';
 
 type TaggedValue<TValue = unknown, TTag extends string = string> = {
   value: TValue;

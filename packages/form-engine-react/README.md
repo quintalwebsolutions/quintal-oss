@@ -3,8 +3,8 @@
 ## Roadmap
 
 - Support for popular schema validation libraries:
-  - [Valibot](https://github.com/fabian-hiller/valibot)
   - [Zod](https://zod.dev/)
+  - [Valibot](https://github.com/fabian-hiller/valibot)
   - [Ajv.JS](https://ajv.js.org/)
   - [Joi](https://joi.dev/)
   - [Yup](https://github.com/jquense/yup)
@@ -12,7 +12,7 @@
 ## Paradigms
 
 This form engine supports multiple form use cases and applies them intelligently
-when and where necessary, even mixing paradigms within the same form.
+when and where necessary, even allowing to mix paradigms within the same form.
 
 ### Tracked, Controlled Form Elements
 
@@ -51,6 +51,3 @@ completely at the mercy of the HTML gods.
   affect the rest of the form.
 - Cons: Can only validate after a server round trip, no way to programmatically
   react to the input value changing.
-
-> NOTE: As of writing, right now this paradigm is not yet supported. We are
-> working towards supporting it in the near future.

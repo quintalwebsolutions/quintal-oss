@@ -13,7 +13,3 @@ dist
 
 # Turbo
 .turbo
-
-# Misc
-.DS_Store
-.idea

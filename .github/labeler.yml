@@ -1,8 +1,8 @@
-@quintal/result:
-  - packages/result/*
-
-@quintal/config:
+"@quintal/config":
   - packages/config/*
 
-@quintal/table-engine:
+"@quintal/result":
+  - packages/result/*
+
+"@quintal/table-engine":
   - packages/table-engine/*

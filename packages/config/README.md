@@ -35,5 +35,5 @@ export default defineConfig({
 });
 ```
 
-Then simply run the `quintal-config generate` command on postinstall, and you
-don't have to worry about configuration ever again.
+Then run the `quintal-config generate` command on postinstall, and you don't
+have to worry about configuration ever again.

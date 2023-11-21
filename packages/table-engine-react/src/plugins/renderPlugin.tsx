@@ -159,7 +159,7 @@ export function renderPlugin<TRow extends Row, TPlugins extends Plugins>(
     transformTable: (table) => {
       const renderTable = options.renderTable ?? defaultRenderTable;
       // FIXME
-      // @ts-expect-error This errors for some reason. Replacing RenderTableFunc with:
+      // This errors for some reason. Replacing RenderTableFunc with:
       // type RenderTableFunc<TRow extends Row, TPlugins extends Plugins> = RenderFunc<
       //   TableBase<TRow, RenderPluginArgs<TRow, TPlugins>> & Table<TRow, TPlugins>
       // >;

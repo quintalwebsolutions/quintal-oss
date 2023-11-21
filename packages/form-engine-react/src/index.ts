@@ -1,3 +1,3 @@
-export * from './lib';
-export * from './hooks';
-export * from './plugins';
+export function createForm(): void {}
+
+export function useForm(): void {}

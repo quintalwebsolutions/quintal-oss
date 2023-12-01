@@ -1,7 +1,7 @@
 # @quintal/environment
 
-## 0.0.1
+## 0.1.0
 
-### Patch Changes
+### Minor Changes
 
 - a9eac34: Init package

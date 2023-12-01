@@ -12,7 +12,8 @@ import type {
   PluginArray,
   Row,
   Plugins,
- SetStateFromPlugins } from '../types';
+  SetStateFromPlugins,
+} from '../types';
 import { applyPlugins, getEntries } from './util';
 
 export function makeHead<TRow extends Row, TPlugins extends Plugins>(

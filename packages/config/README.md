@@ -35,5 +35,7 @@ export default defineConfig({
 });
 ```
 
-Then simply run the `quintal-config generate` command on postinstall, and you
-don't have to worry about configuration ever again.
+After creating this config file, you can run the `quintal-config install`
+command to install all packages required to use the packages defined in your
+config file. Then run the `quintal-config generate` command on postinstall, and
+you never have to worry about configuration again.

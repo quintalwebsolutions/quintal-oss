@@ -1,14 +1,7 @@
 import type { ReactElement } from 'react';
 import { describe, expectTypeOf, it, vi } from 'vitest';
-import type {
-  P,
-  PaginationPlugin,
-  RenderPlugin} from '../src';
-import {
-  makeTable,
-  paginationPlugin,
-  renderPlugin
-} from '../src';
+import type { P, PaginationPlugin, RenderPlugin } from '../src';
+import { makeTable, paginationPlugin, renderPlugin } from '../src';
 
 describe('plugin', () => {
   it('combines the outputs of multiple plugins', () => {

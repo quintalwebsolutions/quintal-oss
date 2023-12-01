@@ -23,9 +23,8 @@
 //   resetButton?: ButtonConfig;
 // };
 
-export function useForm(
+export function useForm(): null {
   // config: Config,
-): null {
   // console.log(config);
   return null;
 }

@@ -72,6 +72,33 @@ importers:
         specifier: 3.6.4
         version: 3.6.4(typescript@5.3.2)(vite@5.0.4)
 
+  packages/environment:
+    devDependencies:
+      '@quintal/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: 20.9.3
+        version: 20.9.3
+      '@vitest/coverage-v8':
+        specifier: 0.34.6
+        version: 0.34.6(vitest@0.34.6)
+      happy-dom:
+        specifier: 12.10.3
+        version: 12.10.3
+      typescript:
+        specifier: 5.3.2
+        version: 5.3.2
+      vite:
+        specifier: 5.0.1
+        version: 5.0.1(@types/node@20.9.3)
+      vitest:
+        specifier: 0.34.6
+        version: 0.34.6(happy-dom@12.10.3)
+      zod:
+        specifier: 3.22.4
+        version: 3.22.4
+
   packages/form-engine-react:
     devDependencies:
       '@quintal/config':
@@ -6282,3 +6309,7 @@ packages:
     optionalDependencies:
       commander: 9.5.0
     dev: false
+
+  /zod@3.22.4:
+    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
+    dev: true

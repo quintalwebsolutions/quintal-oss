@@ -43,7 +43,7 @@
     "isolatedModules": true,
 
     "jsx": "react-jsx",
-    "lib": ["ES6"],
+    "lib": ["DOM", "ES6"],
     "target": "ES6",
     "useDefineForClassFields": true,
 

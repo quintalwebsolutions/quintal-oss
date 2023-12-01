@@ -19,6 +19,10 @@
     {
       "name": "@quintal/result",
       "path": "../packages/result"
+    },
+    {
+      "name": "@quintal/environment",
+      "path": "../packages/environment"
     }
   ],
   "extensions": {

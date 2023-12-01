@@ -15,15 +15,19 @@
     "lint:fix": "pnpm lint:check --fix"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "6.12.0",
-    "@typescript-eslint/parser": "6.12.0",
+    "@typescript-eslint/eslint-plugin": "6.13.1",
+    "@typescript-eslint/parser": "6.13.1",
     "@vercel/style-guide": "5.1.0",
     "@vitejs/plugin-react": "4.2.0",
     "eslint": "8.54.0",
+    "eslint-config-next": "14.0.3",
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-prettier": "5.0.1",
+    "eslint-plugin-tailwindcss": "3.13.0",
+    "next": "14.0.3",
     "prettier": "3.1.0",
     "prettier-plugin-packagejson": "2.4.6",
-    "vite-plugin-dts": "3.6.3"
+    "react": "18.2.0",
+    "vite-plugin-dts": "3.6.4"
   }
 }

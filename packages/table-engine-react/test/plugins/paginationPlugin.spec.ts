@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { P , PaginationPlugin} from '../../src';
-import { makeTable , paginationPlugin } from '../../src';
+import type { P, PaginationPlugin } from '../../src';
+import { makeTable, paginationPlugin } from '../../src';
 
 type Row = { count: number };
 type Plugin = P<PaginationPlugin<Row>>;
@@ -74,12 +74,18 @@ describe('paginationPlugin', () => {
     expect(setState).toHaveBeenCalledTimes(3);
     table.pagination.setNextPage();
     expect(setState).toHaveBeenCalledTimes(4);
-    expect((): void => { table.pagination.setPrevPage(); }).toThrow();
+    expect((): void => {
+      table.pagination.setPrevPage();
+    }).toThrow();
     expect(setState).toHaveBeenCalledTimes(4);
     table.pagination.setPage(4);
     expect(setState).toHaveBeenCalledTimes(5);
-    expect((): void => { table.pagination.setPage(-1); }).toThrow();
-    expect((): void => { table.pagination.setPage(10); }).toThrow();
+    expect((): void => {
+      table.pagination.setPage(-1);
+    }).toThrow();
+    expect((): void => {
+      table.pagination.setPage(10);
+    }).toThrow();
     expect(setState).toHaveBeenCalledTimes(5);
   });
 

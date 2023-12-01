@@ -6,11 +6,13 @@ module.exports = {
   extends: [
     '@vercel/style-guide/eslint/node',
     '@vercel/style-guide/eslint/typescript',
-  ].map(require.resolve).concat([
-    'next/core-web-vitals',
-    'plugin:tailwindcss/recommended',
-    'plugin:prettier/recommended',
-  ]),
+  ]
+    .map(require.resolve)
+    .concat([
+      'next/core-web-vitals',
+      'plugin:tailwindcss/recommended',
+      'plugin:prettier/recommended',
+    ]),
   parserOptions: {
     project,
   },

@@ -1,15 +1,7 @@
 import type { ReactElement } from 'react';
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
-import type {
-  P,
-  PaginationPlugin,
-  Plugins,
-  RenderPlugin} from '../../src';
-import {
-  makeTable,
-  paginationPlugin,
-  renderPlugin
-} from '../../src';
+import type { P, PaginationPlugin, Plugins, RenderPlugin } from '../../src';
+import { makeTable, paginationPlugin, renderPlugin } from '../../src';
 
 type RenderFunction = () => ReactElement | null;
 

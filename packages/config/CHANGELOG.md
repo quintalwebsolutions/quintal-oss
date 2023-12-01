@@ -1,5 +1,11 @@
 # @quintal/config
 
+## 0.2.0
+
+### Minor Changes
+
+- d4da40a: Init package
+
 ## 0.1.1
 
 ### Patch Changes

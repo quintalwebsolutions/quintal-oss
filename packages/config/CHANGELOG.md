@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- d4da40a: Init package
+- d4da40a: Add tsconfig "DOM" to lib
 
 ## 0.1.1
 

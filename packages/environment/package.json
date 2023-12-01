@@ -16,6 +16,9 @@
     "lint:types": "tsc",
     "test": "vitest"
   },
+  "peerDependencies": {
+    "zod": "^3.22.4"
+  },
   "devDependencies": {
     "@quintal/config": "workspace:*",
     "@types/node": "20.9.3",

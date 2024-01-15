@@ -4,8 +4,8 @@ const dts = require('vite-plugin-dts');
 const react = require('@vitejs/plugin-react');
 
 const fileName = {
-  es: `index.mjs`,
-  cjs: `index.cjs`,
+  es: 'index.mjs',
+  cjs: 'index.cjs',
 };
 
 const formats = Object.keys(fileName);

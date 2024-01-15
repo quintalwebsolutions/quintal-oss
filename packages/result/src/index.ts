@@ -5,7 +5,7 @@ type IsOk<TOk extends boolean, TTrue, TFalse> = TOk extends true
     : never;
 
 /** A type that represents either success or failure */
-type ResultConstructor<TOk extends boolean, T, E> = {
+export type ResultConstructor<TOk extends boolean, T, E> = {
   /**
    * TODO implement these functions
    * - ok: Converts from `Result<T, E>` to `Option<T>`, discarding the error, if any.
@@ -21,21 +21,49 @@ type ResultConstructor<TOk extends boolean, T, E> = {
    * Is `true` if the result is `ok`.
    *
    * This property can be used to type-narrow the result value.
+   *
+   * @example
+   * // `r.unwrap()` is of type `boolean`, `r.unwrapErr()` is of type `unknown`
+   * const r = result(() => true);
+   *
+   * if (r.isOk) {
+   *   // `r.unwrap()` is of type `boolean`, `r.unwrapErr()` is of type `never`
+   * } else {
+   *   // `r.unwrap()` is of type `never`, `r.unwrapErr()` is of type `unknown`
+   * }
    */
   isOk: TOk;
   /**
    * Is `true` if the result is `err`.
    *
    * This property can be used to type-narrow the result value.
+   *
+   * @example
+   * // `r.unwrap()` is of type `boolean`, `r.unwrapErr()` is of type `unknown`
+   * const r = result(() => true);
+   *
+   * if (r.isErr) {
+   *   // `r.unwrap()` is of type `never`, `r.unwrapErr()` is of type `unknown`
+   * } else {
+   *   // `r.unwrap()` is of type `boolean`, `r.unwrapErr()` is of type `never`
+   * }
    */
   isErr: IsOk<TOk, false, true>;
 
   /**
    * Calls the provided closure with a reference to the contained value (if `ok`).
+   *
+   * @example
+   * ok(42).inspect((value) => console.log(value)); // logs "42" to the console
+   * err('error').inspect((value) => console.log(value)); // Doesn't log anything
    */
   inspect: (fn: (value: T) => void) => ResultConstructor<TOk, T, E>;
   /**
    * Calls the provided closure with a reference to the contained error (if `err`).
+   *
+   * @example
+   * ok(42).inspectErr((value) => console.log(value)); // Doesn't log anything
+   * err('error').inspectErr((value) => console.log(value)); // Logs "error" to the console
    */
   inspectErr: (fn: (error: E) => void) => ResultConstructor<TOk, T, E>;
 
@@ -46,23 +74,23 @@ type ResultConstructor<TOk extends boolean, T, E> = {
    *
    * @example
    * const x = ok(2);
-   * const y = err("late error");
-   * expect(x.and(y)).toBe(err("late error"));
+   * const y = err('late error');
+   * expect(x.and(y)).toBe(err('late error'));
    *
    * @example
-   * const x = err("early error");
-   * const y = ok("foo");
-   * expect(x.and(y)).toBe(err("early error"));
+   * const x = err('early error');
+   * const y = ok('foo');
+   * expect(x.and(y)).toBe(err('early error'));
    *
    * @example
-   * const x = err("not a 2");
-   * const y = err("late error");
-   * expect(x.and(y)).toBe(err("not a 2"));
+   * const x = err('not a 2');
+   * const y = err('late error');
+   * expect(x.and(y)).toBe(err('not a 2'));
    *
    * @example
    * const x = ok(2);
-   * const y = ok("different result type");
-   * expect(x.and(y)).toBe(ok("different result type"));
+   * const y = ok('different result type');
+   * expect(x.and(y)).toBe(ok('different result type'));
    */
   and: <U>(res: Result<U, E>) => Result<U, E>;
   /**
@@ -71,10 +99,10 @@ type ResultConstructor<TOk extends boolean, T, E> = {
    * This function can be used for control flow based on Result values.
    *
    * @example
-   * const s = (x: number) => x === 42 ? err("bad number") : ok(x * x);
+   * const s = (x: number) => x === 42 ? err('bad number') : ok(x * x);
    * expect(ok(2)).andThen(s)).toBe(ok(4));
-   * expect(ok(42).andThen(s)).toBe(err("bad number"));
-   * expect(err("not a number").andThen(s)).toBe(err("not a number"));
+   * expect(ok(42).andThen(s)).toBe(err('bad number'));
+   * expect(err('not a number').andThen(s)).toBe(err('not a number'));
    */
   andThen: <U>(fn: (value: T) => Result<U, E>) => Result<U, E>;
   /**
@@ -84,18 +112,18 @@ type ResultConstructor<TOk extends boolean, T, E> = {
    *
    * @example
    * const x = ok(2);
-   * const y = err("late error");
+   * const y = err('late error');
    * expect(x.or(y)).toBe(ok(2));
    *
    * @example
-   * const x = err("early error");
+   * const x = err('early error');
    * const y = ok(2);
    * expect(x.or(y)).toBe(ok(2));
    *
    * @example
-   * const x = err("not a 2");
-   * const y = err("late error");
-   * expect(x.or(y)).toBe(err("late error"));
+   * const x = err('not a 2');
+   * const y = err('late error');
+   * expect(x.or(y)).toBe(err('late error'));
    *
    * @example
    * const x = ok(2);

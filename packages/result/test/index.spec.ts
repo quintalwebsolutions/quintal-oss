@@ -128,34 +128,33 @@ describe('Result', () => {
 
   it('Allows to inspect the value in the result', () => {
     const mockFn = vi.fn();
-    
+
     ok(42).inspect((v) => {
       expectTypeOf(v).toEqualTypeOf<number>();
       expect(v).toBe(42);
-      mockFn()
+      mockFn();
     });
-    expect(mockFn).toHaveBeenCalledTimes(1)
-    
-    
+    expect(mockFn).toHaveBeenCalledTimes(1);
+
     ok(42).inspectErr((v) => {
       expectTypeOf(v).toEqualTypeOf<never>();
       mockFn();
-    })
-    expect(mockFn).toHaveBeenCalledTimes(1)
-    
+    });
+    expect(mockFn).toHaveBeenCalledTimes(1);
+
     err('error' as const).inspect((v) => {
       expectTypeOf(v).toEqualTypeOf<never>();
       mockFn();
-    })
+    });
     expect(mockFn).toHaveBeenCalledTimes(1);
-    
+
     err('error' as const).inspectErr((v) => {
       expectTypeOf(v).toEqualTypeOf<'error'>();
       expect(v).toBe('error');
       mockFn();
-    })
+    });
     expect(mockFn).toHaveBeenCalledTimes(2);
-  })
+  });
 
   it('Maps a result by applying a function to a contained ok value, leaving an err value untouched', () => {
     const okValue = ok(42).map((v) => {

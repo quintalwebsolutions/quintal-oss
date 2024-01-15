@@ -1,1 +1,9 @@
-module.exports = require('@quintal/config/vite');
+const recommended = require('@quintal/config/vite');
+
+module.exports = {
+  ...recommended,
+  build: {
+    ...recommended.build,
+    outDir: '.dist',
+  },
+};

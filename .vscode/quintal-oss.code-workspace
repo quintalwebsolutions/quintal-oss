@@ -21,17 +21,20 @@
       "path": "../packages/result"
     },
     {
+      "name": "@quintal/option",
+      "path": "../packages/option"
+    },
+    {
       "name": "@quintal/environment",
       "path": "../packages/environment"
     }
   ],
   "extensions": {
-    "recommendations": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+    "recommendations": ["biomejs.biome"]
   },
   "settings": {
     "search.exclude": {
       "**/node_modules": true,
-      "pnpm-lock.yaml": true,
       "**/dist": true,
       "**/.coverage": true,
       "**/.next": true,
@@ -44,8 +47,10 @@
       "typescriptreact"
     ],
     "npm.packageManager": "pnpm",
+    "editor.defaultFormatter": "biomejs.biome",
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+      "source.organizeImports.biome": "explicit",
+      "quickfix.biome": "explicit"
     },
     "typescript.tsdk": "node_modules/typescript/lib",
     "typescript.enablePromptUseWorkspaceTsdk": true

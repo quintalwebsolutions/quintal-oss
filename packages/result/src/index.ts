@@ -1,48 +1,55 @@
-export type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
-export type AsyncResult<T, E> = Promise<Result<T, E>>;
+type IsOk<TOk extends boolean, TTrue, TFalse> = TOk extends true
+  ? TTrue
+  : TOk extends false
+    ? TFalse
+    : never;
 
-export function ok<T>(value: T): Result<T, never>;
-export function ok(): Result<void, never>;
-export function ok<T>(value?: T): Result<T | undefined, never> {
-  return { ok: true, value };
+/** A type that represents either success or failure */
+type ResultConstructor<TOk extends boolean, T, E> = {
+  /** Is `true` if the result is `ok` */
+  isOk: TOk;
+  /** Is `true` if the result is `err` */
+  isErr: IsOk<TOk, false, true>;
+  /**
+   * Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `ok` value, leaving an `err` value untouched.
+   */
+  map: <U>(fn: (val: T) => U) => IsOk<TOk, OkResult<U>, ErrResult<E>>;
+  /**
+   * Returns the contained `ok` value, or throws the value if it is an `err`.
+   * * Because this function may throw, it is generally discouraged. Instead, prefer to use `unwrapOr`.
+   */
+  unwrap: () => T;
+};
+
+export type OkResult<T> = ResultConstructor<true, T, never>;
+export type ErrResult<E> = ResultConstructor<false, never, E>;
+export type Result<T, E> = OkResult<T> | ErrResult<E>;
+
+export function ok<T>(value: T): OkResult<T> {
+  return {
+    isOk: true,
+    isErr: false,
+    map: (fn) => ok(fn(value)),
+    unwrap: () => value,
+  };
 }
 
-export function err<E>(error: E): Result<never, E> {
-  return { ok: false, error };
+export function err<E>(error: E): ErrResult<E> {
+  return {
+    isOk: false,
+    isErr: true,
+    map: () => err(error),
+    unwrap: () => {
+      throw error;
+    },
+  };
 }
 
-export function resultWrap<T>(func: () => T): Result<T, unknown> {
+export function result<T>(fn: () => T): Result<T, unknown> {
   try {
-    const value = func();
+    const value = fn();
     return ok(value);
   } catch (e) {
     return err(e);
   }
-}
-
-export async function asyncResultWrap<T>(
-  func: () => Promise<T>,
-): AsyncResult<T, unknown> {
-  try {
-    const value = await func();
-    return ok(value);
-  } catch (e) {
-    return err(e);
-  }
-}
-
-export function runResult<T1, T2, E1, E2>(
-  result: Result<T1, E1>,
-  run: (value: T1) => Result<T2, E2>,
-): Result<T2, E1 | E2> {
-  if (!result.ok) return result;
-  return run(result.value);
-}
-
-export async function asyncRunResult<T1, T2, E1, E2>(
-  result: Result<T1, E1>,
-  run: (value: T1) => AsyncResult<T2, E2>,
-): AsyncResult<T2, E1 | E2> {
-  if (!result.ok) return result;
-  return run(result.value);
 }

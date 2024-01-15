@@ -8,13 +8,15 @@
     "build": "run-s build:*",
     "build:clean": "shx rm -rf dist",
     "build:code": "vite build",
-    "clean": "shx rm -rf .coverage .coverage-ts .turbo dist node_modules",
+    "clean": "shx rm -rf .config .coverage .coverage-ts .turbo dist node_modules",
     "dev": "vitest --watch",
     "lint": "pnpm lint:fix && pnpm lint:types",
-    "lint:check": "eslint .",
-    "lint:fix": "pnpm lint:check --fix",
-    "lint:types": "tsc",
-    "test": "vitest"
+    "lint:check": "biome ci .",
+    "lint:fix": "biome check --apply-unsafe .",
+    "lint:types": "tsc --noEmit",
+    "test": "run-p test:*",
+    "test:source": "vitest",
+    "test:types": "typescript-coverage-report --outputDir .coverage-ts --strict"
   },
   "devDependencies": {
     "@quintal/config": "workspace:*",

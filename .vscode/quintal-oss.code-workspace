@@ -34,9 +34,11 @@
   },
   "settings": {
     "search.exclude": {
+      "pnpm-lock.yaml": true,
       "**/node_modules": true,
-      "**/dist": true,
       "**/.coverage": true,
+      "**/.coverage-ts": true,
+      "**/.dist": true,
       "**/.next": true,
       "**/.turbo": true
     },

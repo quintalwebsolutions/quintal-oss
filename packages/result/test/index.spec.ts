@@ -41,18 +41,27 @@ describe('Result', () => {
 
   it('Allows to type-narrow a generic result type', () => {
     const unknownResult = result(noThrowSync);
-    expectTypeOf<ReturnType<typeof unknownResult.map>>()
-      .toHaveProperty('isOk')
-      .toEqualTypeOf<boolean>();
+    expectTypeOf<
+      ReturnType<typeof unknownResult.unwrap>
+    >().toEqualTypeOf<boolean>();
+    expectTypeOf<
+      ReturnType<typeof unknownResult.unwrapErr>
+    >().toEqualTypeOf<unknown>();
 
     if (unknownResult.isOk) {
-      expectTypeOf(unknownResult.map)
-        .returns.toHaveProperty('isOk')
-        .toEqualTypeOf<true>();
+      expectTypeOf<
+        ReturnType<typeof unknownResult.unwrap>
+      >().toEqualTypeOf<boolean>();
+      expectTypeOf<
+        ReturnType<typeof unknownResult.unwrapErr>
+      >().toEqualTypeOf<never>();
     } else {
-      expectTypeOf(unknownResult.map)
-        .returns.toHaveProperty('isOk')
-        .toEqualTypeOf<false>();
+      expectTypeOf<
+        ReturnType<typeof unknownResult.unwrap>
+      >().toEqualTypeOf<never>();
+      expectTypeOf<
+        ReturnType<typeof unknownResult.unwrapErr>
+      >().toEqualTypeOf<unknown>();
     }
   });
 

@@ -9,7 +9,7 @@ A TypeScript error handling paradigm using a `Result` monad, inspired by [the Ru
 
 Functions return `Result` whenever errors are expected and recoverable. A simple function returning Result might be defined and used like so:
 
-<!-- TODO example -->
+// TODO add example
 
 <!-- ## Results must be used -->
 
@@ -17,7 +17,7 @@ Functions return `Result` whenever errors are expected and recoverable. A simple
 
 ## Method Overview
 
-Result comes with some convenience methods that make working with it more succinct.
+Result comes with a wide variety of different convenience methods that make working with it more succinct.
 
 ### Querying contained values
 
@@ -27,13 +27,17 @@ Result comes with some convenience methods that make working with it more succin
 
 ### Extracting a contained value
 
-- `expect` throws the provided custom message if the `Result` is `err`.
-- `unwrap` throws the error value if the `Result` is `err`.
-- `unwrapOr` returns the provided default value if the `Result` is `err`.
-- `unwrapOrElse` returns the result of evaluating the provided function if the `Result` is `err`.
+These methods extract the contained value from a `Result<T, E>` when it is the `ok` variant. If the `Result` is `err`:
 
-- `expectErr` throws the provided custom message if the `Result` is `ok`.
-- `unwrapErr` throws the success value if the `Result` is `ok`.
+- `expect` throws the provided custom message.
+- `unwrap` throws the error value.
+- `unwrapOr` returns the provided default value.
+- `unwrapOrElse` returns the result of evaluating the provided function.
+
+These methods extract the contained value from a `Result<T, E>` when it is the `err` variant. If the `Result` is `ok`:
+
+- `expectErr` throws the provided custom message.
+- `unwrapErr` throws the success value.
 
 ### Transforming contained values
 
@@ -41,17 +45,19 @@ Result comes with some convenience methods that make working with it more succin
 - `err` transforms `Result<T, E>` into `Option<E>`, mapping `err` to `some` and `ok` to `none`.
 - `map` transforms `Result<T, E>` into `Result<U, E>` by applying the provided function to the contained value of `ok` and leaving `err` values unchanged.
 - `mapErr` transforms `Result<T, E>` into `Result<T, F>` by applying the provided function to the contained value of `err` and leaving `ok` values unchanged.
-- `mapOr` transforms a `Result<T, E>` into `U` by applying the provided function to the contained value of `ok`, or returns the provided default value if the `Result` is `err`.
+- `mapOr` transforms `Result<T, E>` into `U` by applying the provided function to the contained value of `ok`, or returns the provided default value if the `Result` is `err`.
 - `mapOrElse` transforms a `Result<T, E>` into `U` by applying the provided function to the contained value of `ok`, or applies the provided default fallback function to the contained value of `err`.
 
 ### Boolean operators
 
 These methods treat the `Result` as a boolean value, where `ok` acts like `true` and `err` acts like `false`.
 
-- `and` and `or`
-- `andThen` and `orElse`
+- `and` and `or` take another `Result` as input, and produce a `Result` as output.
+- `andThen` and `orElse` take a function as input, and only lazily evaluate the function when they need to produce a new value.
 
-## API
+<!-- ## API -->
+
+<!-- TODO auto-generate API section from typedoc -->
 
 <!-- ```ts
 async function checkUserPassword(username: string, password: string): Promise<boolean> {

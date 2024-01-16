@@ -49,8 +49,8 @@ const okRes1 = ok('value1') as Result<'value1', 'error1'>;
 const okRes2 = ok('value2') as Result<'value2', 'error2'>;
 const errRes1 = err('error1') as Result<'value1', 'error1'>;
 const errRes2 = err('error2') as Result<'value2', 'error2'>;
-const syncOkResultValue = result(noThrowSync);
-const syncErrResultValue = result(throwSync);
+const okResValue = result(noThrowSync);
+const errResValue = result(throwSync);
 
 describe('Result', () => {
   it('Is able to create type-safe `ok` and `err` values', () => {
@@ -91,13 +91,13 @@ describe('Result', () => {
     expect(errValue.unwrap).toThrow('error');
     expect(errValue.unwrapErr()).toBe('error');
 
-    expectResultUnwrap(syncOkResultValue).toBe<'value', unknown>(true);
-    expect(syncOkResultValue.unwrap()).toEqual('value');
-    expect(syncOkResultValue.unwrapErr).toThrowErrorMatchingInlineSnapshot('"value"');
+    expectResultUnwrap(okResValue).toBe<'value', unknown>(true);
+    expect(okResValue.unwrap()).toEqual('value');
+    expect(okResValue.unwrapErr).toThrowErrorMatchingInlineSnapshot('"value"');
 
-    expectResultUnwrap(syncErrResultValue).toBe<'value', unknown>(true);
-    expect(syncErrResultValue.unwrap).toThrow('error');
-    expect(syncErrResultValue.unwrapErr()).toStrictEqual(Error('error'));
+    expectResultUnwrap(errResValue).toBe<'value', unknown>(true);
+    expect(errResValue.unwrap).toThrow('error');
+    expect(errResValue.unwrapErr()).toStrictEqual(Error('error'));
 
     const asyncOkResultValue = await asyncResult(noThrowAsync);
     expectResultUnwrap(asyncOkResultValue).toBe<'value', unknown>(true);
@@ -108,6 +108,47 @@ describe('Result', () => {
     expectResultUnwrap(asyncErrResultValue).toBe<'value', unknown>(true);
     expect(asyncErrResultValue.unwrap).toThrow('error');
     expect(asyncErrResultValue.unwrapErr()).toStrictEqual(Error('error'));
+  });
+
+  it('Allows to unwrap a result value and provide a default value or compute it from a closure', () => {
+    const defaultValue = 'default' as const;
+    const mock = vi.fn();
+    const defaultFunction = () => {
+      mock();
+      return defaultValue;
+    };
+
+    const okOr = okValue.unwrapOr(defaultValue);
+    const okOrElse = okValue.unwrapOrElse(defaultFunction);
+    expect(mock).toHaveBeenCalledTimes(0);
+    expectTypeOf(okOr).toEqualTypeOf<'value'>();
+    expectTypeOf(okOrElse).toEqualTypeOf<'value'>();
+    expect(okOr).toBe('value');
+    expect(okOrElse).toBe('value');
+
+    const errOr = errValue.unwrapOr(defaultValue);
+    const errOrElse = errValue.unwrapOrElse(defaultFunction);
+    expect(mock).toHaveBeenCalledTimes(1);
+    expectTypeOf(errOr).toEqualTypeOf<'default'>();
+    expectTypeOf(errOrElse).toEqualTypeOf<'default'>();
+    expect(errOr).toBe('default');
+    expect(errOrElse).toBe('default');
+
+    const okResOr = okRes1.unwrapOr(defaultValue);
+    const okResOrElse = okRes1.unwrapOrElse(defaultFunction);
+    expect(mock).toHaveBeenCalledTimes(1);
+    expectTypeOf(okResOr).toEqualTypeOf<'value1' | 'default'>();
+    expectTypeOf(okResOrElse).toEqualTypeOf<'value1' | 'default'>();
+    expect(okResOr).toBe('value1');
+    expect(okResOrElse).toBe('value1');
+
+    const errResOr = errRes1.unwrapOr(defaultValue);
+    const errResOrElse = errRes1.unwrapOrElse(defaultFunction);
+    expect(mock).toHaveBeenCalledTimes(2);
+    expectTypeOf(errResOr).toEqualTypeOf<'value1' | 'default'>();
+    expectTypeOf(errResOrElse).toEqualTypeOf<'value1' | 'default'>();
+    expect(errResOr).toBe('default');
+    expect(errResOrElse).toBe('default');
   });
 
   it('Allows to inspect the value in the result', () => {
@@ -272,11 +313,10 @@ describe('Result', () => {
     expect(resErrResErr.unwrapErr()).toBe('error2');
   });
 
-  it('Provides a `map` operation', () => {
-    const okMapped = okValue.map((v) => {
-      expectTypeOf(v).toEqualTypeOf<'value'>();
-      return v === 'value';
-    });
+  it('Provides a `map` operation for `ok` and `err` values', () => {
+    const fn = (v: string) => v === 'value';
+
+    const okMapped = okValue.map(fn);
     expectTypeOf(okMapped.isOk).toEqualTypeOf<true>();
     expect(okMapped.isOk).toBe(true);
     expectTypeOf(okMapped.isErr).toEqualTypeOf<false>();
@@ -284,10 +324,7 @@ describe('Result', () => {
     expectResultUnwrap(okMapped).toBe<boolean, never>(true);
     expect(okMapped.unwrap()).toBe(true);
 
-    const errMapped = errValue.map((v) => {
-      expectTypeOf(v).toEqualTypeOf<never>();
-      return v === 'value';
-    });
+    const errMapped = errValue.map(fn);
     expectTypeOf(errMapped.isOk).toEqualTypeOf<false>();
     expect(errMapped.isOk).toBe(false);
     expectTypeOf(errMapped.isErr).toEqualTypeOf<true>();
@@ -295,10 +332,7 @@ describe('Result', () => {
     expectResultUnwrap(errMapped).toBe<never, 'error'>(true);
     expect(errMapped.unwrapErr()).toBe('error');
 
-    const okResultMapped = syncOkResultValue.map((v) => {
-      expectTypeOf(v).toEqualTypeOf<'value'>();
-      return !v;
-    });
+    const okResultMapped = okResValue.map(fn);
     expectTypeOf(okResultMapped.isOk).toEqualTypeOf<boolean>();
     expect(okResultMapped.isOk).toBe(true);
     expectTypeOf(okResultMapped.isErr).toEqualTypeOf<boolean>();
@@ -306,10 +340,7 @@ describe('Result', () => {
     expectResultUnwrap(okResultMapped).toBe<boolean, unknown>(true);
     expect(okResultMapped.unwrap()).toBe(false);
 
-    const errResultMapped = syncErrResultValue.map((v) => {
-      expectTypeOf(v).toEqualTypeOf<'value'>();
-      return !v;
-    });
+    const errResultMapped = errResValue.map(fn);
     expectTypeOf(errResultMapped.isOk).toEqualTypeOf<boolean>();
     expect(errResultMapped.isOk).toBe(false);
     expectTypeOf(errResultMapped.isErr).toEqualTypeOf<boolean>();

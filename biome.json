@@ -2,7 +2,7 @@
   "$schema": "node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
     "include": ["*"],
-    "ignore": [".coverage", ".docs", ".dist"]
+    "ignore": [".coverage", ".coverage-ts", ".docs", ".dist"]
   },
   "linter": {
     "enabled": true,

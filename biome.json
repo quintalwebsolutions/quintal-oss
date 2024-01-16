@@ -16,7 +16,7 @@
     "indentStyle": "space",
     "indentWidth": 2,
     "lineEnding": "lf",
-    "lineWidth": 80
+    "lineWidth": 100
   },
   "organizeImports": {
     "enabled": true
@@ -36,7 +36,7 @@
       "indentStyle": "space",
       "indentWidth": 2,
       "lineEnding": "lf",
-      "lineWidth": 80,
+      "lineWidth": 100,
       "bracketSameLine": false,
       "bracketSpacing": true
     }
@@ -51,7 +51,7 @@
       "indentStyle": "space",
       "indentWidth": 2,
       "lineEnding": "lf",
-      "lineWidth": 80
+      "lineWidth": 100
     }
   }
 }

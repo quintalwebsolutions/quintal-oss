@@ -1,6 +1,6 @@
-const recommended = require('@quintal/config/vite');
+import recommended from '@quintal/config/vite';
 
-module.exports = {
+export default {
   ...recommended,
   build: {
     ...recommended.build,

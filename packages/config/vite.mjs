@@ -1,7 +1,7 @@
-const { resolve } = require('node:path');
-const { defineConfig } = require('vite');
-const dts = require('vite-plugin-dts');
-const react = require('@vitejs/plugin-react');
+import { resolve } from 'node:path';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
 
 const fileName = {
   es: 'index.mjs',
@@ -10,7 +10,7 @@ const fileName = {
 
 const formats = Object.keys(fileName);
 
-module.exports = defineConfig({
+export default defineConfig({
   build: {
     lib: {
       entry: resolve(process.cwd(), 'src', 'index.ts'),

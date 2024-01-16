@@ -92,7 +92,7 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    * const y = ok('different result type');
    * expect(x.and(y)).toBe(ok('different result type'));
    */
-  and: <U>(res: Result<U, E>) => Result<U, E>;
+  and: <R extends AnyResult>(res: R) => IsOk<TOk, R, ResultConstructor<TOk, T, E>>;
   /**
    * Calls `fn` if the result is `ok`, otherwise return its own `err` value.
    *
@@ -130,7 +130,7 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    * const y = ok(100);
    * expect(x.or(y)).toBe(ok(2));
    */
-  or: <F>(res: Result<T, F>) => Result<T, F>;
+  or: <R extends AnyResult>(res: R) => IsOk<TOk, ResultConstructor<TOk, T, E>, R>;
   /**
    * Calls `fn` if the result is `err`, otherwise returns its own `ok` value.
    *
@@ -201,6 +201,9 @@ export type OkResult<T> = ResultConstructor<true, T, never>;
 export type ErrResult<E> = ResultConstructor<false, never, E>;
 export type Result<T, E> = OkResult<T> | ErrResult<E>;
 
+// biome-ignore lint/suspicious/noExplicitAny: This type exists for generics parameters to extend
+export type AnyResult = Result<any, any>;
+
 export function ok<T>(value: T): OkResult<T> {
   return {
     isOk: true,
@@ -210,9 +213,9 @@ export function ok<T>(value: T): OkResult<T> {
       return ok(value);
     },
     inspectErr: () => ok(value),
-    and: (res) => res, // TODO test
+    and: (res) => res,
     andThen: (fn) => fn(value), // TODO test
-    or: () => ok(value), // TODO test
+    or: () => ok(value),
     orElse: () => ok(value), // TODO test
     map: (fn) => ok(fn(value)),
     mapErr: () => ok(value), // TODO test
@@ -236,9 +239,9 @@ export function err<E>(error: E): ErrResult<E> {
       fn(error);
       return err(error);
     },
-    and: () => err(error), // TODO test
+    and: () => err(error),
     andThen: () => err(error), // TODO test
-    or: (res) => res, // TODO test
+    or: (res) => res,
     orElse: (fn) => fn(error), // TODO test
     map: () => err(error),
     mapErr: (fn) => err(fn(error)), // TODO test
@@ -262,9 +265,7 @@ export function result<T>(fn: () => T): Result<T, unknown> {
   }
 }
 
-export async function asyncResult<T>(
-  fn: () => Promise<T>,
-): Promise<Result<T, unknown>> {
+export async function asyncResult<T>(fn: () => Promise<T>): Promise<Result<T, unknown>> {
   try {
     const value = (await fn()) as T; // I don't get why this cast is necessary
     return ok(value);

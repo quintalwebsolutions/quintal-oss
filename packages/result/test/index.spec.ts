@@ -314,38 +314,35 @@ describe('Result', () => {
   });
 
   it('Provides a `map` operation for `ok` and `err` values', () => {
-    const fn = (v: string) => v === 'value';
+    const mapFn = (v: string) => v === 'value';
+    const mapErrFn = (v: unknown) => v === 'error' ? 'new-error' as const : 'old-error' as const
 
-    const okMapped = okValue.map(fn);
-    expectTypeOf(okMapped.isOk).toEqualTypeOf<true>();
-    expect(okMapped.isOk).toBe(true);
-    expectTypeOf(okMapped.isErr).toEqualTypeOf<false>();
-    expect(okMapped.isErr).toBe(false);
+    const okMapped = okValue.map(mapFn);
     expectResultUnwrap(okMapped).toBe<boolean, never>(true);
     expect(okMapped.unwrap()).toBe(true);
+    const okMappedErr = okValue.mapErr(mapErrFn)
+    expectResultUnwrap(okMappedErr).toBe<'value', never>(true);
+    expect(okMappedErr.unwrap()).toBe('value');
 
-    const errMapped = errValue.map(fn);
-    expectTypeOf(errMapped.isOk).toEqualTypeOf<false>();
-    expect(errMapped.isOk).toBe(false);
-    expectTypeOf(errMapped.isErr).toEqualTypeOf<true>();
-    expect(errMapped.isErr).toBe(true);
+    const errMapped = errValue.map(mapFn);
     expectResultUnwrap(errMapped).toBe<never, 'error'>(true);
     expect(errMapped.unwrapErr()).toBe('error');
+    const errMappedErr = errValue.mapErr(mapErrFn);
+    expectResultUnwrap(errMappedErr).toBe<never, 'new-error' | 'old-error'>(true);
+    expect(errMappedErr.unwrapErr()).toBe('new-error');
 
-    const okResultMapped = okResValue.map(fn);
-    expectTypeOf(okResultMapped.isOk).toEqualTypeOf<boolean>();
-    expect(okResultMapped.isOk).toBe(true);
-    expectTypeOf(okResultMapped.isErr).toEqualTypeOf<boolean>();
-    expect(okResultMapped.isErr).toBe(false);
+    const okResultMapped = okResValue.map(mapFn);
     expectResultUnwrap(okResultMapped).toBe<boolean, unknown>(true);
-    expect(okResultMapped.unwrap()).toBe(false);
+    expect(okResultMapped.unwrap()).toBe(true);
+    const okResultMappedErr = okResValue.mapErr(mapErrFn);
+    expectResultUnwrap(okResultMappedErr).toBe<'value', 'new-error' | 'old-error'>(true);
+    expect(okResultMappedErr.unwrap()).toBe('value');
 
-    const errResultMapped = errResValue.map(fn);
-    expectTypeOf(errResultMapped.isOk).toEqualTypeOf<boolean>();
-    expect(errResultMapped.isOk).toBe(false);
-    expectTypeOf(errResultMapped.isErr).toEqualTypeOf<boolean>();
-    expect(errResultMapped.isErr).toBe(true);
+    const errResultMapped = errResValue.map(mapFn);
     expectResultUnwrap(errResultMapped).toBe<boolean, unknown>(true);
     expect(errResultMapped.unwrapErr()).toStrictEqual(Error('error'));
+    const errResultMappedErr = errResValue.mapErr(mapErrFn);
+    expectResultUnwrap(errResultMappedErr).toBe<'value', 'new-error' | 'old-error'>(true);
+    expect(errResultMappedErr.unwrapErr()).toStrictEqual('old-error');
   });
 });

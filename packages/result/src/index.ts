@@ -60,6 +60,30 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
   // TODO expect: Returns the contained `ok` value
   // TODO expectErr: Returns the contained `err` value
   /**
+   * Returns the contained `ok` value, or throws the given error message it is an `err`.
+   * 
+   * It is recommended that expect messages are used to describe the reason you expect the `Result` should be `ok` (hint: use the word "should").
+   * 
+   * * Because this function may throw, its use is generally discouraged. Instead, prefer to use `ok`, `unwrapOr`, or `unwrapOrElse`.
+   * 
+   * @example
+   * console.log(ok(42).expect("Value should be ok")); // Logs "42" to the console
+   * console.log(err('error').expect("Value should be ok")); // Throws "Value should be ok"
+   */
+  expect: (message: string) => T;
+   /**
+   * Returns the contained `err` value, or throws the given error message it is an `ok`.
+   * 
+   * It is recommended that expect messages are used to describe the reason you expect the `Result` should be `err` (hint: use the word "should").
+   * 
+   * * Because this function may throw, its use is generally discouraged. Instead, prefer to use `err`.
+   * 
+   * @example
+   * console.log(ok(42).expectErr("Value should be err")); // Throws "Value should be err"
+   * console.log(err('error').expectErr("Value should be err")); // Logs "error" to the console
+   */
+  expectErr: (message: string) => E;
+  /**
    * Returns the contained `ok` value, or throws the value if it is an `err`.
    *
    * * Because this function may throw, its use is generally discouraged. Instead, prefer to use `ok`, `unwrapOr`, or `unwrapOrElse`.
@@ -240,7 +264,7 @@ export function ok<T>(value: T): OkResult<T> {
     or: () => ok(value),
     orElse: () => ok(value), // TODO test
     map: (fn) => ok(fn(value)),
-    mapErr: () => ok(value), // TODO test
+    mapErr: () => ok(value),
     mapOr: (_, fn) => fn(value), // TODO test
     mapOrElse: (_, fn) => fn(value), // TODO test
     unwrap: () => value,
@@ -266,7 +290,7 @@ export function err<E>(error: E): ErrResult<E> {
     or: (res) => res,
     orElse: (fn) => fn(error), // TODO test
     map: () => err(error),
-    mapErr: (fn) => err(fn(error)), // TODO test
+    mapErr: (fn) => err(fn(error)),
     mapOr: (defaultValue) => defaultValue, // TODO test
     mapOrElse: (defaultFn) => defaultFn(error), // TODO test
     unwrap: () => {

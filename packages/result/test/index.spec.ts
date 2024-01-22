@@ -500,46 +500,96 @@ describe('Result', () => {
     expectResultUnwrap(errResultMappedErr).toBe<'value', 'new-error' | 'old-error'>(true);
     expect(errResultMappedErr.unwrapErr()).toStrictEqual('old-error');
   });
-  
+
   it('mapOr should return the mapped value for ok and default value for err', () => {
-    const mapFn = (v: string) => v === 'value' ? 1 : 2;
+    const mapFn = (v: string) => (v === 'value' ? 1 : 2);
     const expectMappedType = (v: 0 | 1 | 2) => v;
-    
+
     const okMapped = okValue.mapOr(0, mapFn);
     expectMappedType(okMapped);
     expect(okMapped).toBe(1);
-    
+
     const errMapped = errValue.mapOr(0, mapFn);
     expectMappedType(errMapped);
     expect(errMapped).toBe(0);
-    
-    const okResultMapped= okResValue.mapOr(0, mapFn);
+
+    const okResultMapped = okResValue.mapOr(0, mapFn);
     expectMappedType(okResultMapped);
     expect(okResultMapped).toBe(1);
-    
+
     const errResultMapped = errResValue.mapOr(0, mapFn);
     expectMappedType(errResultMapped);
     expect(errResultMapped).toBe(0);
   });
 
   it('mapOrElse should return the mapped value for ok and computed default for err', () => {
-    const mapFn = (v: string) => v === 'value' ? 1 : 2;
+    const mapFn = (v: string) => (v === 'value' ? 1 : 2);
     const expectMappedType = (v: 0 | 1 | 2) => v;
-    
+
     const okMapped = okValue.mapOrElse(() => 0 as const, mapFn);
     expectMappedType(okMapped);
     expect(okMapped).toBe(1);
-    
+
     const errMapped = errValue.mapOrElse(() => 0 as const, mapFn);
     expectMappedType(errMapped);
     expect(errMapped).toBe(0);
-    
-    const okResultMapped= okResValue.mapOrElse(() => 0 as const, mapFn);
+
+    const okResultMapped = okResValue.mapOrElse(() => 0 as const, mapFn);
     expectMappedType(okResultMapped);
     expect(okResultMapped).toBe(1);
-    
+
     const errResultMapped = errResValue.mapOrElse(() => 0 as const, mapFn);
     expectMappedType(errResultMapped);
     expect(errResultMapped).toBe(0);
+  });
+
+  it('Provides an `isOkAnd` operation', () => {
+    const pTrue = () => true;
+    const pFalse = () => false;
+
+    const okTrue = okValue.isOkAnd(pTrue);
+    expect(okTrue).toBe(true);
+    const okFalse = okValue.isOkAnd(pFalse);
+    expect(okFalse).toBe(false);
+
+    const errTrue = errValue.isOkAnd(pTrue);
+    expect(errTrue).toBe(false);
+    const errFalse = errValue.isOkAnd(pFalse);
+    expect(errFalse).toBe(false);
+
+    const okResultTrue = okResValue.isOkAnd(pTrue);
+    expect(okResultTrue).toBe(true);
+    const okResultFalse = okResValue.isOkAnd(pFalse);
+    expect(okResultFalse).toBe(false);
+
+    const errResultTrue = errResValue.isOkAnd(pTrue);
+    expect(errResultTrue).toBe(false);
+    const errResultFalse = errResValue.isOkAnd(pFalse);
+    expect(errResultFalse).toBe(false);
+  });
+
+  it('Provides an `isErrAnd` operation', () => {
+    const pTrue = () => true;
+    const pFalse = () => false;
+
+    const okTrue = okValue.isErrAnd(pTrue);
+    expect(okTrue).toBe(false);
+    const okFalse = okValue.isErrAnd(pFalse);
+    expect(okFalse).toBe(false);
+
+    const errTrue = errValue.isErrAnd(pTrue);
+    expect(errTrue).toBe(true);
+    const errFalse = errValue.isErrAnd(pFalse);
+    expect(errFalse).toBe(false);
+
+    const okResultTrue = okResValue.isErrAnd(pTrue);
+    expect(okResultTrue).toBe(false);
+    const okResultFalse = okResValue.isErrAnd(pFalse);
+    expect(okResultFalse).toBe(false);
+
+    const errResultTrue = errResValue.isErrAnd(pTrue);
+    expect(errResultTrue).toBe(true);
+    const errResultFalse = errResValue.isErrAnd(pFalse);
+    expect(errResultFalse).toBe(false);
   });
 });

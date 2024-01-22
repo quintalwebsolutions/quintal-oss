@@ -20,7 +20,16 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    * }
    */
   isOk: TOk; // TODO should this be a function? It would be more true to Rust
-  // TODO isOkAnd: Returns `true` if the result is `ok` and the value inside of it matches a predicate.
+  /**
+   * Returns `true` if the result is `ok` and the value inside of it matches a predicate.
+   *
+   * @example
+   * ok('value').isOkAnd(() => true); // true
+   * ok('value').isOkAnd(() => false); // false
+   * err('error').isOkAnd(() => true); // false
+   * err('error').isOkAnd(() => false); // false
+   */
+  isOkAnd: (fn: (value: T) => boolean) => boolean;
   /**
    * Is `true` if the result is `err`.
    *
@@ -37,7 +46,16 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    * }
    */
   isErr: IsOk<TOk, false, true>; // TODO should this be a function? It would be more true to Rust
-  // TODO isErrAnd: Returns `true` if the result is `err` and the value inside of it matches a predicate.
+  /**
+   * Returns `true` if the result is `err` and the value inside of it matches a predicate.
+   *
+   * @example
+   * ok('value').isErrAnd(() => true); // false
+   * ok('value').isErrAnd(() => false); // false
+   * err('error').isErrAnd(() => true); // true
+   * err('error').isErrAnd(() => false); // false
+   */
+  isErrAnd: (fn: (error: E) => boolean) => boolean;
   /**
    * Calls the provided closure with a reference to the contained value (if `ok`).
    *
@@ -251,7 +269,9 @@ export type AnyResult = Result<any, any>;
 export function ok<T>(value: T): OkResult<T> {
   return {
     isOk: true,
+    isOkAnd: (fn) => fn(value),
     isErr: false,
+    isErrAnd: () => false,
     inspect: (fn) => {
       fn(value);
       return ok(value);
@@ -281,7 +301,9 @@ export function ok<T>(value: T): OkResult<T> {
 export function err<E>(error: E): ErrResult<E> {
   return {
     isOk: false,
+    isOkAnd: () => false,
     isErr: true,
+    isErrAnd: (fn) => fn(error),
     inspect: () => err(error),
     inspectErr: (fn) => {
       fn(error);

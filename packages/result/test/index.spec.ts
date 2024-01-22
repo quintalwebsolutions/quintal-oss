@@ -89,23 +89,19 @@ describe('Result', () => {
     expect(() => errValue.expect('Should be ok')).toThrow('Should be ok');
     expect(errValue.expectErr('Should be error')).toBe('error');
 
-    // expectResultUnwrap(okResValue).toBe<'value', unknown>(true);
-    // expect(okResValue.unwrap()).toEqual('value');
-    // expect(okResValue.unwrapErr).toThrowErrorMatchingInlineSnapshot('"value"');
+    expect(okResValue.expect('Should be ok')).toBe('value');
+    expect(() => okResValue.expectErr('Should be error')).toThrow('Should be error');
 
-    // expectResultUnwrap(errResValue).toBe<'value', unknown>(true);
-    // expect(errResValue.unwrap).toThrow('error');
-    // expect(errResValue.unwrapErr()).toStrictEqual(Error('error'));
+    expect(() => errResValue.expect('Should be ok')).toThrow('Should be ok');
+    expect(errResValue.expectErr('Should be error')).toStrictEqual(Error('error'));
 
-    // const asyncOkResultValue = await asyncResult(noThrowAsync);
-    // expectResultUnwrap(asyncOkResultValue).toBe<'value', unknown>(true);
-    // expect(asyncOkResultValue.unwrap()).toBe('value');
-    // expect(asyncOkResultValue.unwrapErr).toThrowErrorMatchingInlineSnapshot('"value"');
+    const asyncOkResultValue = await asyncResult(noThrowAsync);
+    expect(asyncOkResultValue.expect('Should be ok')).toBe('value');
+    expect(() => asyncOkResultValue.expectErr('Should be error')).toThrow('Should be error');
 
-    // const asyncErrResultValue = await asyncResult(throwAsync);
-    // expectResultUnwrap(asyncErrResultValue).toBe<'value', unknown>(true);
-    // expect(asyncErrResultValue.unwrap).toThrow('error');
-    // expect(asyncErrResultValue.unwrapErr()).toStrictEqual(Error('error'));
+    const asyncErrResultValue = await asyncResult(throwAsync);
+    expect(() => asyncErrResultValue.expect('Should be ok')).toThrow('Should be ok');
+    expect(asyncErrResultValue.expectErr('Should be error')).toStrictEqual(Error('error'));
   });
 
   it('Allows to unwrap the result value', async () => {
@@ -118,7 +114,7 @@ describe('Result', () => {
     expect(errValue.unwrapErr()).toBe('error');
 
     expectResultUnwrap(okResValue).toBe<'value', unknown>(true);
-    expect(okResValue.unwrap()).toEqual('value');
+    expect(okResValue.unwrap()).toBe('value');
     expect(okResValue.unwrapErr).toThrowErrorMatchingInlineSnapshot('"value"');
 
     expectResultUnwrap(errResValue).toBe<'value', unknown>(true);
@@ -273,6 +269,72 @@ describe('Result', () => {
     expect(resErrResErr.unwrapErr()).toBe('error1');
   });
 
+  it('Provides an `andThen` operation', () => {
+    const okOk = earlyOk.andThen(() => lateOk);
+    expectResultUnwrap(okOk).toBe<'late', never>(true);
+    expect(okOk.unwrap()).toBe('late');
+
+    const okErr = earlyOk.andThen(() => lateErr);
+    expectResultUnwrap(okErr).toBe<never, 'late'>(true);
+    expect(okErr.unwrapErr()).toBe('late');
+
+    const okResOk = earlyOk.andThen(() => okRes2);
+    expectResultUnwrap(okResOk).toBe<'value2', 'error2'>(true);
+    expect(okResOk.unwrap()).toBe('value2');
+
+    const okResErr = earlyOk.andThen(() => errRes2);
+    expectResultUnwrap(okResErr).toBe<'value2', 'error2'>(true);
+    expect(okResErr.unwrapErr()).toBe('error2');
+
+    const errOk = earlyErr.andThen(() => lateOk);
+    expectResultUnwrap(errOk).toBe<never, 'early'>(true);
+    expect(errOk.unwrapErr()).toBe('early');
+
+    const errErr = earlyErr.andThen(() => lateErr);
+    expectResultUnwrap(errErr).toBe<never, 'early'>(true);
+    expect(errErr.unwrapErr()).toBe('early');
+
+    const errResOk = earlyErr.andThen(() => okRes2);
+    expectResultUnwrap(errResOk).toBe<never, 'early'>(true);
+    expect(errResOk.unwrapErr()).toBe('early');
+
+    const errResErr = earlyErr.andThen(() => errRes2);
+    expectResultUnwrap(errResErr).toBe<never, 'early'>(true);
+    expect(errResErr.unwrapErr()).toBe('early');
+
+    const resOkOk = okRes1.andThen(() => lateOk);
+    expectResultUnwrap(resOkOk).toBe<'late', 'error1'>(true);
+    expect(resOkOk.unwrap()).toBe('late');
+
+    const resOkErr = okRes1.andThen(() => lateErr);
+    expectResultUnwrap(resOkErr).toBe<never, 'error1' | 'late'>(true);
+    expect(resOkErr.unwrapErr()).toBe('late');
+
+    const resOkResOk = okRes1.andThen(() => okRes2);
+    expectResultUnwrap(resOkResOk).toBe<'value2', 'error1' | 'error2'>(true);
+    expect(resOkResOk.unwrap()).toBe('value2');
+
+    const resOkResErr = okRes1.andThen(() => errRes2);
+    expectResultUnwrap(resOkResErr).toBe<'value2', 'error1' | 'error2'>(true);
+    expect(resOkResErr.unwrapErr()).toBe('error2');
+
+    const resErrOk = errRes1.andThen(() => lateOk);
+    expectResultUnwrap(resErrOk).toBe<'late', 'error1'>(true);
+    expect(resErrOk.unwrapErr()).toBe('error1');
+
+    const resErrErr = errRes1.andThen(() => lateErr);
+    expectResultUnwrap(resErrErr).toBe<never, 'error1' | 'late'>(true);
+    expect(resErrErr.unwrapErr()).toBe('error1');
+
+    const resErrResOk = errRes1.andThen(() => okRes2);
+    expectResultUnwrap(resErrResOk).toBe<'value2', 'error1' | 'error2'>(true);
+    expect(resErrResOk.unwrapErr()).toBe('error1');
+
+    const resErrResErr = errRes1.andThen(() => errRes2);
+    expectResultUnwrap(resErrResErr).toBe<'value2', 'error1' | 'error2'>(true);
+    expect(resErrResErr.unwrapErr()).toBe('error1');
+  });
+
   it('Provides an `or` operation', () => {
     const okOk = earlyOk.or(lateOk);
     expectResultUnwrap(okOk).toBe<'early', never>(true);
@@ -339,6 +401,72 @@ describe('Result', () => {
     expect(resErrResErr.unwrapErr()).toBe('error2');
   });
 
+  it('Provides an `orElse` operation', () => {
+    const okOk = earlyOk.orElse(() => lateOk);
+    expectResultUnwrap(okOk).toBe<'early', never>(true);
+    expect(okOk.unwrap()).toBe('early');
+
+    const okErr = earlyOk.orElse(() => lateErr);
+    expectResultUnwrap(okErr).toBe<'early', never>(true);
+    expect(okErr.unwrap()).toBe('early');
+
+    const okResOk = earlyOk.orElse(() => okRes2);
+    expectResultUnwrap(okResOk).toBe<'early', never>(true);
+    expect(okResOk.unwrap()).toBe('early');
+
+    const okResErr = earlyOk.orElse(() => errRes2);
+    expectResultUnwrap(okResErr).toBe<'early', never>(true);
+    expect(okResErr.unwrap()).toBe('early');
+
+    const errOk = earlyErr.orElse(() => lateOk);
+    expectResultUnwrap(errOk).toBe<'late', never>(true);
+    expect(errOk.unwrap()).toBe('late');
+
+    const errErr = earlyErr.orElse(() => lateErr);
+    expectResultUnwrap(errErr).toBe<never, 'late'>(true);
+    expect(errErr.unwrapErr()).toBe('late');
+
+    const errResOk = earlyErr.orElse(() => okRes2);
+    expectResultUnwrap(errResOk).toBe<'value2', 'error2'>(true);
+    expect(errResOk.unwrap()).toBe('value2');
+
+    const errResErr = earlyErr.orElse(() => errRes2);
+    expectResultUnwrap(errResErr).toBe<'value2', 'error2'>(true);
+    expect(errResErr.unwrapErr()).toBe('error2');
+
+    const resOkOk = okRes1.orElse(() => lateOk);
+    expectResultUnwrap(resOkOk).toBe<'value1' | 'late', never>(true);
+    expect(resOkOk.unwrap()).toBe('value1');
+
+    const resOkErr = okRes1.orElse(() => lateErr);
+    expectResultUnwrap(resOkErr).toBe<'value1', 'late'>(true);
+    expect(resOkErr.unwrap()).toBe('value1');
+
+    const resOkResOk = okRes1.orElse(() => okRes2);
+    expectResultUnwrap(resOkResOk).toBe<'value1' | 'value2', 'error2'>(true);
+    expect(resOkResOk.unwrap()).toBe('value1');
+
+    const resOkResErr = okRes1.orElse(() => errRes2);
+    expectResultUnwrap(resOkResErr).toBe<'value1' | 'value2', 'error2'>(true);
+    expect(resOkResErr.unwrap()).toBe('value1');
+
+    const resErrOk = errRes1.orElse(() => lateOk);
+    expectResultUnwrap(resErrOk).toBe<'value1' | 'late', never>(true);
+    expect(resErrOk.unwrap()).toBe('late');
+
+    const resErrErr = errRes1.orElse(() => lateErr);
+    expectResultUnwrap(resErrErr).toBe<'value1', 'late'>(true);
+    expect(resErrErr.unwrapErr()).toBe('late');
+
+    const resErrResOk = errRes1.orElse(() => okRes2);
+    expectResultUnwrap(resErrResOk).toBe<'value1' | 'value2', 'error2'>(true);
+    expect(resErrResOk.unwrap()).toBe('value2');
+
+    const resErrResErr = errRes1.orElse(() => errRes2);
+    expectResultUnwrap(resErrResErr).toBe<'value1' | 'value2', 'error2'>(true);
+    expect(resErrResErr.unwrapErr()).toBe('error2');
+  });
+
   it('Provides a `map` operation for `ok` and `err` values', () => {
     const mapFn = (v: string) => v === 'value';
     const mapErrFn = (v: unknown) =>
@@ -371,5 +499,47 @@ describe('Result', () => {
     const errResultMappedErr = errResValue.mapErr(mapErrFn);
     expectResultUnwrap(errResultMappedErr).toBe<'value', 'new-error' | 'old-error'>(true);
     expect(errResultMappedErr.unwrapErr()).toStrictEqual('old-error');
+  });
+  
+  it('mapOr should return the mapped value for ok and default value for err', () => {
+    const mapFn = (v: string) => v === 'value' ? 1 : 2;
+    const expectMappedType = (v: 0 | 1 | 2) => v;
+    
+    const okMapped = okValue.mapOr(0, mapFn);
+    expectMappedType(okMapped);
+    expect(okMapped).toBe(1);
+    
+    const errMapped = errValue.mapOr(0, mapFn);
+    expectMappedType(errMapped);
+    expect(errMapped).toBe(0);
+    
+    const okResultMapped= okResValue.mapOr(0, mapFn);
+    expectMappedType(okResultMapped);
+    expect(okResultMapped).toBe(1);
+    
+    const errResultMapped = errResValue.mapOr(0, mapFn);
+    expectMappedType(errResultMapped);
+    expect(errResultMapped).toBe(0);
+  });
+
+  it('mapOrElse should return the mapped value for ok and computed default for err', () => {
+    const mapFn = (v: string) => v === 'value' ? 1 : 2;
+    const expectMappedType = (v: 0 | 1 | 2) => v;
+    
+    const okMapped = okValue.mapOrElse(() => 0 as const, mapFn);
+    expectMappedType(okMapped);
+    expect(okMapped).toBe(1);
+    
+    const errMapped = errValue.mapOrElse(() => 0 as const, mapFn);
+    expectMappedType(errMapped);
+    expect(errMapped).toBe(0);
+    
+    const okResultMapped= okResValue.mapOrElse(() => 0 as const, mapFn);
+    expectMappedType(okResultMapped);
+    expect(okResultMapped).toBe(1);
+    
+    const errResultMapped = errResValue.mapOrElse(() => 0 as const, mapFn);
+    expectMappedType(errResultMapped);
+    expect(errResultMapped).toBe(0);
   });
 });

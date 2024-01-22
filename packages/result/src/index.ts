@@ -269,12 +269,12 @@ export function ok<T>(value: T): OkResult<T> {
     unwrapOrElse: () => value,
     map: (fn) => ok(fn(value)),
     mapErr: () => ok(value),
-    mapOr: (_, fn) => fn(value), // TODO test
-    mapOrElse: (_, fn) => fn(value), // TODO test
+    mapOr: (_, fn) => fn(value),
+    mapOrElse: (_, fn) => fn(value),
     and: (res) => res,
-    andThen: (fn) => fn(value), // TODO test
+    andThen: (fn) => fn(value),
     or: () => ok(value),
-    orElse: () => ok(value), // TODO test
+    orElse: () => ok(value),
   };
 }
 
@@ -299,12 +299,12 @@ export function err<E>(error: E): ErrResult<E> {
     unwrapOrElse: (fn) => fn(error),
     map: () => err(error),
     mapErr: (fn) => err(fn(error)),
-    mapOr: (defaultValue) => defaultValue, // TODO test
-    mapOrElse: (defaultFn) => defaultFn(error), // TODO test
+    mapOr: (defaultValue) => defaultValue,
+    mapOrElse: (defaultFn) => defaultFn(error),
     and: () => err(error),
-    andThen: () => err(error), // TODO test
+    andThen: () => err(error),
     or: (res) => res,
-    orElse: (fn) => fn(error), // TODO test
+    orElse: (fn) => fn(error),
   };
 }
 

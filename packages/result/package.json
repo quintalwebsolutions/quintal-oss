@@ -15,7 +15,7 @@
     "lint:check": "biome ci .",
     "lint:fix": "biome check --apply-unsafe .",
     "lint:types": "tsc --noEmit",
-    "test": "run-p test:*",
+    "test": "run-s test:*",
     "test:source": "vitest",
     "test:types": "typescript-coverage-report --outputDir .coverage-ts --strict"
   },

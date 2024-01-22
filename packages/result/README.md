@@ -2,12 +2,12 @@
 
 A TypeScript error handling paradigm using a `Result` monad, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/). For an amazing introduction to Monads, [watch this video by Studying With Alex](https://www.youtube.com/watch?v=C2w45qRc3aU)
 
-`Result<T, E>` is the type used for returning and propagating errors. It has the following variants:
+`Result<T, E>` is a type used for returning and propagating errors. It has the following variants:
 
 - `ok(value: T)`, representing success;
 - `err(error: E)`, representing error.
 
-Functions return `Result` whenever errors are expected and recoverable. A simple function returning Result might be defined and used like so:
+Functions return `Result` whenever errors are expected and recoverable. A simple function returning `Result`` might be defined and used like so:
 
 // TODO add example
 
@@ -17,7 +17,7 @@ Functions return `Result` whenever errors are expected and recoverable. A simple
 
 ## Method Overview
 
-Result comes with a wide variety of different convenience methods that make working with it more succinct.
+`Result` comes with a wide variety of different convenience methods that make working with it more succinct.
 
 ### Querying contained values
 
@@ -55,7 +55,9 @@ These methods treat the `Result` as a boolean value, where `ok` acts like `true`
 - `and` and `or` take another `Result` as input, and produce a `Result` as output.
 - `andThen` and `orElse` take a function as input, and only lazily evaluate the function when they need to produce a new value.
 
-<!-- ## API -->
+## API
+
+You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/docs/@quintal/result)
 
 <!-- TODO auto-generate API section from typedoc -->
 

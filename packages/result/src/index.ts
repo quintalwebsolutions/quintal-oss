@@ -2,7 +2,7 @@ type IsOk<TOk extends boolean, TTrue, TFalse> = TOk extends true ? TTrue : TFals
 
 /** A type that represents either success or failure */
 export type ResultConstructor<TOk extends boolean, T, E> = {
-  // Querying the contained values
+  // Querying contained values
 
   /**
    * Is `true` if the result is `ok`.
@@ -19,7 +19,7 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    *   // `r.unwrap()` is of type `never`, `r.unwrapErr()` is of type `unknown`
    * }
    */
-  isOk: TOk; // TODO should this be a function? It's more true to Rust
+  isOk: TOk; // TODO should this be a function? It would be more true to Rust
   // TODO isOkAnd: Returns `true` if the result is `ok` and the value inside of it matches a predicate.
   /**
    * Is `true` if the result is `err`.
@@ -36,7 +36,7 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    *   // `r.unwrap()` is of type `boolean`, `r.unwrapErr()` is of type `never`
    * }
    */
-  isErr: IsOk<TOk, false, true>; // TODO should this be a function? It's more true to Rust
+  isErr: IsOk<TOk, false, true>; // TODO should this be a function? It would be more true to Rust
   // TODO isErrAnd: Returns `true` if the result is `err` and the value inside of it matches a predicate.
   /**
    * Calls the provided closure with a reference to the contained value (if `ok`).
@@ -55,29 +55,27 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    */
   inspectErr: (fn: (error: E) => void) => ResultConstructor<TOk, T, E>;
 
-  // Extract a value
+  // Extracting a contained value
 
-  // TODO expect: Returns the contained `ok` value
-  // TODO expectErr: Returns the contained `err` value
   /**
    * Returns the contained `ok` value, or throws the given error message it is an `err`.
-   * 
+   *
    * It is recommended that expect messages are used to describe the reason you expect the `Result` should be `ok` (hint: use the word "should").
-   * 
+   *
    * * Because this function may throw, its use is generally discouraged. Instead, prefer to use `ok`, `unwrapOr`, or `unwrapOrElse`.
-   * 
+   *
    * @example
    * console.log(ok(42).expect("Value should be ok")); // Logs "42" to the console
    * console.log(err('error').expect("Value should be ok")); // Throws "Value should be ok"
    */
   expect: (message: string) => T;
-   /**
+  /**
    * Returns the contained `err` value, or throws the given error message it is an `ok`.
-   * 
+   *
    * It is recommended that expect messages are used to describe the reason you expect the `Result` should be `err` (hint: use the word "should").
-   * 
+   *
    * * Because this function may throw, its use is generally discouraged. Instead, prefer to use `err`.
-   * 
+   *
    * @example
    * console.log(ok(42).expectErr("Value should be err")); // Throws "Value should be err"
    * console.log(err('error').expectErr("Value should be err")); // Logs "error" to the console
@@ -259,20 +257,24 @@ export function ok<T>(value: T): OkResult<T> {
       return ok(value);
     },
     inspectErr: () => ok(value),
-    and: (res) => res,
-    andThen: (fn) => fn(value), // TODO test
-    or: () => ok(value),
-    orElse: () => ok(value), // TODO test
-    map: (fn) => ok(fn(value)),
-    mapErr: () => ok(value),
-    mapOr: (_, fn) => fn(value), // TODO test
-    mapOrElse: (_, fn) => fn(value), // TODO test
+    expect: () => value,
+    expectErr: (message) => {
+      throw message;
+    },
     unwrap: () => value,
     unwrapErr: () => {
       throw value;
     },
     unwrapOr: () => value,
     unwrapOrElse: () => value,
+    map: (fn) => ok(fn(value)),
+    mapErr: () => ok(value),
+    mapOr: (_, fn) => fn(value), // TODO test
+    mapOrElse: (_, fn) => fn(value), // TODO test
+    and: (res) => res,
+    andThen: (fn) => fn(value), // TODO test
+    or: () => ok(value),
+    orElse: () => ok(value), // TODO test
   };
 }
 
@@ -285,20 +287,24 @@ export function err<E>(error: E): ErrResult<E> {
       fn(error);
       return err(error);
     },
-    and: () => err(error),
-    andThen: () => err(error), // TODO test
-    or: (res) => res,
-    orElse: (fn) => fn(error), // TODO test
-    map: () => err(error),
-    mapErr: (fn) => err(fn(error)),
-    mapOr: (defaultValue) => defaultValue, // TODO test
-    mapOrElse: (defaultFn) => defaultFn(error), // TODO test
+    expect: (message) => {
+      throw message;
+    },
+    expectErr: () => error,
     unwrap: () => {
       throw error;
     },
     unwrapErr: () => error,
     unwrapOr: (defaultValue) => defaultValue,
     unwrapOrElse: (fn) => fn(error),
+    map: () => err(error),
+    mapErr: (fn) => err(fn(error)),
+    mapOr: (defaultValue) => defaultValue, // TODO test
+    mapOrElse: (defaultFn) => defaultFn(error), // TODO test
+    and: () => err(error),
+    andThen: () => err(error), // TODO test
+    or: (res) => res,
+    orElse: (fn) => fn(error), // TODO test
   };
 }
 

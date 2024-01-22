@@ -82,6 +82,32 @@ describe('Result', () => {
     }
   });
 
+  it('Allows to unwrap the result value with a custom error message', async () => {
+    expect(okValue.expect('Should be ok')).toBe('value');
+    expect(() => okValue.expectErr('Should be error')).toThrow('Should be error');
+
+    expect(() => errValue.expect('Should be ok')).toThrow('Should be ok');
+    expect(errValue.expectErr('Should be error')).toBe('error');
+
+    // expectResultUnwrap(okResValue).toBe<'value', unknown>(true);
+    // expect(okResValue.unwrap()).toEqual('value');
+    // expect(okResValue.unwrapErr).toThrowErrorMatchingInlineSnapshot('"value"');
+
+    // expectResultUnwrap(errResValue).toBe<'value', unknown>(true);
+    // expect(errResValue.unwrap).toThrow('error');
+    // expect(errResValue.unwrapErr()).toStrictEqual(Error('error'));
+
+    // const asyncOkResultValue = await asyncResult(noThrowAsync);
+    // expectResultUnwrap(asyncOkResultValue).toBe<'value', unknown>(true);
+    // expect(asyncOkResultValue.unwrap()).toBe('value');
+    // expect(asyncOkResultValue.unwrapErr).toThrowErrorMatchingInlineSnapshot('"value"');
+
+    // const asyncErrResultValue = await asyncResult(throwAsync);
+    // expectResultUnwrap(asyncErrResultValue).toBe<'value', unknown>(true);
+    // expect(asyncErrResultValue.unwrap).toThrow('error');
+    // expect(asyncErrResultValue.unwrapErr()).toStrictEqual(Error('error'));
+  });
+
   it('Allows to unwrap the result value', async () => {
     expectResultUnwrap(okValue).toBe<'value', never>(true);
     expect(okValue.unwrap()).toBe('value');
@@ -315,12 +341,13 @@ describe('Result', () => {
 
   it('Provides a `map` operation for `ok` and `err` values', () => {
     const mapFn = (v: string) => v === 'value';
-    const mapErrFn = (v: unknown) => v === 'error' ? 'new-error' as const : 'old-error' as const
+    const mapErrFn = (v: unknown) =>
+      v === 'error' ? ('new-error' as const) : ('old-error' as const);
 
     const okMapped = okValue.map(mapFn);
     expectResultUnwrap(okMapped).toBe<boolean, never>(true);
     expect(okMapped.unwrap()).toBe(true);
-    const okMappedErr = okValue.mapErr(mapErrFn)
+    const okMappedErr = okValue.mapErr(mapErrFn);
     expectResultUnwrap(okMappedErr).toBe<'value', never>(true);
     expect(okMappedErr.unwrap()).toBe('value');
 

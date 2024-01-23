@@ -1,4 +1,4 @@
-import { NoneOption, SomeOption, AnyOption, none, some } from '@quintal/option';
+import { AnyOption, NoneOption, SomeOption, none, some } from '@quintal/option';
 
 type IsOk<TOk extends boolean, TTrue, TFalse> = TOk extends true ? TTrue : TFalse;
 
@@ -336,14 +336,16 @@ export function ok<T>(value: T): OkResult<T> {
     err: () => none,
     flatten: () => {
       // TODO achieve without cast
-      type Cast = T extends AnyResult ? T : OkResult<T>
+      type Cast = T extends AnyResult ? T : OkResult<T>;
       if (isAnyResult(value)) return value as Cast;
       return ok(value) as Cast;
     },
     transpose: () => {
       // TODO achieve without casts
-      type Cast = T extends NoneOption ? T : SomeOption<OkResult<T extends SomeOption<infer TSome> ? TSome : T>>;
-      const isOption = isAnyOption(value); 
+      type Cast = T extends NoneOption
+        ? T
+        : SomeOption<OkResult<T extends SomeOption<infer TSome> ? TSome : T>>;
+      const isOption = isAnyOption(value);
       if (isOption && value.isNone) return value as Cast;
       return some(ok(isOption && value.isSome ? value.unwrap() : value)) as Cast;
     },

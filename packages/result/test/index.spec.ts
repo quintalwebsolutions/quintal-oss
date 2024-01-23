@@ -1,5 +1,6 @@
+import { NoneOption, Option, SomeOption, none, some } from '@quintal/option';
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
-import { AnyResult, Result, asyncResult, err, ok, result } from '../src';
+import { AnyResult, ErrResult, OkResult, Result, asyncResult, err, ok, result } from '../src';
 
 // Source https://www.totaltypescript.com/how-to-test-your-types
 type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
@@ -53,9 +54,7 @@ const okResValue = result(noThrowSync);
 const errResValue = result(throwSync);
 
 describe('Result', () => {
-  it('Is able to create type-safe `ok` and `err` values', () => {
-    const resultValue = result(noThrowSync);
-
+  it('should accurately type-check and validate `ok` and `err` states', () => {
     expectTypeOf(okValue.isOk).toEqualTypeOf<true>();
     expect(okValue.isOk).toBe(true);
     expectTypeOf(okValue.isErr).toEqualTypeOf<false>();
@@ -66,13 +65,13 @@ describe('Result', () => {
     expectTypeOf(errValue.isErr).toEqualTypeOf<true>();
     expect(errValue.isErr).toBe(true);
 
-    expectTypeOf(resultValue.isOk).toEqualTypeOf<boolean>();
-    expect(resultValue.isOk).toBe(true);
-    expectTypeOf(resultValue.isErr).toEqualTypeOf<boolean>();
-    expect(resultValue.isErr).toBe(false);
+    expectTypeOf(okResValue.isOk).toEqualTypeOf<boolean>();
+    expect(okResValue.isOk).toBe(true);
+    expectTypeOf(okResValue.isErr).toEqualTypeOf<boolean>();
+    expect(okResValue.isErr).toBe(false);
   });
 
-  it('Allows to type-narrow a generic result type', () => {
+  it('should correctly type-narrow based on `isOk` and `isErr` checks', () => {
     const unknownResult = result(noThrowSync);
     expectResultUnwrap(unknownResult).toBe<'value', unknown>(true);
     if (unknownResult.isOk) {
@@ -82,7 +81,7 @@ describe('Result', () => {
     }
   });
 
-  it('Allows to unwrap the result value with a custom error message', async () => {
+  it('should unwrap the contained value or throw a custom error with `expect` and `expectErr`', async () => {
     expect(okValue.expect('Should be ok')).toBe('value');
     expect(() => okValue.expectErr('Should be error')).toThrow('Should be error');
 
@@ -104,10 +103,10 @@ describe('Result', () => {
     expect(asyncErrResultValue.expectErr('Should be error')).toStrictEqual(Error('error'));
   });
 
-  it('Allows to unwrap the result value', async () => {
+  it('should unwrap the contained `ok` value and throw on `err` with `unwrap` and `unwrapErr`', async () => {
     expectResultUnwrap(okValue).toBe<'value', never>(true);
     expect(okValue.unwrap()).toBe('value');
-    expect(okValue.unwrapErr).toThrowErrorMatchingInlineSnapshot('"value"');
+    expect(okValue.unwrapErr).toThrow("Attempted to unwrapErr an 'ok' value: value");
 
     expectResultUnwrap(errValue).toBe<never, 'error'>(true);
     expect(errValue.unwrap).toThrow('error');
@@ -115,7 +114,7 @@ describe('Result', () => {
 
     expectResultUnwrap(okResValue).toBe<'value', unknown>(true);
     expect(okResValue.unwrap()).toBe('value');
-    expect(okResValue.unwrapErr).toThrowErrorMatchingInlineSnapshot('"value"');
+    expect(okResValue.unwrapErr).toThrow("Attempted to unwrapErr an 'ok' value: value");
 
     expectResultUnwrap(errResValue).toBe<'value', unknown>(true);
     expect(errResValue.unwrap).toThrow('error');
@@ -124,7 +123,7 @@ describe('Result', () => {
     const asyncOkResultValue = await asyncResult(noThrowAsync);
     expectResultUnwrap(asyncOkResultValue).toBe<'value', unknown>(true);
     expect(asyncOkResultValue.unwrap()).toBe('value');
-    expect(asyncOkResultValue.unwrapErr).toThrowErrorMatchingInlineSnapshot('"value"');
+    expect(asyncOkResultValue.unwrapErr).toThrow("Attempted to unwrapErr an 'ok' value: value");
 
     const asyncErrResultValue = await asyncResult(throwAsync);
     expectResultUnwrap(asyncErrResultValue).toBe<'value', unknown>(true);
@@ -132,7 +131,7 @@ describe('Result', () => {
     expect(asyncErrResultValue.unwrapErr()).toStrictEqual(Error('error'));
   });
 
-  it('Allows to unwrap a result value and provide a default value or compute it from a closure', () => {
+  it('should unwrap the contained value or return default with `unwrapOr` and `unwrapOrElse`', () => {
     const defaultValue = 'default' as const;
     const mock = vi.fn();
     const defaultFunction = () => {
@@ -173,7 +172,7 @@ describe('Result', () => {
     expect(errResOrElse).toBe('default');
   });
 
-  it('Allows to inspect the value in the result', () => {
+  it('should facilityate inspection of `ok` and `err` values with `inspect` and `inspectErr`', () => {
     const mockFn = vi.fn();
 
     okValue.inspect((v) => {
@@ -203,7 +202,7 @@ describe('Result', () => {
     expect(mockFn).toHaveBeenCalledTimes(2);
   });
 
-  it('Provides an `and` operation', () => {
+  it('should apply the logical `and` operation between result values', () => {
     const okOk = earlyOk.and(lateOk);
     expectResultUnwrap(okOk).toBe<'late', never>(true);
     expect(okOk.unwrap()).toBe('late');
@@ -269,7 +268,7 @@ describe('Result', () => {
     expect(resErrResErr.unwrapErr()).toBe('error1');
   });
 
-  it('Provides an `andThen` operation', () => {
+  it('should facilitate `andThen` chaining for result transformations', () => {
     const okOk = earlyOk.andThen(() => lateOk);
     expectResultUnwrap(okOk).toBe<'late', never>(true);
     expect(okOk.unwrap()).toBe('late');
@@ -335,7 +334,7 @@ describe('Result', () => {
     expect(resErrResErr.unwrapErr()).toBe('error1');
   });
 
-  it('Provides an `or` operation', () => {
+  it('should apply the logical `or` operation between result values', () => {
     const okOk = earlyOk.or(lateOk);
     expectResultUnwrap(okOk).toBe<'early', never>(true);
     expect(okOk.unwrap()).toBe('early');
@@ -401,7 +400,7 @@ describe('Result', () => {
     expect(resErrResErr.unwrapErr()).toBe('error2');
   });
 
-  it('Provides an `orElse` operation', () => {
+  it('should facilitate `orElse` chaining for error handling in results', () => {
     const okOk = earlyOk.orElse(() => lateOk);
     expectResultUnwrap(okOk).toBe<'early', never>(true);
     expect(okOk.unwrap()).toBe('early');
@@ -467,7 +466,7 @@ describe('Result', () => {
     expect(resErrResErr.unwrapErr()).toBe('error2');
   });
 
-  it('Provides a `map` operation for `ok` and `err` values', () => {
+  it('should map a function `ok` and `err` values using `map` and `mapErr`', () => {
     const mapFn = (v: string) => v === 'value';
     const mapErrFn = (v: unknown) =>
       v === 'error' ? ('new-error' as const) : ('old-error' as const);
@@ -501,7 +500,7 @@ describe('Result', () => {
     expect(errResultMappedErr.unwrapErr()).toStrictEqual('old-error');
   });
 
-  it('mapOr should return the mapped value for ok and default value for err', () => {
+  it('should return mapped value or default with `mapOr` for `ok` and `err`', () => {
     const mapFn = (v: string) => (v === 'value' ? 1 : 2);
     const expectMappedType = (v: 0 | 1 | 2) => v;
 
@@ -522,7 +521,7 @@ describe('Result', () => {
     expect(errResultMapped).toBe(0);
   });
 
-  it('mapOrElse should return the mapped value for ok and computed default for err', () => {
+  it('should apply mapping or fallback function with `mapOrElse`', () => {
     const mapFn = (v: string) => (v === 'value' ? 1 : 2);
     const expectMappedType = (v: 0 | 1 | 2) => v;
 
@@ -543,7 +542,7 @@ describe('Result', () => {
     expect(errResultMapped).toBe(0);
   });
 
-  it('Provides an `isOkAnd` operation', () => {
+  it('should validate `ok` values against predicates with `isOkAnd`', () => {
     const pTrue = () => true;
     const pFalse = () => false;
 
@@ -568,7 +567,7 @@ describe('Result', () => {
     expect(errResultFalse).toBe(false);
   });
 
-  it('Provides an `isErrAnd` operation', () => {
+  it('should validate `err` values against predicates with `isErrAnd`', () => {
     const pTrue = () => true;
     const pFalse = () => false;
 
@@ -591,5 +590,134 @@ describe('Result', () => {
     expect(errResultTrue).toBe(true);
     const errResultFalse = errResValue.isErrAnd(pFalse);
     expect(errResultFalse).toBe(false);
+  });
+
+  it('should convert to `Option` with `ok` and `err`', () => {
+    const okSome = okValue.ok();
+    expectTypeOf(okSome).toEqualTypeOf<SomeOption<'value'>>();
+    expectTypeOf(okSome.isSome).toEqualTypeOf<true>();
+    expect(okSome.isSome).toBe(true);
+    expect(okSome.unwrap()).toBe('value');
+
+    const okNone = okValue.err();
+    expectTypeOf(okNone).toEqualTypeOf<NoneOption>();
+    expectTypeOf(okNone.isSome).toEqualTypeOf<false>();
+    expect(okNone.isNone).toBe(true);
+    expect(okNone.unwrap).toThrow();
+
+    const errSome = errValue.err();
+    expectTypeOf(errSome).toEqualTypeOf<SomeOption<'error'>>();
+    expectTypeOf(errSome.isSome).toEqualTypeOf<true>();
+    expect(errSome.isSome).toBe(true);
+    expect(errSome.unwrap()).toBe('error');
+
+    const errNone = errValue.ok();
+    expectTypeOf(errNone).toEqualTypeOf<NoneOption>();
+    expectTypeOf(errNone.isSome).toEqualTypeOf<false>();
+    expect(errNone.isNone).toBe(true);
+    expect(errNone.unwrap).toThrow();
+
+    const okResSome = okResValue.ok();
+    expectTypeOf(okResSome).toEqualTypeOf<Option<'value'>>();
+    expectTypeOf(okResSome.isSome).toEqualTypeOf<boolean>();
+    expect(okResSome.isSome).toBe(true);
+    expect(okResSome.unwrap()).toBe('value');
+
+    const okResNone = okResValue.err();
+    expectTypeOf(okResNone).toEqualTypeOf<Option<unknown>>();
+    expectTypeOf(okResNone.isSome).toEqualTypeOf<boolean>();
+    expect(okResNone.isNone).toBe(true);
+    expect(okResNone.unwrap).toThrow();
+
+    const errResSome = errResValue.err();
+    expectTypeOf(errResSome).toEqualTypeOf<Option<unknown>>();
+    expectTypeOf(errResSome.isSome).toEqualTypeOf<boolean>();
+    expect(errResSome.isSome).toBe(true);
+    expect(errResSome.unwrap()).toStrictEqual(Error('error'));
+
+    const errResNone = errResValue.ok();
+    expectTypeOf(errResNone).toEqualTypeOf<Option<'value'>>();
+    expectTypeOf(errResNone.isSome).toEqualTypeOf<boolean>();
+    expect(errResNone.isNone).toBe(true);
+    expect(errResNone.unwrap).toThrow();
+  });
+
+  it('should flatten a `Result` for at most one level', () => {
+    const singleOk = ok('value' as const).flatten();
+    expectResultUnwrap(singleOk).toBe<'value', never>(true);
+    expect(singleOk.unwrap()).toBe('value');
+
+    const singleErr = err('error' as const).flatten();
+    expectResultUnwrap(singleErr).toBe<never, 'error'>(true);
+    expect(singleErr.unwrapErr()).toBe('error');
+
+    const singleOkRes = okResValue.flatten();
+    expectResultUnwrap(singleOkRes).toBe<'value', unknown>(true);
+    expect(singleOkRes.unwrap()).toBe('value');
+
+    const singleErrRes = errResValue.flatten();
+    expectResultUnwrap(singleErrRes).toBe<'value', unknown>(true);
+    expect(singleErrRes.unwrapErr()).toStrictEqual(Error('error'));
+
+    const okOk = ok(ok('value' as const)).flatten();
+    expectResultUnwrap(okOk).toBe<'value', never>(true);
+    expect(okOk.unwrap()).toBe('value');
+
+    const okErr = ok(err('error' as const)).flatten();
+    expectResultUnwrap(okErr).toBe<never, 'error'>(true);
+    expect(okErr.unwrapErr()).toBe('error');
+
+    const errOk = err(ok('value' as const)).flatten();
+    expectResultUnwrap(errOk).toBe<never, OkResult<'value'>>(true);
+    expect(errOk.unwrapErr().unwrap()).toBe('value');
+
+    const errErr = err(err('error' as const)).flatten();
+    expectResultUnwrap(errErr).toBe<never, ErrResult<'error'>>(true);
+    expect(errErr.unwrapErr().unwrapErr()).toBe('error');
+
+    const okOkOk = ok(ok(ok('value' as const))).flatten();
+    expectResultUnwrap(okOkOk).toBe<OkResult<'value'>, never>(true);
+    expect(okOkOk.unwrap().unwrap()).toBe('value');
+
+    const okOkRes = (ok(ok('value')) as Result<Result<'value', 'error2'>, 'error1'>).flatten();
+    expectResultUnwrap(okOkRes).toBe<'value', 'error1' | 'error2'>(true);
+    expect(okOkRes.unwrap()).toBe('value');
+  });
+
+  it('should transpose a `Result` of an `Option` into an `Option` of a `Result`', () => {
+    const okNone = ok(none).transpose();
+    expectTypeOf(okNone).toEqualTypeOf<NoneOption>();
+    expect(okNone.isNone).toBe(true);
+
+    const okSome = ok(some('value' as const)).transpose();
+    expectTypeOf(okSome).toEqualTypeOf<SomeOption<OkResult<'value'>>>();
+    expect(okSome.isSome).toBe(true);
+    expect(okSome.unwrap().isOk).toBe(true);
+    expect(okSome.unwrap().unwrap()).toBe('value');
+
+    const okTransposed = okValue.transpose();
+    expectTypeOf(okTransposed).toEqualTypeOf<SomeOption<OkResult<'value'>>>();
+    expect(okTransposed.isSome).toBe(true);
+    expect(okTransposed.unwrap().isOk).toBe(true);
+    expect(okTransposed.unwrap().unwrap()).toBe('value');
+
+    const errNone = err(none).transpose();
+    expectTypeOf(errNone).toEqualTypeOf<SomeOption<ErrResult<NoneOption>>>();
+    expect(errNone.isSome).toBe(true);
+    expect(errNone.unwrap().isErr).toBe(true);
+    expect(errNone.unwrap().unwrapErr().isNone).toBe(true);
+
+    const errSome = err(some('value' as const)).transpose();
+    expectTypeOf(errSome).toEqualTypeOf<SomeOption<ErrResult<SomeOption<'value'>>>>();
+    expect(errSome.isSome).toBe(true);
+    expect(errSome.unwrap().isErr).toBe(true);
+    expect(errSome.unwrap().unwrapErr().isSome).toBe(true);
+    expect(errSome.unwrap().unwrapErr().unwrap()).toBe('value');
+
+    const errTransposed = errValue.transpose();
+    expectTypeOf(errTransposed).toEqualTypeOf<SomeOption<ErrResult<'error'>>>();
+    expect(errTransposed.isSome).toBe(true);
+    expect(errTransposed.unwrap().isErr).toBe(true);
+    expect(errTransposed.unwrap().unwrapErr()).toBe('error');
   });
 });

@@ -1,6 +1,6 @@
 {
-  "name": "@quintal/result",
-  "version": "0.2.0",
+  "name": "@quintal/option",
+  "version": "0.0.0",
   "main": "./.dist/index.cjs",
   "module": "./.dist/index.mjs",
   "types": "./.dist/index.d.ts",
@@ -14,13 +14,13 @@
     "lint": "pnpm lint:fix && pnpm lint:types",
     "lint:check": "biome ci .",
     "lint:fix": "biome check --apply-unsafe .",
-    "lint:types": "tsc --noEmit",
+    "lint:types": "t.sc --noEmit",
     "test": "run-s test:*",
     "test:source": "vitest",
     "test:types": "typescript-coverage-report --outputDir .coverage-ts --strict"
   },
   "dependencies": {
-    "@quintal/option": "workspace:*"
+    "@quintal/result": "workspace:*"
   },
   "devDependencies": {
     "@quintal/config": "workspace:*",

@@ -1,13 +1,13 @@
 # Result
 
-A TypeScript error handling paradigm using a `Result` monad, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/). For an amazing introduction to Monads, [watch this video by Studying With Alex](https://www.youtube.com/watch?v=C2w45qRc3aU)
+A TypeScript error handling paradigm using a `Result` monad, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/). For an amazing introduction to Monads, [watch this video by Studying With Alex](https://www.youtube.com/watch?v=C2w45qRc3aU).
 
-`Result<T, E>` is a type used for returning and propagating errors. It has the following variants:
+The type `Result<T, E>` is used for returning and propagating errors. It has the following variants:
 
 - `ok(value: T)`, representing success;
 - `err(error: E)`, representing error.
 
-Functions return `Result` whenever errors are expected and recoverable. A simple function returning `Result`` might be defined and used like so:
+Functions return `Result` whenever errors are expected and recoverable. It signifies that the absence of a value is due to an error or an exceptional situation that the caller needs to handle specifically. For cases where having no value is expected, have a look at [@quintal/option](https://npmjs.com/package/@quintal/option). A simple function returning `Result` might be defined and used like so:
 
 // TODO add example
 
@@ -25,7 +25,7 @@ Functions return `Result` whenever errors are expected and recoverable. A simple
 - `isOkAnd` and `isErrAnd` return `true` if the `Result` is `ok` or `err`, respectively, and the value inside of it matches a predicate.
 - `inspect` and `inspectErr` peek into the `Result` if it is `ok` or `err`, respectively.
 
-### Extracting a contained value
+### Extracting the contained value
 
 These methods extract the contained value from a `Result<T, E>` when it is the `ok` variant. If the `Result` is `err`:
 

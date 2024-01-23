@@ -141,7 +141,48 @@ importers:
         specifier: 0.34.6
         version: 0.34.6(happy-dom@12.10.3)
 
+  packages/option:
+    dependencies:
+      '@quintal/result':
+        specifier: workspace:*
+        version: link:../result
+    devDependencies:
+      '@quintal/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: 20.10.2
+        version: 20.10.2
+      '@vitest/coverage-v8':
+        specifier: 0.34.6
+        version: 0.34.6(vitest@0.34.6)
+      happy-dom:
+        specifier: 12.10.3
+        version: 12.10.3
+      typedoc:
+        specifier: 0.25.7
+        version: 0.25.7(typescript@5.3.2)
+      typedoc-plugin-markdown:
+        specifier: 3.17.1
+        version: 3.17.1(typedoc@0.25.7)
+      typescript:
+        specifier: 5.3.2
+        version: 5.3.2
+      typescript-coverage-report:
+        specifier: 0.8.0
+        version: 0.8.0(typescript@5.3.2)
+      vite:
+        specifier: 5.0.4
+        version: 5.0.4(@types/node@20.10.2)
+      vitest:
+        specifier: 0.34.6
+        version: 0.34.6(happy-dom@12.10.3)
+
   packages/result:
+    dependencies:
+      '@quintal/option':
+        specifier: workspace:*
+        version: link:../option
     devDependencies:
       '@quintal/config':
         specifier: workspace:*

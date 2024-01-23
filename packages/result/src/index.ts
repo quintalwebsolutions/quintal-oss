@@ -1,4 +1,26 @@
+import { NoneOption, SomeOption, AnyOption, none, some } from '@quintal/option';
+
 type IsOk<TOk extends boolean, TTrue, TFalse> = TOk extends true ? TTrue : TFalse;
+
+function isAnyResult<T>(res: T | AnyResult): res is AnyResult {
+  return (
+    typeof res === 'object' &&
+    res !== null &&
+    'isOk' in res &&
+    'isErr' in res &&
+    (res.isOk === true || res.isErr === true)
+  );
+}
+
+function isAnyOption<T>(opt: T | AnyOption): opt is AnyOption {
+  return (
+    typeof opt === 'object' &&
+    opt !== null &&
+    'isSome' in opt &&
+    'isNone' in opt &&
+    (opt.isSome === true || opt.isNone === true)
+  );
+}
 
 /** A type that represents either success or failure */
 export type ResultConstructor<TOk extends boolean, T, E> = {
@@ -19,7 +41,7 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    *   // `r.unwrap()` is of type `never`, `r.unwrapErr()` is of type `unknown`
    * }
    */
-  isOk: TOk; // TODO should this be a function? It would be more true to Rust
+  isOk: TOk;
   /**
    * Returns `true` if the result is `ok` and the value inside of it matches a predicate.
    *
@@ -45,7 +67,7 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    *   // `r.unwrap()` is of type `boolean`, `r.unwrapErr()` is of type `never`
    * }
    */
-  isErr: IsOk<TOk, false, true>; // TODO should this be a function? It would be more true to Rust
+  isErr: IsOk<TOk, false, true>;
   /**
    * Returns `true` if the result is `err` and the value inside of it matches a predicate.
    *
@@ -60,7 +82,7 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    * Calls the provided closure with a reference to the contained value (if `ok`).
    *
    * @example
-   * ok(42).inspect((value) => console.log(value)); // logs "42" to the console
+   * ok('value').inspect((value) => console.log(value)); // logs 'value' to the console
    * err('error').inspect((value) => console.log(value)); // Doesn't log anything
    */
   inspect: (fn: (value: T) => void) => ResultConstructor<TOk, T, E>;
@@ -69,34 +91,34 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    *
    * @example
    * ok(42).inspectErr((value) => console.log(value)); // Doesn't log anything
-   * err('error').inspectErr((value) => console.log(value)); // Logs "error" to the console
+   * err('error').inspectErr((value) => console.log(value)); // Logs 'error' to the console
    */
   inspectErr: (fn: (error: E) => void) => ResultConstructor<TOk, T, E>;
 
-  // Extracting a contained value
+  // Extracting the contained value
 
   /**
    * Returns the contained `ok` value, or throws the given error message it is an `err`.
    *
-   * It is recommended that expect messages are used to describe the reason you expect the `Result` should be `ok` (hint: use the word "should").
+   * It is recommended that expect messages are used to describe the reason you expect the `Result` should be `ok` (hint: use the word 'should').
    *
    * * Because this function may throw, its use is generally discouraged. Instead, prefer to use `ok`, `unwrapOr`, or `unwrapOrElse`.
    *
    * @example
-   * console.log(ok(42).expect("Value should be ok")); // Logs "42" to the console
-   * console.log(err('error').expect("Value should be ok")); // Throws "Value should be ok"
+   * ok('value').expect('Value should be ok'); // 'value'
+   * err('error').expect('Value should be ok'); // Throws 'Value should be ok'
    */
   expect: (message: string) => T;
   /**
    * Returns the contained `err` value, or throws the given error message it is an `ok`.
    *
-   * It is recommended that expect messages are used to describe the reason you expect the `Result` should be `err` (hint: use the word "should").
+   * It is recommended that expect messages are used to describe the reason you expect the `Result` should be `err` (hint: use the word 'should').
    *
    * * Because this function may throw, its use is generally discouraged. Instead, prefer to use `err`.
    *
    * @example
-   * console.log(ok(42).expectErr("Value should be err")); // Throws "Value should be err"
-   * console.log(err('error').expectErr("Value should be err")); // Logs "error" to the console
+   * ok('value').expectErr('Value should be err'); // Throws 'Value should be err'
+   * err('error').expectErr('Value should be err'); // 'error'
    */
   expectErr: (message: string) => E;
   /**
@@ -105,8 +127,8 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    * * Because this function may throw, its use is generally discouraged. Instead, prefer to use `ok`, `unwrapOr`, or `unwrapOrElse`.
    *
    * @example
-   * console.log(ok(42).unwrap()); // Logs "42" to the console
-   * console.log(err('error').unwrap()); // Throws "error"
+   * ok('value').unwrap(); // 'value'
+   * err('error').unwrap(); // Throws 'error'
    */
   unwrap: () => T;
   /**
@@ -115,8 +137,8 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    * * Because this function may throw, its use is generally discouraged. Instead, prefer to use `err`.
    *
    * @example
-   * console.log(ok(42).unwrapErr()); // Throws "42"
-   * console.log(err('error').unwrapErr()); // Logs "error" to the console
+   * ok('value').unwrapErr(); // Throws 'value'
+   * err('error').unwrapErr(); // 'error'
    */
   unwrapErr: () => E;
   /**
@@ -125,31 +147,74 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    * * If you are passing the result of a function call to `defaultValue`, it is recommended to use `unwrapOrElse`, which is lazily evaluated.
    *
    * @example
-   * console.log(ok('value').unwrapOr('default')); // Logs 'value' to the console
-   * console.log(err('error').unwrapOr('default')); // Logs 'default' to the console
+   * ok('value').unwrapOr('default'); // 'value'
+   * err('error').unwrapOr('default'); // 'default'
    */
   unwrapOr: <U>(defaultValue: U) => IsOk<TOk, T, U>;
   /**
    * Returns the contained `ok` value, or computes it from a closure.
    *
    * @example
-   * console.log(ok('value').unwrapOrElse((error) => 'default')); // Logs 'value' to the console
-   * console.log(err('error').unwrapOrElse((error) => 'default')); // Logs 'default' to the console
+   * ok('value').unwrapOrElse((_error) => 'default'); // 'value'
+   * err('error').unwrapOrElse((_error) => 'default'); // 'default'
    */
-  unwrapOrElse: <U>(op: (error: E) => U) => IsOk<TOk, T, U>;
+  unwrapOrElse: <U>(fn: (error: E) => U) => IsOk<TOk, T, U>;
 
   // Transforming contained values
 
-  // TODO ok: Converts from `Result<T, E>` to `Option<T>`, discarding the error, if any.
-  // TODO err: Converts from `Result<T, E>` to `Option<E>`, discarding the success value, if any.
+  /**
+   * Converts from `Result<T, E>` to `Option<T>` from [@quintal/option](https://npmjs.com/package/@quintal/option), discarding the error, if any.
+   *
+   * @example
+   * ok('value').ok(); // some('value')
+   * err('error').ok(); // none
+   */
+  ok: () => IsOk<TOk, SomeOption<T>, NoneOption>;
+  /**
+   * Converts from `Result<T, E>` to `Option<E>` from [@quintal/option](https://npmjs.com/package/@quintal/option), discarding the success value, if any.
+   *
+   * @example
+   * ok('value').err(); // none
+   * err('error').err(); // some('error')
+   */
+  err: () => IsOk<TOk, NoneOption, SomeOption<E>>;
+  /**
+   * Transposes a `Result` of an `Option` into an `Option` of a `Result`
+   *
+   * @example
+   * ok(none).transpose(); // none
+   * ok(some('value')).transpose(); // some(ok('value'))
+   * ok('value').transpose(); // some(ok('value'))
+   * err(none).transpose(); // some(err(none))
+   * err(some('value')).transpose(); // some(err(some('value')))
+   * err('error').transpose(); // some(err('error'))
+   */
+  transpose: () => IsOk<
+    TOk,
+    T extends NoneOption ? T : SomeOption<OkResult<T extends SomeOption<infer TSome> ? TSome : T>>,
+    SomeOption<ErrResult<E>>
+  >;
+  /**
+   * Flattens at most one level of `Result` nesting.
+   *
+   * @example
+   * ok('value').flatten(); // ok('value')
+   * err('error').flatten(); // err('error')
+   * ok(ok('value')).flatten(); // ok('value')
+   * ok(err('error')).flatten(); // err('error')
+   * err(ok('value')).flatten(); // err(ok('value'))
+   * err(err('error)).flatten(); // err(err('error'))
+   * ok(ok(ok('value'))).flatten(); // ok(ok('value'))
+   */
+  flatten: () => IsOk<TOk, T extends AnyResult ? T : OkResult<T>, ErrResult<E>>;
   /**
    * Maps a `Result<T, E>` to a `Result<U, E>` by applying a function to a contained `ok` value, leaving an `err` value untouched.
    *
    * This function can be used to compose the results of two functions.
    *
    * @example
-   * console.log(ok(2).map((v) => v * 2).unwrap()); // Logs '4' to the console
-   * console.log(err(2).map((v) => v * 2).unwrapErr()); // Logs '2' to the console
+   * ok(2).map((v) => v * 2).unwrap(); // 4
+   * err(2).map((v) => v * 2).unwrapErr(); // 2
    */
   map: <U>(fn: (value: T) => U) => IsOk<TOk, OkResult<U>, ErrResult<E>>;
   /**
@@ -158,8 +223,8 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    * This function can be used to pass through a successful result while handling an error.
    *
    * @example
-   * console.log(ok(2).mapErr((v) => v * 2).unwrap()); // Logs '2' to the console
-   * console.log(err(2).mapErr((v) => v * 2).unwrapErr()); // Logs '4' to the console
+   * ok(2).mapErr((v) => v * 2).unwrap(); // 2
+   * err(2).mapErr((v) => v * 2).unwrapErr(); // 4
    */
   mapErr: <F>(fn: (error: E) => F) => IsOk<TOk, OkResult<T>, ErrResult<F>>;
   /**
@@ -168,12 +233,20 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    * This function can be used to unpack a successful result while handling an error.
    *
    * * If you are passing the result of a function call to `defaultValue`, it is recommended to use `mapOrElse`, which is lazily evaluated.
+   *
+   * @example
+   * ok(2).mapOr(42, (v) => v * 2).unwrap(); // 4
+   * err(2).mapOr(42, (v) => v * 2).unwrapErr() // 42
    */
   mapOr: <U>(defaultValue: U, fn: (value: T) => U) => U;
   /**
    * Maps a `Result<T, E>` to `U` by applying fallback function `defaultFn` to an `err` value, or function `fn` to an `ok` value.
    *
    * This function can be used to unpack a successful result while handling an error.
+   *
+   * @example
+   * ok(2).mapOrElse((_error) => 42, (v) => v * 2).unwrap(); // 4
+   * err(2).mapOrElse((_error) => 42, (v) => v * 2).unwrapErr() // 42
    */
   mapOrElse: <U>(defaultFn: (error: E) => U, fn: (value: T) => U) => U;
 
@@ -185,24 +258,10 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    * * If you are passing the result of a function call to `res`, it is recommended to use `andThen`, which is lazily evaluated.
    *
    * @example
-   * const x = ok(2);
-   * const y = err('late error');
-   * expect(x.and(y)).toBe(err('late error'));
-   *
-   * @example
-   * const x = err('early error');
-   * const y = ok('foo');
-   * expect(x.and(y)).toBe(err('early error'));
-   *
-   * @example
-   * const x = err('not a 2');
-   * const y = err('late error');
-   * expect(x.and(y)).toBe(err('not a 2'));
-   *
-   * @example
-   * const x = ok(2);
-   * const y = ok('different result type');
-   * expect(x.and(y)).toBe(ok('different result type'));
+   * err('early error').and(ok('late value')).unwrapErr(); // 'early error'
+   * err('early error').and(err('late error)).unwrapErr(); // 'early error'
+   * ok('early value').and(err('late error')).unwrapErr(); // 'late error'
+   * ok('early value').and(ok('late value')).unwrap(); // 'late value'
    */
   and: <R extends AnyResult>(res: R) => IsOk<TOk, R, ErrResult<E>>;
   /**
@@ -212,9 +271,9 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    *
    * @example
    * const s = (x: number) => x === 42 ? err('bad number') : ok(x * x);
-   * expect(ok(2)).andThen(s)).toBe(ok(4));
-   * expect(ok(42).andThen(s)).toBe(err('bad number'));
-   * expect(err('not a number').andThen(s)).toBe(err('not a number'));
+   * ok(2).andThen(s).unwrap(); // 4
+   * ok(42).andThen(s).unwrapErr(); // 'bad number'
+   * err('not a number').andThen(s).unwrapErr(); // 'not a number'
    */
   andThen: <R extends AnyResult>(fn: (value: T) => R) => IsOk<TOk, R, ErrResult<E>>;
   /**
@@ -223,24 +282,10 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    * * If you are passing the result of a function call to `res`, it is recommended to use `orElse`, which is lazily evaluated.
    *
    * @example
-   * const x = ok(2);
-   * const y = err('late error');
-   * expect(x.or(y)).toBe(ok(2));
-   *
-   * @example
-   * const x = err('early error');
-   * const y = ok(2);
-   * expect(x.or(y)).toBe(ok(2));
-   *
-   * @example
-   * const x = err('not a 2');
-   * const y = err('late error');
-   * expect(x.or(y)).toBe(err('late error'));
-   *
-   * @example
-   * const x = ok(2);
-   * const y = ok(100);
-   * expect(x.or(y)).toBe(ok(2));
+   * ok('early value').or(ok('late value)).unwrap(); // 'early value'
+   * ok('early value').or(err('late error')).unwrap(); // 'early value'
+   * err('early error').or(ok('late value')).unwrap(); // 'late value'
+   * err('early error').or(err('late error)).unwrapErr(); // 'late error'
    */
   or: <R extends AnyResult>(res: R) => IsOk<TOk, OkResult<T>, R>;
   /**
@@ -251,10 +296,10 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
    * @example
    * const s = (x: number) => ok(x * x);
    * const e = (x: number) => err(x);
-   * expect(ok(2).orElse(s).orElse(s)).toBe(ok(2));
-   * expect(ok(2).orElse(e).orElse(s)).toBe(ok(2));
-   * expect(err(3).orElse(s).orElse(e)).toBe(ok(9));
-   * expect(err(3).orElse(e).orElse(e)).toBe(err(3));
+   * ok(2).orElse(s).orElse(s).unwrap(); // 2
+   * ok(2).orElse(e).orElse(s).unwrap(); // 2
+   * err(2).orElse(s).orElse(e).unwrap(); // 4
+   * err(3).orElse(e).orElse(e).unwrapErr(); // 3
    */
   orElse: <R extends AnyResult>(fn: (error: E) => R) => IsOk<TOk, OkResult<T>, R>;
 };
@@ -279,14 +324,29 @@ export function ok<T>(value: T): OkResult<T> {
     inspectErr: () => ok(value),
     expect: () => value,
     expectErr: (message) => {
-      throw message;
+      throw new Error(message);
     },
     unwrap: () => value,
     unwrapErr: () => {
-      throw value;
+      throw new Error(`Attempted to unwrapErr an 'ok' value: ${value}`);
     },
     unwrapOr: () => value,
     unwrapOrElse: () => value,
+    ok: () => some(value),
+    err: () => none,
+    flatten: () => {
+      // TODO achieve without cast
+      type Cast = T extends AnyResult ? T : OkResult<T>
+      if (isAnyResult(value)) return value as Cast;
+      return ok(value) as Cast;
+    },
+    transpose: () => {
+      // TODO achieve without casts
+      type Cast = T extends NoneOption ? T : SomeOption<OkResult<T extends SomeOption<infer TSome> ? TSome : T>>;
+      const isOption = isAnyOption(value); 
+      if (isOption && value.isNone) return value as Cast;
+      return some(ok(isOption && value.isSome ? value.unwrap() : value)) as Cast;
+    },
     map: (fn) => ok(fn(value)),
     mapErr: () => ok(value),
     mapOr: (_, fn) => fn(value),
@@ -310,15 +370,19 @@ export function err<E>(error: E): ErrResult<E> {
       return err(error);
     },
     expect: (message) => {
-      throw message;
+      throw new Error(message);
     },
     expectErr: () => error,
     unwrap: () => {
-      throw error;
+      throw new Error(`Attempted to unwrap an 'err' value: ${error}`);
     },
     unwrapErr: () => error,
     unwrapOr: (defaultValue) => defaultValue,
     unwrapOrElse: (fn) => fn(error),
+    ok: () => none,
+    err: () => some(error),
+    flatten: () => err(error),
+    transpose: () => some(err(error)),
     map: () => err(error),
     mapErr: (fn) => err(fn(error)),
     mapOr: (defaultValue) => defaultValue,
@@ -339,9 +403,9 @@ export function result<T>(fn: () => T): Result<T, unknown> {
   }
 }
 
-export async function asyncResult<T>(fn: () => Promise<T>): Promise<Result<T, unknown>> {
+export async function asyncResult<T>(fn: () => Promise<T>): Promise<Result<Awaited<T>, unknown>> {
   try {
-    const value = (await fn()) as T; // I don't get why this cast is necessary
+    const value = await fn();
     return ok(value);
   } catch (e) {
     return err(e);

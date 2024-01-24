@@ -17,7 +17,6 @@ export type OptionConstructor<TSome extends boolean, T> = {
   getOrInsertWith: (fn: () => T) => Option<T>;
   insert: (value: T) => Option<T>;
   inspect: (fn: (value: T) => void) => Option<T>;
-
 };
 
 export type SomeOption<T> = OptionConstructor<true, T>;
@@ -33,7 +32,7 @@ export function some<T>(value: T): SomeOption<T> {
     isNone: false,
     expect: () => value,
     unwrap: () => value,
-  }
+  };
 }
 
 export const none: NoneOption = {
@@ -44,5 +43,5 @@ export const none: NoneOption = {
   },
   unwrap: () => {
     throw new ReferenceError('Attempted to unwrap a none value');
-  }
-}
+  },
+};

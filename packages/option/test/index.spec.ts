@@ -1,5 +1,5 @@
-import {describe, expect, expectTypeOf, it} from 'vitest'
-import {some, none, Option, AnyOption} from '../src';
+import { describe, expect, expectTypeOf, it } from 'vitest';
+import { AnyOption, Option, none, some } from '../src';
 
 // Source https://www.totaltypescript.com/how-to-test-your-types
 type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
@@ -8,9 +8,7 @@ type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ?
 
 function expectOptionUnwrap<TOption extends AnyOption>(_option: TOption) {
   return {
-    toBe: <TUnwrap>(
-      _val:Equal<ReturnType<TOption['unwrap']>, TUnwrap>,
-    ) => {},
+    toBe: <TUnwrap>(_val: Equal<ReturnType<TOption['unwrap']>, TUnwrap>) => {},
   };
 }
 
@@ -23,7 +21,7 @@ const someOption2 = some('value2' as const) as Option<'value2'>;
 const noneOption1 = none as Option<'none1'>;
 const noneOption2 = none as Option<'none2'>;
 
-describe("Option", () => {
+describe('Option', () => {
   it('Is able to create type-save `some` and `none` values', () => {
     expectTypeOf(someValue.isSome).toEqualTypeOf<true>();
     expect(someValue.isSome).toBe(true);
@@ -34,17 +32,17 @@ describe("Option", () => {
     expect(noneValue.isSome).toBe(false);
     expectTypeOf(noneValue.isNone).toEqualTypeOf<true>();
     expect(noneValue.isNone).toBe(true);
-    
+
     expectTypeOf(someOption1.isSome).toEqualTypeOf<boolean>();
     expect(someOption1.isSome).toBe(true);
     expectTypeOf(someOption1.isNone).toEqualTypeOf<boolean>();
     expect(someOption1.isNone).toBe(false);
-    
+
     expectTypeOf(noneOption1.isSome).toEqualTypeOf<boolean>();
     expect(noneOption1.isSome).toBe(false);
     expectTypeOf(noneOption1.isNone).toEqualTypeOf<boolean>();
     expect(noneOption1.isNone).toBe(true);
-  })
+  });
 
   it('Allows to type-narrow a generic type', () => {
     expectOptionUnwrap(someOption1).toBe<'value1'>(true);
@@ -75,4 +73,4 @@ describe("Option", () => {
     expectOptionUnwrap(noneOption1).toBe<'none1'>(true);
     expect(noneOption1.unwrap).toThrow('Attempted to unwrap a none value');
   });
-})
+});

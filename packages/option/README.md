@@ -1,16 +1,16 @@
 # Option
 
-A TypeScript optional value handling paradigm using an `Option` monad, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/). For an amazing introduction to Monads, [watch this video by Studying With Alex](https://www.youtube.com/watch?v=C2w45qRc3aU).
+A TypeScript optional value handling paradigm using an `Option` monad, inspired by [the Rust programming language](https://doc.rust-lang.org/std/option/).
 
 The type `Option<T>` represents an optional value. It has the following variants:
 
 - `some(value: T)`, representing the presence of a value;
 - `none`, representing the absence of a value.
 
-Functions return `Option` whenever the absence of a value is a normal, expected part of the function's behaviour. It signifies that having no value is a routine possibility, not necessarily a problem or error. For those cases, have a look at [@quintal/result](https://npmjs.com/package/@quintal/result). A simple function returning `Option` might be defined and used like so:
+Functions return `Option` whenever the absence of a value is a normal, expected part of the function's behaviour. It signifies that having no value is a routine possibility, not necessarily a problem or error. For those cases, have a look at [@quintal/result](https://npmjs.com/package/@quintal/result). A function returning `Option` might be defined and used like so:
 
 ```ts
-import { some, none } from '@quintal/option';
+import { type Option, some, none } from '@quintal/option';
 
 function safeDivide(numerator: number, denominator: number): Option<number> {
   if (denominator === 0) return none;
@@ -70,5 +70,3 @@ These methods treat the `Option` as a boolean value, where `some` acts like `tru
 ## API
 
 You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/docs/@quintal/option)
-
-<!-- TODO auto-generate API section from typedoc -->

@@ -307,6 +307,7 @@ export type ResultConstructor<TOk extends boolean, T, E> = {
 export type OkResult<T> = ResultConstructor<true, T, never>;
 export type ErrResult<E> = ResultConstructor<false, never, E>;
 export type Result<T, E> = OkResult<T> | ErrResult<E>;
+export type AsyncResult<T, E> = Promise<Result<T, E>>;
 
 // biome-ignore lint/suspicious/noExplicitAny: This type exists for generics parameters to extend
 export type AnyResult = Result<any, any>;
@@ -405,7 +406,7 @@ export function result<T>(fn: () => T): Result<T, unknown> {
   }
 }
 
-export async function asyncResult<T>(fn: () => Promise<T>): Promise<Result<Awaited<T>, unknown>> {
+export async function asyncResult<T>(fn: () => Promise<T>): AsyncResult<Awaited<T>, unknown> {
   try {
     const value = await fn();
     return ok(value);

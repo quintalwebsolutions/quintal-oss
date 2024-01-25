@@ -1,8 +1,10 @@
 # Monads
 
+A collection of monads (e.g. Result, Option) for TypeScript, mostly inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/).
+
 ## Result
 
-A TypeScript error handling paradigm using a `Result` monad, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/).
+A TypeScript error handling paradigm using a `Result` monad.
 
 The type `Result<T, E>` is used for returning and propagating errors. It has the following variants:
 
@@ -153,7 +155,7 @@ You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/
 
 ## Option
 
-A TypeScript optional value handling paradigm using an `Option` monad, inspired by [the Rust programming language](https://doc.rust-lang.org/std/option/).
+A TypeScript optional value handling paradigm using an `Option` monad.
 
 The type `Option<T>` represents an optional value. It has the following variants:
 

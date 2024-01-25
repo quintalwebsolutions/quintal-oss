@@ -1,5 +1,5 @@
 ---
-"@quintal/option": patch
+"@quintal/monads": patch
 ---
 
 Init package

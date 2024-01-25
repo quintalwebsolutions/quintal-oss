@@ -1,17 +1,16 @@
-import { NoneOption, Option, SomeOption, none, some } from '@quintal/option';
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
-import { AnyResult, ErrResult, OkResult, Result, asyncResult, err, ok, result } from '../src';
-
-// Source https://www.totaltypescript.com/how-to-test-your-types
-type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
-  ? true
-  : false;
-
-type And<X extends boolean, Y extends boolean> = X extends true
-  ? Y extends true
-    ? true
-    : false
-  : false;
+import { NoneOption, Option, SomeOption, none, some } from '../src/option';
+import {
+  AnyResult,
+  ErrResult,
+  OkResult,
+  Result,
+  asyncResult,
+  err,
+  ok,
+  result,
+} from '../src/result';
+import { And, Equal } from '../src/util';
 
 function expectResultUnwrap<TResult extends AnyResult>(_result: TResult) {
   return {

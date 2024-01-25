@@ -1,8 +1,0 @@
-{
-  "extends": "@quintal/config/tsconfig/base.json",
-  "compilerOptions": {
-    "rootDir": "."
-  },
-  "include": ["**/*.ts", "vite.config.mjs"],
-  "exclude": [".config", ".coverage", ".coverage-ts", ".dist", ".docs", ".turbo", "node_modules"]
-}

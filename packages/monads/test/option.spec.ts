@@ -1,10 +1,6 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import { AnyOption, Option, none, some } from '../src';
-
-// Source https://www.totaltypescript.com/how-to-test-your-types
-type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
-  ? true
-  : false;
+import { AnyOption, Option, none, some } from '../src/option';
+import { Equal } from '../src/util';
 
 function expectOptionUnwrap<TOption extends AnyOption>(_option: TOption) {
   return {
@@ -14,12 +10,12 @@ function expectOptionUnwrap<TOption extends AnyOption>(_option: TOption) {
 
 const someValue = some('value' as const);
 const noneValue = none;
-const earlySome = some('early' as const);
-const lateSome = some('late' as const);
+// const earlySome = some('early' as const);
+// const lateSome = some('late' as const);
 const someOption1 = some('value1' as const) as Option<'value1'>;
-const someOption2 = some('value2' as const) as Option<'value2'>;
+// const someOption2 = some('value2' as const) as Option<'value2'>;
 const noneOption1 = none as Option<'none1'>;
-const noneOption2 = none as Option<'none2'>;
+// const noneOption2 = none as Option<'none2'>;
 
 describe('Option', () => {
   it('Is able to create type-save `some` and `none` values', () => {

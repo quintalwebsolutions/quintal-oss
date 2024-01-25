@@ -3,6 +3,6 @@
   "compilerOptions": {
     "rootDir": "."
   },
-  "include": ["**/*.ts", "vite.config.js"],
+  "include": ["**/*.ts", "vite.config.mjs"],
   "exclude": ["node_modules", "dist"]
 }

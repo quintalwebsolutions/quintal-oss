@@ -19,8 +19,8 @@ export default defineConfig({
       fileName: (format) => fileName[format],
     },
     rollupOptions: {
-      external: ['@quintal/result', '@quintal/option']
-    }
+      external: ['@quintal/result', '@quintal/option'],
+    },
   },
   test: {
     // TODO

@@ -1,22 +1,25 @@
-const { resolve } = require('node:path');
-const { defineConfig } = require('vite');
-const dts = require('vite-plugin-dts');
-const react = require('@vitejs/plugin-react');
+import { resolve } from 'node:path';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
 
 const fileName = {
-  es: `index.mjs`,
-  cjs: `index.cjs`,
+  es: 'index.mjs',
+  cjs: 'index.cjs',
 };
 
 const formats = Object.keys(fileName);
 
-module.exports = defineConfig({
+export default defineConfig({
   build: {
     lib: {
       entry: resolve(process.cwd(), 'src', 'index.ts'),
       name: '@quintal/result',
       formats,
       fileName: (format) => fileName[format],
+    },
+    rollupOptions: {
+      external: ['@quintal/result', '@quintal/option'],
     },
   },
   test: {

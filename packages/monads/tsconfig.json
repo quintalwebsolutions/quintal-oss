@@ -4,5 +4,5 @@
     "rootDir": "."
   },
   "include": ["**/*.ts", "vite.config.mjs"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": [".config", ".coverage", ".coverage-ts", ".dist", ".docs", ".turbo", "node_modules"]
 }

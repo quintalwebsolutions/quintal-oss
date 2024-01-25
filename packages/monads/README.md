@@ -11,7 +11,7 @@ The type `Result<T, E>` is used for returning and propagating errors. It has the
 - `ok(value: T)`, representing success;
 - `err(error: E)`, representing error.
 
-Functions return `Result` whenever errors are expected and recoverable. It signifies that the absence of a value is due to an error or an exceptional situation that the caller needs to handle specifically. For cases where having no value is expected, have a look at [@quintal/option](https://npmjs.com/package/@quintal/option). A function returning `Result` might be defined like so:
+Functions return `Result` whenever errors are expected and recoverable. It signifies that the absence of a value is due to an error or an exceptional situation that the caller needs to handle specifically. For cases where having no value is expected, have a look at the `Option` type. A function returning `Result` might be defined like so:
 
 ```ts
 import { type AsyncResult, asyncResult, err, ok } from '@quintal/result';
@@ -162,7 +162,7 @@ The type `Option<T>` represents an optional value. It has the following variants
 - `some(value: T)`, representing the presence of a value;
 - `none`, representing the absence of a value.
 
-Functions return `Option` whenever the absence of a value is a normal, expected part of the function's behaviour. It signifies that having no value is a routine possibility, not necessarily a problem or error. For those cases, have a look at [@quintal/result](https://npmjs.com/package/@quintal/result). A function returning `Option` might be defined like so:
+Functions return `Option` whenever the absence of a value is a normal, expected part of the function's behaviour. It signifies that having no value is a routine possibility, not necessarily a problem or error. For those cases, have a look at the `Result` type. A function returning `Option` might be defined like so:
 
 ```ts
 import { type Option, some, none } from '@quintal/option';

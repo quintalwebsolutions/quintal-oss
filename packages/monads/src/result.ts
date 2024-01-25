@@ -152,7 +152,7 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
   // Transforming the contained value
 
   /**
-   * Converts from `Result<T, E>` to `Option<T>` from [@quintal/option](https://npmjs.com/package/@quintal/option), discarding the error, if any.
+   * Converts from `Result<T, E>` to `Option<T>`, discarding the error, if any.
    *
    * @example
    * ok('value').ok(); // some('value')
@@ -160,7 +160,7 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
    */
   ok: () => Ternary<TIsOk, SomeOption<T>, NoneOption>;
   /**
-   * Converts from `Result<T, E>` to `Option<E>` from [@quintal/option](https://npmjs.com/package/@quintal/option), discarding the success value, if any.
+   * Converts from `Result<T, E>` to `Option<E>`, discarding the success value, if any.
    *
    * @example
    * ok('value').err(); // none

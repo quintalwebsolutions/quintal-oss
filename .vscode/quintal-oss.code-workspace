@@ -17,12 +17,8 @@
       "path": "../packages/config"
     },
     {
-      "name": "@quintal/result",
-      "path": "../packages/result"
-    },
-    {
-      "name": "@quintal/option",
-      "path": "../packages/option"
+      "name": "@quintal/monads",
+      "path": "../packages/monads"
     },
     {
       "name": "@quintal/environment",

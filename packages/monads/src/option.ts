@@ -11,6 +11,8 @@ export function isAnyOption<T>(opt: T | AnyOption): opt is AnyOption {
   );
 }
 
+// TODO add docs and tests
+
 /** A type that represents either the presence or absence of a value */
 export type OptionConstructor<TIsSome extends boolean, T> = {
   // Querying

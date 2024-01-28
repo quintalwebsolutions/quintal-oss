@@ -1,6 +1,8 @@
 # Monads
 
-A collection of monads (e.g. Result, Option) for TypeScript, mostly inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/).
+A collection of monads (e.g. Result, Option) for TypeScript, mostly inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/). 
+
+You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/docs/@quintal/monads)
 
 ## Result
 
@@ -149,10 +151,6 @@ These methods treat the `Result` as a boolean value, where `ok` acts like `true`
 - `and` and `or` take another `Result` as input, and produce a `Result` as output.
 - `andThen` and `orElse` take a function as input, and only lazily evaluate the function when they need to produce a new value.
 
-### API
-
-You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/docs/@quintal/result)
-
 ## Option
 
 A TypeScript optional value handling paradigm using an `Option` monad.
@@ -222,7 +220,3 @@ These methods treat the `Option` as a boolean value, where `some` acts like `tru
 - `take` gets the current value and, if any, replaces the `Option` with `none`.
 - `takeIf` gets the current value and, if any, replaces the `Option` with `none` if the provided predicate function on the current value evaluates to `true`. 
 - `replace` gets the current value and, if any, replaces the `Option` with `some(value)`. -->
-
-### API
-
-You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/docs/@quintal/option)

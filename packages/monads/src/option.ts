@@ -1,4 +1,4 @@
-import { ErrResult, OkResult, err, ok } from './result';
+import { Err, Ok, err, ok } from './result';
 import { Ternary } from './util';
 
 export function isAnyOption<T>(opt: T | AnyOption): opt is AnyOption {
@@ -31,17 +31,17 @@ export type OptionConstructor<TIsSome extends boolean, T> = {
 
   // Transforming the contained value
 
-  okOr: <E>(error: E) => Ternary<TIsSome, OkResult<T>, ErrResult<E>>;
-  okOrElse: <E>(error: () => E) => Ternary<TIsSome, OkResult<T>, ErrResult<E>>;
+  okOr: <E>(error: E) => Ternary<TIsSome, Ok<T>, Err<E>>;
+  okOrElse: <E>(error: () => E) => Ternary<TIsSome, Ok<T>, Err<E>>;
   // TODO
   // transpose: ;
   // flatten: () => Option<T>;
-  map: <U>(fn: (value: T) => U) => Ternary<TIsSome, SomeOption<U>, NoneOption>;
+  map: <U>(fn: (value: T) => U) => Ternary<TIsSome, Some<U>, None>;
   mapOr: <U>(defaultValue: U, fn: (value: T) => U) => U;
   mapOrElse: <U>(defaultFn: () => U, fn: (value: T) => U) => U;
   filter: <P extends boolean>(
     predicate: (value: T) => P,
-  ) => Ternary<TIsSome, P extends true ? SomeOption<T> : NoneOption, NoneOption>;
+  ) => Ternary<TIsSome, P extends true ? Some<T> : None, None>;
   // TODO `O extends AnyOption`? These can all be more typesafe
   // zip: <U>(other: Option<U>) => Option<[T, U]>;
   // zipWith: <U, R>(other: Option<U>, fn: (optA: T, optB: U) => R) => Option<R>;
@@ -49,27 +49,23 @@ export type OptionConstructor<TIsSome extends boolean, T> = {
 
   // Boolean operators
 
-  and: <O extends AnyOption>(opt: O) => Ternary<TIsSome, O, NoneOption>;
-  or: <O extends AnyOption>(opt: O) => Ternary<TIsSome, SomeOption<T>, O>;
+  and: <O extends AnyOption>(opt: O) => Ternary<TIsSome, O, None>;
+  or: <O extends AnyOption>(opt: O) => Ternary<TIsSome, Some<T>, O>;
   xor: <O extends AnyOption>(
     opt: O,
-  ) => Ternary<
-    TIsSome,
-    Ternary<O['isSome'], NoneOption, SomeOption<T>>,
-    Ternary<O['isSome'], O, NoneOption>
-  >;
-  andThen: <O extends AnyOption>(fn: (value: T) => O) => Ternary<TIsSome, O, NoneOption>;
-  orElse: <O extends AnyOption>(fn: () => O) => Ternary<TIsSome, SomeOption<T>, O>;
+  ) => Ternary<TIsSome, Ternary<O['isSome'], None, Some<T>>, Ternary<O['isSome'], O, None>>;
+  andThen: <O extends AnyOption>(fn: (value: T) => O) => Ternary<TIsSome, O, None>;
+  orElse: <O extends AnyOption>(fn: () => O) => Ternary<TIsSome, Some<T>, O>;
 };
 
-export type SomeOption<T> = OptionConstructor<true, T>;
-export type NoneOption = OptionConstructor<false, never>;
-export type Option<T> = SomeOption<T> | NoneOption;
+export type Some<T> = OptionConstructor<true, T>;
+export type None = OptionConstructor<false, never>;
+export type Option<T> = Some<T> | None;
 
 // biome-ignore lint/suspicious/noExplicitAny: This type exists for generics parameters to extend
 export type AnyOption = Option<any>;
 
-export function some<T>(value: T): SomeOption<T> {
+export function some<T>(value: T): Some<T> {
   return {
     isSome: true,
     isNone: false,
@@ -89,14 +85,14 @@ export function some<T>(value: T): SomeOption<T> {
     mapOrElse: (_, fn) => fn(value),
     filter: (p) => {
       // TODO achieve without cast
-      type Cast = ReturnType<typeof p> extends true ? SomeOption<T> : NoneOption;
+      type Cast = ReturnType<typeof p> extends true ? Some<T> : None;
       return (p(value) ? some(value) : none) as Cast;
     },
     and: (opt) => opt,
     or: () => some(value),
     xor: (opt) => {
       // TODO achieve without cast
-      type Cast = Ternary<(typeof opt)['isSome'], NoneOption, SomeOption<T>>;
+      type Cast = Ternary<(typeof opt)['isSome'], None, Some<T>>;
       return (opt.isSome ? none : some(value)) as Cast;
     },
     andThen: (fn) => fn(value),
@@ -104,7 +100,7 @@ export function some<T>(value: T): SomeOption<T> {
   };
 }
 
-export const none: NoneOption = {
+export const none: None = {
   isSome: false,
   isNone: true,
   TernaryAnd: () => false,
@@ -127,7 +123,7 @@ export const none: NoneOption = {
   or: (opt) => opt,
   xor: (opt) => {
     // TODO achieve without cast
-    type Cast = Ternary<(typeof opt)['isSome'], typeof opt, NoneOption>;
+    type Cast = Ternary<(typeof opt)['isSome'], typeof opt, None>;
     return (opt.isSome ? opt : none) as Cast;
   },
   andThen: () => none,

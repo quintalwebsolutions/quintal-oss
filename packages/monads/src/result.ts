@@ -1,4 +1,4 @@
-import { NoneOption, SomeOption, isAnyOption, none, some } from './option';
+import { None, Some, isAnyOption, none, some } from './option';
 import { Ternary } from './util';
 
 function isAnyResult<T>(res: T | AnyResult): res is AnyResult {
@@ -11,7 +11,7 @@ function isAnyResult<T>(res: T | AnyResult): res is AnyResult {
   );
 }
 
-/** A type that represents either success or failure */
+/** A data structure that represents either success or failure */
 export type ResultConstructor<TIsOk extends boolean, T, E> = {
   // Querying the contained value
 
@@ -158,7 +158,7 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
    * ok('value').ok(); // some('value')
    * err('error').ok(); // none
    */
-  ok: () => Ternary<TIsOk, SomeOption<T>, NoneOption>;
+  ok: () => Ternary<TIsOk, Some<T>, None>;
   /**
    * Converts from `Result<T, E>` to `Option<E>`, discarding the success value, if any.
    *
@@ -166,7 +166,7 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
    * ok('value').err(); // none
    * err('error').err(); // some('error')
    */
-  err: () => Ternary<TIsOk, NoneOption, SomeOption<E>>;
+  err: () => Ternary<TIsOk, None, Some<E>>;
   /**
    * Transposes a `Result` of an `Option` into an `Option` of a `Result`
    *
@@ -180,8 +180,8 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
    */
   transpose: () => Ternary<
     TIsOk,
-    T extends NoneOption ? T : SomeOption<OkResult<T extends SomeOption<infer TSome> ? TSome : T>>,
-    SomeOption<ErrResult<E>>
+    T extends None ? T : Some<Ok<T extends Some<infer TSome> ? TSome : T>>,
+    Some<Err<E>>
   >;
   /**
    * Flattens at most one level of `Result` nesting.
@@ -195,7 +195,7 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
    * err(err('error)).flatten(); // err(err('error'))
    * ok(ok(ok('value'))).flatten(); // ok(ok('value'))
    */
-  flatten: () => Ternary<TIsOk, T extends AnyResult ? T : OkResult<T>, ErrResult<E>>;
+  flatten: () => Ternary<TIsOk, T extends AnyResult ? T : Ok<T>, Err<E>>;
   /**
    * Maps a `Result<T, E>` to a `Result<U, E>` by applying a function to a contained `ok` value, leaving an `err` value untouched.
    *
@@ -205,7 +205,7 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
    * ok(2).map((v) => v * 2).unwrap(); // 4
    * err(2).map((v) => v * 2).unwrapErr(); // 2
    */
-  map: <U>(fn: (value: T) => U) => Ternary<TIsOk, OkResult<U>, ErrResult<E>>;
+  map: <U>(fn: (value: T) => U) => Ternary<TIsOk, Ok<U>, Err<E>>;
   /**
    * Maps a `Result<T, E>` to a `Result<T, F>` by applying a function to a contained `err` value, leaving an `ok` value untouched.
    *
@@ -215,7 +215,7 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
    * ok(2).mapErr((v) => v * 2).unwrap(); // 2
    * err(2).mapErr((v) => v * 2).unwrapErr(); // 4
    */
-  mapErr: <F>(fn: (error: E) => F) => Ternary<TIsOk, OkResult<T>, ErrResult<F>>;
+  mapErr: <F>(fn: (error: E) => F) => Ternary<TIsOk, Ok<T>, Err<F>>;
   /**
    * Returns the provided default (if `err`), or applies a function to the contained value (if `ok`).
    *
@@ -252,7 +252,7 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
    * ok('early value').and(err('late error')).unwrapErr(); // 'late error'
    * ok('early value').and(ok('late value')).unwrap(); // 'late value'
    */
-  and: <R extends AnyResult>(res: R) => Ternary<TIsOk, R, ErrResult<E>>;
+  and: <R extends AnyResult>(res: R) => Ternary<TIsOk, R, Err<E>>;
   /**
    * Returns `res` if the result is `err`, otherwise returns its own `ok` value.
    *
@@ -264,7 +264,7 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
    * err('early error').or(ok('late value')).unwrap(); // 'late value'
    * err('early error').or(err('late error)).unwrapErr(); // 'late error'
    */
-  or: <R extends AnyResult>(res: R) => Ternary<TIsOk, OkResult<T>, R>;
+  or: <R extends AnyResult>(res: R) => Ternary<TIsOk, Ok<T>, R>;
   /**
    * Calls `fn` if the result is `ok`, otherwise return its own `err` value.
    *
@@ -276,7 +276,7 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
    * ok(42).andThen(s).unwrapErr(); // 'bad number'
    * err('not a number').andThen(s).unwrapErr(); // 'not a number'
    */
-  andThen: <R extends AnyResult>(fn: (value: T) => R) => Ternary<TIsOk, R, ErrResult<E>>;
+  andThen: <R extends AnyResult>(fn: (value: T) => R) => Ternary<TIsOk, R, Err<E>>;
   /**
    * Calls `fn` if the result is `err`, otherwise returns its own `ok` value.
    *
@@ -290,100 +290,242 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
    * err(2).orElse(s).orElse(e).unwrap(); // 4
    * err(3).orElse(e).orElse(e).unwrapErr(); // 3
    */
-  orElse: <R extends AnyResult>(fn: (error: E) => R) => Ternary<TIsOk, OkResult<T>, R>;
+  orElse: <R extends AnyResult>(fn: (error: E) => R) => Ternary<TIsOk, Ok<T>, R>;
 };
 
-export type OkResult<T> = ResultConstructor<true, T, never>;
-export type ErrResult<E> = ResultConstructor<false, never, E>;
-export type Result<T, E> = OkResult<T> | ErrResult<E>;
+export class Ok<T> implements ResultConstructor<true, T, never> {
+  private value: T;
+
+  constructor(value: T) {
+    this.value = value;
+  }
+
+  get isOk(): true {
+    return true;
+  }
+
+  get isErr(): false {
+    return false;
+  }
+
+  isOkAnd(fn: (value: T) => boolean): boolean {
+    return fn(this.value);
+  }
+
+  isErrAnd(_fn: (error: never) => boolean): false {
+    return false;
+  }
+
+  inspect(fn: (value: T) => void): Ok<T> {
+    fn(this.value);
+    return this;
+  }
+
+  inspectErr(_fn: (error: never) => void): Ok<T> {
+    return this;
+  }
+
+  expect(_message: string): T {
+    return this.value;
+  }
+
+  expectErr(message: string): never {
+    throw new Error(message);
+  }
+
+  unwrap(): T {
+    return this.value;
+  }
+
+  unwrapErr(): never {
+    throw new Error(`Attempted to unwrapErr an 'ok' value: ${this.value}`);
+  }
+
+  unwrapOr<U>(_defaultValue: U): T {
+    return this.value;
+  }
+
+  unwrapOrElse<U>(_fn: (error: never) => U): T {
+    return this.value;
+  }
+
+  ok(): Some<T> {
+    return some(this.value);
+  }
+
+  err(): None {
+    return none;
+  }
+
+  transpose(): T extends None ? T : Some<Ok<T extends Some<infer TSome> ? TSome : T>> {
+    // TODO achieve without cast
+    type Cast = T extends None ? T : Some<Ok<T extends Some<infer TSome> ? TSome : T>>;
+
+    const v = this.value;
+    const isOption = isAnyOption(v);
+    if (isOption && v.isNone) return v as Cast;
+    return some(ok(isOption && v.isSome ? v.unwrap() : v)) as Cast;
+  }
+
+  flatten(): T extends AnyResult ? T : Ok<T> {
+    // TODO achieve without cast
+    type Cast = T extends AnyResult ? T : Ok<T>;
+
+    const v = this.value;
+    if (isAnyResult(v)) return v as Cast;
+    return ok(v) as Cast;
+  }
+
+  map<U>(fn: (value: T) => U): Ok<U> {
+    return ok(fn(this.value));
+  }
+
+  mapErr<F>(_fn: (error: never) => F): Ok<T> {
+    return this;
+  }
+
+  mapOr<U>(_defaultValue: U, fn: (value: T) => U): U {
+    return fn(this.value);
+  }
+
+  mapOrElse<U>(_defaultFn: (error: never) => U, fn: (value: T) => U): U {
+    return fn(this.value);
+  }
+
+  and<R extends AnyResult>(res: R): R {
+    return res;
+  }
+
+  or<R extends AnyResult>(_res: R): Ok<T> {
+    return this;
+  }
+
+  andThen<R extends AnyResult>(fn: (value: T) => R): R {
+    return fn(this.value);
+  }
+
+  orElse<R extends AnyResult>(_fn: (error: never) => R): Ok<T> {
+    return this;
+  }
+}
+
+export class Err<E> implements ResultConstructor<false, never, E> {
+  private error: E;
+
+  constructor(error: E) {
+    this.error = error;
+  }
+
+  get isOk(): false {
+    return false;
+  }
+
+  get isErr(): true {
+    return true;
+  }
+
+  isOkAnd(_fn: (value: never) => boolean): false {
+    return false;
+  }
+
+  isErrAnd(fn: (error: E) => boolean): boolean {
+    return fn(this.error);
+  }
+
+  inspect(_fn: (value: never) => void): Err<E> {
+    return this;
+  }
+
+  inspectErr(fn: (error: E) => void): Err<E> {
+    fn(this.error);
+    return this;
+  }
+
+  expect(message: string): never {
+    throw new Error(message);
+  }
+
+  expectErr(_message: string): E {
+    return this.error;
+  }
+
+  unwrap(): never {
+    throw new Error(`Attempted to unwrap an 'err' value: ${this.error}`);
+  }
+
+  unwrapErr(): E {
+    return this.error;
+  }
+
+  unwrapOr<U>(defaultValue: U): U {
+    return defaultValue;
+  }
+
+  unwrapOrElse<U>(fn: (error: E) => U): U {
+    return fn(this.error);
+  }
+
+  ok(): None {
+    return none;
+  }
+
+  err(): Some<E> {
+    return some(this.error);
+  }
+
+  transpose(): Some<Err<E>> {
+    return some(this);
+  }
+
+  flatten(): Err<E> {
+    return this;
+  }
+
+  map<U>(_fn: (value: never) => U): Err<E> {
+    return this;
+  }
+
+  mapErr<F>(fn: (error: E) => F): Err<F> {
+    return err(fn(this.error));
+  }
+
+  mapOr<U>(defaultValue: U, _fn: (value: never) => U): U {
+    return defaultValue;
+  }
+
+  mapOrElse<U>(defaultFn: (error: E) => U, _fn: (value: never) => U): U {
+    return defaultFn(this.error);
+  }
+
+  and<R extends AnyResult>(_res: R): Err<E> {
+    return this;
+  }
+
+  or<R extends AnyResult>(res: R): R {
+    return res;
+  }
+
+  andThen<R extends AnyResult>(_fn: (value: never) => R): Err<E> {
+    return this;
+  }
+
+  orElse<R extends AnyResult>(fn: (error: E) => R): R {
+    return fn(this.error);
+  }
+}
+
+export type Result<T, E> = Ok<T> | Err<E>;
 export type AsyncResult<T, E> = Promise<Result<T, E>>;
 
 // biome-ignore lint/suspicious/noExplicitAny: This type exists solely for generic parameters to extend
 export type AnyResult = Result<any, any>;
 
-export function ok<T>(value: T): OkResult<T> {
-  return {
-    isOk: true,
-    isErr: false,
-    isOkAnd: (fn) => fn(value),
-    isErrAnd: () => false,
-    inspect: (fn) => {
-      fn(value);
-      return ok(value);
-    },
-    inspectErr: () => ok(value),
-    expect: () => value,
-    expectErr: (message) => {
-      throw new Error(message);
-    },
-    unwrap: () => value,
-    unwrapErr: () => {
-      throw new Error(`Attempted to unwrapErr an 'ok' value: ${value}`);
-    },
-    unwrapOr: () => value,
-    unwrapOrElse: () => value,
-    ok: () => some(value),
-    err: () => none,
-    transpose: () => {
-      // TODO achieve without casts
-      type Cast = T extends NoneOption
-        ? T
-        : SomeOption<OkResult<T extends SomeOption<infer TSome> ? TSome : T>>;
-      const isOption = isAnyOption(value);
-      if (isOption && value.isNone) return value as Cast;
-      return some(ok(isOption && value.isSome ? value.unwrap() : value)) as Cast;
-    },
-    flatten: () => {
-      // TODO achieve without cast
-      type Cast = T extends AnyResult ? T : OkResult<T>;
-      if (isAnyResult(value)) return value as Cast;
-      return ok(value) as Cast;
-    },
-    map: (fn) => ok(fn(value)),
-    mapErr: () => ok(value),
-    mapOr: (_, fn) => fn(value),
-    mapOrElse: (_, fn) => fn(value),
-    and: (res) => res,
-    or: () => ok(value),
-    andThen: (fn) => fn(value),
-    orElse: () => ok(value),
-  };
+export function ok<T>(value: T): Ok<T> {
+  return new Ok(value);
 }
 
-export function err<E>(error: E): ErrResult<E> {
-  return {
-    isOk: false,
-    isErr: true,
-    isOkAnd: () => false,
-    isErrAnd: (fn) => fn(error),
-    inspect: () => err(error),
-    inspectErr: (fn) => {
-      fn(error);
-      return err(error);
-    },
-    expect: (message) => {
-      throw new Error(message);
-    },
-    expectErr: () => error,
-    unwrap: () => {
-      throw new Error(`Attempted to unwrap an 'err' value: ${error}`);
-    },
-    unwrapErr: () => error,
-    unwrapOr: (defaultValue) => defaultValue,
-    unwrapOrElse: (fn) => fn(error),
-    ok: () => none,
-    err: () => some(error),
-    transpose: () => some(err(error)),
-    flatten: () => err(error),
-    map: () => err(error),
-    mapErr: (fn) => err(fn(error)),
-    mapOr: (defaultValue) => defaultValue,
-    mapOrElse: (defaultFn) => defaultFn(error),
-    and: () => err(error),
-    or: (res) => res,
-    andThen: () => err(error),
-    orElse: (fn) => fn(error),
-  };
+export function err<E>(error: E): Err<E> {
+  return new Err(error);
 }
 
 export function result<T>(fn: () => T): Result<T, unknown> {

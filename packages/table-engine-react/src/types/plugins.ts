@@ -43,9 +43,8 @@ export type DefinePluginArgs<
   TPluginArgs extends PluginArgs<TRow>,
 > = TPluginArgs;
 
-export type P<TPlugin> = TPlugin extends Plugin<infer TPlugins>
-  ? TPlugins
-  : Plugins;
+export type P<TPlugin> =
+  TPlugin extends Plugin<infer TPlugins> ? TPlugins : Plugins;
 
 type MapUnion<U> = U extends U ? (k: U) => void : never;
 type UnionToIntersection<U> = MapUnion<U> extends MapUnion<infer I> ? I : never;

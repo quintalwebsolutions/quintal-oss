@@ -25,42 +25,40 @@ export type Value<
 };
 
 type ValueFlag = 'serialized' | 'optional';
-export type UnwrapValue<
-  T,
-  TValueFlag extends ValueFlag = never,
-> = T extends Value<infer TValue, infer _TValueArgs>
-  ? [TValueFlag] extends [never]
-    ? TValue
-    : 'serialized' extends TValueFlag
-      ? T['__serialized__']
-      : 'optional' extends TValueFlag
-        ? T['__internal__'] | T['__empty__']
-        : never
-  : T extends Optional<infer TValue>
-    ? 'serialized' extends TValueFlag
-      ? UnwrapValue<TValue, 'serialized'>
-      : UnwrapValue<TValue, 'optional'>
-    : T extends Many<infer TValue>
-      ? [TValueFlag] extends [never]
-        ? UnwrapValue<TValue>[]
-        : 'serialized' extends TValueFlag
-          ? UnwrapValue<TValue, 'serialized'>
-          : 'optional' extends TValueFlag
-            ? UnwrapValue<TValue>[] | null
-            : never
-      : T extends Record<string, unknown>
+export type UnwrapValue<T, TValueFlag extends ValueFlag = never> =
+  T extends Value<infer TValue, infer _TValueArgs>
+    ? [TValueFlag] extends [never]
+      ? TValue
+      : 'serialized' extends TValueFlag
+        ? T['__serialized__']
+        : 'optional' extends TValueFlag
+          ? T['__internal__'] | T['__empty__']
+          : never
+    : T extends Optional<infer TValue>
+      ? 'serialized' extends TValueFlag
+        ? UnwrapValue<TValue, 'serialized'>
+        : UnwrapValue<TValue, 'optional'>
+      : T extends Many<infer TValue>
         ? [TValueFlag] extends [never]
-          ? { [TKey in keyof T]: UnwrapValue<T[TKey], TValueFlag> }
+          ? UnwrapValue<TValue>[]
           : 'serialized' extends TValueFlag
-            ? { [TKey in keyof T]: UnwrapValue<T[TKey], 'serialized'> }
+            ? UnwrapValue<TValue, 'serialized'>
             : 'optional' extends TValueFlag
-              ? { [TKey in keyof T]: UnwrapValue<T[TKey]> } | null
+              ? UnwrapValue<TValue>[] | null
               : never
-        : 'serialized' extends TValueFlag
-          ? T
-          : 'optional' extends TValueFlag
-            ? T | null
-            : T;
+        : T extends Record<string, unknown>
+          ? [TValueFlag] extends [never]
+            ? { [TKey in keyof T]: UnwrapValue<T[TKey], TValueFlag> }
+            : 'serialized' extends TValueFlag
+              ? { [TKey in keyof T]: UnwrapValue<T[TKey], 'serialized'> }
+              : 'optional' extends TValueFlag
+                ? { [TKey in keyof T]: UnwrapValue<T[TKey]> } | null
+                : never
+          : 'serialized' extends TValueFlag
+            ? T
+            : 'optional' extends TValueFlag
+              ? T | null
+              : T;
 
 export type Values = Record<string, unknown>;
 

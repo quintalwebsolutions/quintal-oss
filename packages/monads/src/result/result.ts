@@ -1,4 +1,5 @@
 import { None, Some, isAnyOption, none, some } from '../option';
+// import { AsyncOk, asyncOk } from './async-result';
 import { ResultConstructor } from './result-constructor';
 import { Match, isAnyResult } from './util';
 
@@ -92,6 +93,16 @@ export class Ok<T> implements ResultConstructor<true, T, never> {
   map<U>(fn: (value: T) => U): Ok<U> {
     return ok(fn(this.value));
   }
+
+  // TODO proof of concept
+  // map<U>(fn: (value: T) => U): U extends Promise<infer TValue> ? AsyncOk<TValue> : Ok<U> {
+  //   // TODO achieve without cast
+  //   type Cast = U extends Promise<infer TValue> ? AsyncOk<TValue> : Ok<U>;
+
+  //   const mappedValue = fn(this.value);
+  //   if (mappedValue instanceof Promise) return new AsyncOk(mappedValue.then(ok)) as Cast;
+  //   return ok(mappedValue) as Cast;
+  // }
 
   mapErr<F>(_fn: (error: never) => F): Ok<T> {
     return this;

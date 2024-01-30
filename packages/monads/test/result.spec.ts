@@ -22,6 +22,15 @@ function throws(): 'value' {
   throw new Error('error');
 }
 
+// TODO proof of concept
+// async function returnsAsync(): Promise<'value'> {
+//   return 'value';
+// }
+
+// async function throwsAsync(): Promise<'value'> {
+//   throw new Error('error');
+// }
+
 const okVal = ok('value' as const);
 const errVal = err('error' as const);
 const earlyOk = ok('early' as const);
@@ -349,7 +358,7 @@ describe('Result', () => {
     expect(okOkRes.unwrap()).toBe('value');
   });
 
-  it('should map a function `ok` and `err` values using `map` and `mapErr`', () => {
+  it('should map a function `ok` and `err` values using `map` and `mapErr`', async () => {
     const mapFn = (v: string) => v === 'value';
     const mapErrFn = (v: unknown) =>
       v === 'error' ? ('new-error' as const) : ('old-error' as const);
@@ -381,6 +390,12 @@ describe('Result', () => {
     const errResultMappedErr = errResVal.mapErr(mapErrFn);
     expectResultUnwrap(errResultMappedErr).toBe<'value', 'new-error' | 'old-error'>(true);
     expect(errResultMappedErr.unwrapErr()).toStrictEqual('old-error');
+
+    // TODO proof of concept
+    // const asyncOkMapped = okVal.map(async (v) => mapFn(v));
+    // expectTypeOf(asyncOkMapped).toEqualTypeOf<AsyncOk<boolean>>();
+    // const asyncOkMappedAwaited = await asyncOkMapped;
+    // expectTypeOf(asyncOkMappedAwaited).toEqualTypeOf<Ok<boolean>>();
   });
 
   it('should map function or return default value with `mapOr` and `mapOrElse`', () => {

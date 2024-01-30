@@ -143,6 +143,15 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
 
   // Transforming the contained value
 
+  // TODO proof of concept
+  /**
+   * Converts from `Result<T, E>` to `AsyncResult<T, E>`, which is able to
+   * handle async method chaining.
+   *
+   * @example
+   * await ok(2).asPromise().map(async (v) => v * 2).unwrap(); // 4
+   */
+  // asPromise: () => Ternary<TIsOk, AsyncOk<T>, AsyncErr<E>>;
   /**
    * Converts from `Result<T, E>` to `Option<T>`, discarding the error, if any.
    *
@@ -197,7 +206,10 @@ export type ResultConstructor<TIsOk extends boolean, T, E> = {
    * ok(2).map((v) => v * 2).unwrap(); // 4
    * err(2).map((v) => v * 2).unwrapErr(); // 2
    */
-  map: <U>(fn: (value: T) => U) => Ternary<TIsOk, Ok<U>, Err<E>>;
+  // TODO proof of concept
+  // map: <U>(
+  //   fn: (value: T) => U,
+  // ) => Ternary<TIsOk, U extends Promise<infer TValue> ? AsyncOk<TValue> : Ok<U>, Err<E>>;
   /**
    * Maps a `Result<T, E>` to a `Result<T, F>` by applying a function to a contained `err` value, leaving an `ok` value untouched.
    *

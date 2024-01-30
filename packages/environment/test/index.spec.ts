@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { describe, expect, expectTypeOf, it } from 'vitest';
+import { z } from 'zod';
 import { createEnvironment } from '../src';
 
 describe('environment', () => {
@@ -81,7 +81,7 @@ describe('environment', () => {
         },
       }),
     ).toThrowErrorMatchingInlineSnapshot(
-      '"❌ Invalid environment variables: undefined: Required, nestedUndefined.undefined: Required, emptyString: Required, emptyStringToNumber: Required"',
+      '[Error: ❌ Invalid environment variables: undefined: Required, nestedUndefined.undefined: Required, emptyString: Required, emptyStringToNumber: Required]',
     );
   });
 
@@ -111,13 +111,13 @@ describe('environment', () => {
     expect(
       () => clientEnvironment.serverOnly,
     ).toThrowErrorMatchingInlineSnapshot(
-      '"❌ Attempted to access server-side environment variable \'serverOnly\' on the client"',
+      `[Error: ❌ Attempted to access server-side environment variable 'serverOnly' on the client]`,
     );
     expect(clientEnvironment.notServerOnly).toBe('world');
     expect(
       () => clientEnvironment.nested.serverOnly,
     ).toThrowErrorMatchingInlineSnapshot(
-      '"❌ Attempted to access server-side environment variable \'nested.serverOnly\' on the client"',
+      `[Error: ❌ Attempted to access server-side environment variable 'nested.serverOnly' on the client]`,
     );
     expect(clientEnvironment.nested.notServerOnly).toBe('worldNested');
 

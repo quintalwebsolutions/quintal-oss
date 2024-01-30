@@ -114,7 +114,7 @@ describe('makeBody', () => {
           "rawValue": {
             "value": "hello",
           },
-          "serializedValue": "{\\"value\\":\\"hello\\"}",
+          "serializedValue": "{"value":"hello"}",
         },
       }
     `);
@@ -137,7 +137,7 @@ describe('makeBody', () => {
             "value": "hello",
           },
         },
-        "serializedValue": "{\\"value\\":\\"hello\\"}",
+        "serializedValue": "{"value":"hello"}",
       }
     `);
   });

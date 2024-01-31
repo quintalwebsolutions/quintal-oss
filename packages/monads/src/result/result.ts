@@ -1,9 +1,8 @@
 import { None, Some, isAnyOption, none, some } from '../option';
-// import { AsyncOk, asyncOk } from './async-result';
 import { ResultConstructor } from './result-constructor';
 import { Match, isAnyResult } from './util';
 
-export class Ok<T> implements ResultConstructor<true, T, never> {
+export class Ok<T> implements ResultConstructor<T, { IsOk: true; IsAsync: false }> {
   private _value: T;
 
   constructor(value: T) {
@@ -137,7 +136,7 @@ export class Ok<T> implements ResultConstructor<true, T, never> {
   }
 }
 
-export class Err<E> implements ResultConstructor<false, never, E> {
+export class Err<E> implements ResultConstructor<E, { IsOk: false; IsAsync: false }> {
   private _error: E;
 
   constructor(error: E) {

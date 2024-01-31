@@ -1,1 +1,17 @@
-export { type Result, type AnyResult, Ok, Err, result, ok, err } from './result';
+export {
+  type Result,
+  type AnyResult,
+  type Ok,
+  type Err,
+  result,
+  ok,
+  err,
+} from './result';
+export {
+  type AsyncResult,
+  type AsyncOk,
+  type AsyncErr,
+  asyncResult,
+  asyncOk,
+  asyncErr,
+} from './async-result';

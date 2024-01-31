@@ -1,5 +1,16 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
-import { AnyResult, Err, Ok, Result, err, ok, result } from '../src';
+import {
+  AnyResult,
+  Err,
+  Ok,
+  Result,
+  // asyncErr,
+  // asyncOk,
+  // asyncResult,
+  err,
+  ok,
+  result,
+} from '../src';
 import { None, Option, Some, none, some } from '../src/option';
 import { And, Equal } from '../src/util';
 
@@ -22,7 +33,6 @@ function throws(): 'value' {
   throw new Error('error');
 }
 
-// TODO proof of concept
 // async function returnsAsync(): Promise<'value'> {
 //   return 'value';
 // }
@@ -32,7 +42,9 @@ function throws(): 'value' {
 // }
 
 const okVal = ok('value' as const);
+// const asyncOkVal = asyncOk('value' as const);
 const errVal = err('error' as const);
+// const asyncErrVal = asyncErr('error' as const);
 const earlyOk = ok('early' as const);
 const earlyErr = err('early' as const);
 const lateOk = ok('late' as const);
@@ -43,23 +55,33 @@ const errRes1 = err('error1') as Result<'value1', 'error1'>;
 const errRes2 = err('error2') as Result<'value2', 'error2'>;
 const okResVal = result(returns);
 const errResVal = result(throws);
+// const asyncOkResVal = asyncResult(returnsAsync);
+// const asyncErrResVal = asyncResult(throwsAsync);
 
 describe('Result', () => {
-  it('should have type-safe `ok` and `err` states', () => {
-    expectTypeOf(okVal.isOk).toEqualTypeOf<true>();
-    expect(okVal.isOk).toBe(true);
-    expectTypeOf(okVal.isErr).toEqualTypeOf<false>();
-    expect(okVal.isErr).toBe(false);
+  it('should have type-safe `ok` and `err` states', async () => {
+    function eIsOkIsErr<TResult extends AnyResult>(result: TResult) {
+      return {
+        toBe: async <TIsOk, TIsErr>(
+          _typeMatch: And<Equal<TIsOk, TResult['isOk']>, Equal<TIsErr, TResult['isErr']>>,
+          isOk: boolean,
+          isErr: boolean,
+        ) => {
+          // TODO how to add context to this so that if it fails, we know under which circumstances it failed
+          expect(await result.isOk).toBe(isOk);
+          expect(await result.isErr).toBe(isErr);
+        },
+      };
+    }
 
-    expectTypeOf(errVal.isOk).toEqualTypeOf<false>();
-    expect(errVal.isOk).toBe(false);
-    expectTypeOf(errVal.isErr).toEqualTypeOf<true>();
-    expect(errVal.isErr).toBe(true);
-
-    expectTypeOf(okResVal.isOk).toEqualTypeOf<boolean>();
-    expect(okResVal.isOk).toBe(true);
-    expectTypeOf(okResVal.isErr).toEqualTypeOf<boolean>();
-    expect(okResVal.isErr).toBe(false);
+    await eIsOkIsErr(okVal).toBe<true, false>(true, true, false);
+    await eIsOkIsErr(errVal).toBe<false, true>(true, false, true);
+    await eIsOkIsErr(okResVal).toBe<boolean, boolean>(true, true, false);
+    await eIsOkIsErr(errResVal).toBe<boolean, boolean>(true, false, true);
+    // await eIsOkIsErr(asyncOkVal).toBe<Promise<true>, Promise<false>>(true, true, false);
+    // await eIsOkIsErr(asyncErrVal).toBe<Promise<false>, Promise<true>>(true, false, true);
+    // await eIsOkIsErr(asyncOkResVal).toBe<Promise<boolean>, Promise<boolean>>(true, true, false);
+    // await eIsOkIsErr(asyncErrResVal).toBe<Promise<boolean>, Promise<boolean>>(true, false, true);
   });
 
   it('should type-narrow based on `isOk` and `isErr` checks', () => {
@@ -74,6 +96,9 @@ describe('Result', () => {
       expectResultUnwrap(okResVal).toBe<never, unknown>(true);
       expectTypeOf(okResVal).toHaveProperty('error');
     }
+
+    // TODO can we add conditional 'value' and 'error' props to AsyncResult?
+    // expectResultUnwrap(asyncOkResVal).toBe<'value', unknown>(true);
   });
 
   it('should validate `ok` values against predicates with `isOkAnd`', () => {
@@ -126,7 +151,7 @@ describe('Result', () => {
     expect(errResultFalse).toBe(false);
   });
 
-  it('should facilityate inspection of `ok` and `err` values with `inspect` and `inspectErr`', () => {
+  it('should facilitate inspection of `ok` and `err` values with `inspect` and `inspectErr`', () => {
     const mockFn = vi.fn();
 
     okVal.inspect((v) => {

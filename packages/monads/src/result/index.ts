@@ -9,8 +9,7 @@ export {
 } from './result';
 export {
   type AsyncResult,
-  type AsyncOk,
-  type AsyncErr,
+  type AnyAsyncResult,
   asyncResult,
   asyncOk,
   asyncErr,

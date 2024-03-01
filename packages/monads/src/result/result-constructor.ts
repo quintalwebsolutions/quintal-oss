@@ -1,14 +1,22 @@
-import { None, Some } from '../option';
-import { Ternary } from '../util';
-import { AnyResult, Err, Ok } from './result';
-import { Match } from './util';
+/* c8 ignore start */
+// TODO remove ignore comment when this issue is resolved: https://github.com/vitest-dev/vitest/issues/3605
 
+import { None, Some } from '../option';
+import { MaybePromise, Ternary } from '../util';
+import { AnyAsyncResult, AsyncErr, AsyncOk } from './async-result';
+import { AnyResult, Err, Ok } from './result';
+import { ResultMatch } from './util';
+
+// TODO misschien options er weer uit slopen in favor of Variations "OK", "ERR", "ASYNC"?
 type Options = { IsOk: boolean; IsAsync: boolean };
 type Eval<O extends Options, TIsOkNotAsync, TIsNotOkNotAsync, TIsOkAsync, TIsNotOkAsync> = Ternary<
   O['IsAsync'],
   Ternary<O['IsOk'], TIsOkAsync, TIsNotOkAsync>,
   Ternary<O['IsOk'], TIsOkNotAsync, TIsNotOkNotAsync>
 >;
+
+type Value<T, O extends Options> = Ternary<O['IsOk'], T, never>;
+type Error<T, O extends Options> = Ternary<O['IsOk'], never, T>;
 
 /** A data structure that represents either success or failure */
 export type ResultConstructor<T, O extends Options> = {
@@ -55,9 +63,9 @@ export type ResultConstructor<T, O extends Options> = {
    * err('error').isOkAnd(() => true); // false
    * err('error').isOkAnd(() => false); // false
    */
-  isOkAnd: (
-    fn: (value: Ternary<O['IsOk'], T, never>) => boolean,
-  ) => Ternary<O['IsOk'], boolean, false>;
+  isOkAnd: <P extends MaybePromise<boolean>>(
+    fn: (value: Value<T, O>) => P,
+  ) => Ternary<O['IsOk'], P, false>;
   /**
    * Returns `true` if the result is `err` and the value inside of it matches a predicate.
    *
@@ -67,9 +75,9 @@ export type ResultConstructor<T, O extends Options> = {
    * err('error').isErrAnd(() => true); // true
    * err('error').isErrAnd(() => false); // false
    */
-  isErrAnd: (
-    fn: (error: Ternary<O['IsOk'], never, T>) => boolean,
-  ) => Ternary<O['IsOk'], false, boolean>;
+  isErrAnd: <P extends MaybePromise<boolean>>(
+    fn: (error: Error<T, O>) => P,
+  ) => Ternary<O['IsOk'], false, P>;
   /**
    * Calls the provided closure with a reference to the contained value (if `ok`).
    *
@@ -77,7 +85,7 @@ export type ResultConstructor<T, O extends Options> = {
    * ok('value').inspect((value) => console.log(value)); // logs 'value' to the console
    * err('error').inspect((value) => console.log(value)); // Doesn't log anything
    */
-  inspect: (fn: (value: Ternary<O['IsOk'], T, never>) => void) => ResultConstructor<T, O>;
+  inspect: (fn: (value: Value<T, O>) => MaybePromise<void>) => ResultConstructor<T, O>;
   /**
    * Calls the provided closure with a reference to the contained error (if `err`).
    *
@@ -85,7 +93,7 @@ export type ResultConstructor<T, O extends Options> = {
    * ok(42).inspectErr((value) => console.log(value)); // Doesn't log anything
    * err('error').inspectErr((value) => console.log(value)); // Logs 'error' to the console
    */
-  inspectErr: (fn: (error: Ternary<O['IsOk'], never, T>) => void) => ResultConstructor<T, O>;
+  inspectErr: (fn: (error: Error<T, O>) => MaybePromise<void>) => ResultConstructor<T, O>;
 
   // Extracting the contained value
 
@@ -100,7 +108,7 @@ export type ResultConstructor<T, O extends Options> = {
    * ok('value').expect('Value should be ok'); // 'value'
    * err('error').expect('Value should be ok'); // Throws 'Value should be ok'
    */
-  expect: (message: string) => Ternary<O['IsOk'], T, never>;
+  expect: (message: string) => Value<T, O>;
   /**
    * Returns the contained `err` value, or throws the given error message it is an `ok`.
    *
@@ -112,7 +120,7 @@ export type ResultConstructor<T, O extends Options> = {
    * ok('value').expectErr('Value should be err'); // Throws 'Value should be err'
    * err('error').expectErr('Value should be err'); // 'error'
    */
-  expectErr: (message: string) => Ternary<O['IsOk'], never, T>;
+  expectErr: (message: string) => Error<T, O>;
   /**
    * Returns the contained `ok` value, or throws the value if it is an `err`.
    *
@@ -122,7 +130,7 @@ export type ResultConstructor<T, O extends Options> = {
    * ok('value').unwrap(); // 'value'
    * err('error').unwrap(); // Throws 'error'
    */
-  unwrap: () => Ternary<O['IsOk'], T, never>;
+  unwrap: () => Value<T, O>;
   /**
    * Returns the contained `err` value, or throws the value if it is is an `ok`.
    *
@@ -132,7 +140,7 @@ export type ResultConstructor<T, O extends Options> = {
    * ok('value').unwrapErr(); // Throws 'value'
    * err('error').unwrapErr(); // 'error'
    */
-  unwrapErr: () => Ternary<O['IsOk'], never, T>;
+  unwrapErr: () => Error<T, O>;
   /**
    * Returns the contained `ok` value, or a provided default.
    *
@@ -150,7 +158,7 @@ export type ResultConstructor<T, O extends Options> = {
    * ok('value').unwrapOrElse((_error) => 'default'); // 'value'
    * err('error').unwrapOrElse((_error) => 'default'); // 'default'
    */
-  unwrapOrElse: <U>(fn: (error: Ternary<O['IsOk'], never, T>) => U) => Ternary<O['IsOk'], T, U>;
+  unwrapOrElse: <U>(fn: (error: Error<T, O>) => U) => Ternary<O['IsOk'], T, U>;
 
   // Transforming the contained value
 
@@ -217,11 +225,9 @@ export type ResultConstructor<T, O extends Options> = {
    * ok(2).map((v) => v * 2).unwrap(); // 4
    * err(2).map((v) => v * 2).unwrapErr(); // 2
    */
-  map: <U>(fn: (value: Ternary<O['IsOk'], T, never>) => U) => Ternary<O['IsOk'], Ok<U>, Err<T>>;
-  // TODO proof of concept
-  // map: <U>(
-  //   fn: (value: T) => U,
-  // ) => Ternary<TIsOk, U extends Promise<infer TValue> ? AsyncOk<TValue> : Ok<U>, Err<E>>;
+  map: <U>(
+    fn: (value: Value<T, O>) => U,
+  ) => Ternary<O['IsOk'], U extends Promise<infer TValue> ? AsyncOk<TValue> : Ok<U>, Err<T>>;
   /**
    * Maps a `Result<T, E>` to a `Result<T, F>` by applying a function to a contained `err` value, leaving an `ok` value untouched.
    *
@@ -231,7 +237,9 @@ export type ResultConstructor<T, O extends Options> = {
    * ok(2).mapErr((v) => v * 2).unwrap(); // 2
    * err(2).mapErr((v) => v * 2).unwrapErr(); // 4
    */
-  mapErr: <F>(fn: (error: Ternary<O['IsOk'], never, T>) => F) => Ternary<O['IsOk'], Ok<T>, Err<F>>;
+  mapErr: <F>(
+    fn: (error: Error<T, O>) => F,
+  ) => Ternary<O['IsOk'], Ok<T>, F extends Promise<infer TValue> ? AsyncErr<TValue> : Err<F>>;
   /**
    * Returns the provided default (if `err`), or applies a function to the contained value (if `ok`).
    *
@@ -243,7 +251,7 @@ export type ResultConstructor<T, O extends Options> = {
    * ok(2).mapOr(42, (v) => v * 2).unwrap(); // 4
    * err(2).mapOr(42, (v) => v * 2).unwrapErr() // 42
    */
-  mapOr: <U>(defaultValue: U, fn: (value: Ternary<O['IsOk'], T, never>) => U) => U;
+  mapOr: <U>(defaultValue: U, fn: (value: Value<T, O>) => U) => U;
   /**
    * Maps a `Result<T, E>` to `U` by applying fallback function `defaultFn` to an `err` value, or function `fn` to an `ok` value.
    *
@@ -253,10 +261,7 @@ export type ResultConstructor<T, O extends Options> = {
    * ok(2).mapOrElse((_error) => 42, (v) => v * 2).unwrap(); // 4
    * err(2).mapOrElse((_error) => 42, (v) => v * 2).unwrapErr() // 42
    */
-  mapOrElse: <U>(
-    defaultFn: (error: Ternary<O['IsOk'], never, T>) => U,
-    fn: (value: Ternary<O['IsOk'], T, never>) => U,
-  ) => U;
+  mapOrElse: <U>(defaultFn: (error: Error<T, O>) => U, fn: (value: Value<T, O>) => U) => U;
 
   // Boolean operators
 
@@ -267,23 +272,23 @@ export type ResultConstructor<T, O extends Options> = {
    *
    * @example
    * err('early error').and(ok('late value')).unwrapErr(); // 'early error'
-   * err('early error').and(err('late error)).unwrapErr(); // 'early error'
+   * err('early error').and(err('late error')).unwrapErr(); // 'early error'
    * ok('early value').and(err('late error')).unwrapErr(); // 'late error'
    * ok('early value').and(ok('late value')).unwrap(); // 'late value'
    */
-  and: <R extends AnyResult>(res: R) => Ternary<O['IsOk'], R, Err<T>>;
+  and: <R extends AnyResult | AnyAsyncResult>(resB: R) => Ternary<O['IsOk'], R, Err<T>>;
   /**
    * Returns `res` if the result is `err`, otherwise returns its own `ok` value.
    *
    * * If you are passing the result of a function call to `res`, it is recommended to use `orElse`, which is lazily evaluated.
    *
    * @example
-   * ok('early value').or(ok('late value)).unwrap(); // 'early value'
+   * ok('early value').or(ok('late value')).unwrap(); // 'early value'
    * ok('early value').or(err('late error')).unwrap(); // 'early value'
    * err('early error').or(ok('late value')).unwrap(); // 'late value'
    * err('early error').or(err('late error)).unwrapErr(); // 'late error'
    */
-  or: <R extends AnyResult>(res: R) => Ternary<O['IsOk'], Ok<T>, R>;
+  or: <R extends AnyResult | AnyAsyncResult>(resB: R) => Ternary<O['IsOk'], Ok<T>, R>;
   /**
    * Calls `fn` if the result is `ok`, otherwise return its own `err` value.
    *
@@ -295,9 +300,7 @@ export type ResultConstructor<T, O extends Options> = {
    * ok(42).andThen(s).unwrapErr(); // 'bad number'
    * err('not a number').andThen(s).unwrapErr(); // 'not a number'
    */
-  andThen: <R extends AnyResult>(
-    fn: (value: Ternary<O['IsOk'], T, never>) => R,
-  ) => Ternary<O['IsOk'], R, Err<T>>;
+  andThen: <R extends AnyResult>(fn: (value: Value<T, O>) => R) => Ternary<O['IsOk'], R, Err<T>>;
   /**
    * Calls `fn` if the result is `err`, otherwise returns its own `ok` value.
    *
@@ -311,9 +314,7 @@ export type ResultConstructor<T, O extends Options> = {
    * err(2).orElse(s).orElse(e).unwrap(); // 4
    * err(3).orElse(e).orElse(e).unwrapErr(); // 3
    */
-  orElse: <R extends AnyResult>(
-    fn: (error: Ternary<O['IsOk'], never, T>) => R,
-  ) => Ternary<O['IsOk'], Ok<T>, R>;
+  orElse: <R extends AnyResult>(fn: (error: Error<T, O>) => R) => Ternary<O['IsOk'], Ok<T>, R>;
 
   // Rust syntax utilities
 
@@ -332,5 +333,5 @@ export type ResultConstructor<T, O extends Options> = {
    *   err: (error) => 'Some error handling',
    * }); // 'Some error handling'
    */
-  match: <U>(m: Match<Ternary<O['IsOk'], T, never>, Ternary<O['IsOk'], never, T>, U>) => U;
+  match: <U>(m: ResultMatch<Value<T, O>, Error<T, O>, U>) => U;
 };

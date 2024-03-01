@@ -1,6 +1,6 @@
 import { AnyResult, Err, Ok } from './result';
 
-export type Match<T, E, U> = {
+export type ResultMatch<T, E, U> = {
   ok: (value: T) => U;
   err: (error: E) => U;
 };

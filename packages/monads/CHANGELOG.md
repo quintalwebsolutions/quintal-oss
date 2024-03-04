@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- b021795: All functions can now handle async callbacks
+- b021795: All `Result` functions can now handle async callbacks
 - 52b1be6: Add match function to monads
 
 ### Patch Changes

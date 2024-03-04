@@ -1,4 +1,4 @@
-import type { PluginObject, TransformFn, Plugins, Row } from '../types';
+import type { PluginObject, Plugins, Row, TransformFn } from '../types';
 
 export function serializeValue<TRow extends Row>(
   value: TRow[keyof TRow],
@@ -17,7 +17,6 @@ export function getEntries<TObj extends object, K extends keyof TObj>(
 ): [K, TObj[K]][] {
   // TODO look into this typing
   // @ts-expect-error This should pass by definition.
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- Typing is hard
   return Object.entries(obj);
 }
 

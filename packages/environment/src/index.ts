@@ -33,7 +33,6 @@ type UnwrapEnvValue<T> = T extends EnvValue
 
 type UnwrapEnvValues<TEnvValues extends EnvValues> = {
   [TKey in keyof TEnvValues]: UnwrapEnvValue<TEnvValues[TKey]>;
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents -- This needs to be here for "prettify" effect
 } & unknown;
 
 type CreateEnvironmentOptions<TEnvValues extends EnvValues> = {

@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import { AnyOption, Option, none, some } from '../src/option';
+import { AnyOption, Option, none, some } from '../src';
 import { Equal } from '../src/util';
 
 function expectOptionUnwrap<TOption extends AnyOption>(_option: TOption) {
@@ -49,24 +49,24 @@ describe('Option', () => {
     }
   });
 
-  it('Allows to unwrap the result value with a custom error message', async () => {
+  it('Allows to unwrap the option value with a custom error message', async () => {
     expect(someValue.expect('Should be some')).toBe('value');
     expect(() => noneValue.expect('Should be some')).toThrow('Should be some');
     expect(someOption1.expect('Should be some')).toBe('value1');
     expect(() => noneOption1.expect('Should be some')).toThrow('Should be some');
   });
 
-  it('Allows to unwrap the result value', async () => {
+  it('Allows to unwrap the option value', async () => {
     expectOptionUnwrap(someValue).toBe<'value'>(true);
     expect(someValue.unwrap()).toBe('value');
 
     expectOptionUnwrap(noneValue).toBe<never>(true);
-    expect(noneValue.unwrap).toThrow('Attempted to unwrap a none value');
+    expect(noneValue.unwrap).toThrow("Attempted to unwrap a 'none' value");
 
     expectOptionUnwrap(someOption1).toBe<'value1'>(true);
     expect(someOption1.unwrap()).toBe('value1');
 
     expectOptionUnwrap(noneOption1).toBe<'none1'>(true);
-    expect(noneOption1.unwrap).toThrow('Attempted to unwrap a none value');
+    expect(noneOption1.unwrap).toThrow("Attempted to unwrap a 'none' value");
   });
 });

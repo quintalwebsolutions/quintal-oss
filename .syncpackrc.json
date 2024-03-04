@@ -4,7 +4,13 @@
   "dependencyTypes": ["dev", "prod"],
   "filter": ".",
   "indent": "  ",
-  "semverGroups": [],
+  "semverGroups": [
+    {
+      "range": "",
+      "dependencies": ["**"],
+      "packages": ["**"]
+    }
+  ],
   "semverRange": "",
   "sortAz": [
     "contributors",

@@ -4,9 +4,7 @@
   "main": "./.dist/index.cjs",
   "module": "./.dist/index.mjs",
   "types": "./.dist/index.d.ts",
-  "files": [
-    ".dist"
-  ],
+  "files": [".dist"],
   "scripts": {
     "build": "run-s build:*",
     "build:clean": "shx rm -rf .dist",

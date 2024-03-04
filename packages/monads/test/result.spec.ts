@@ -1,6 +1,5 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import {
-  AnyAsyncResult,
   AnyOption,
   AnyResult,
   AsyncResult,
@@ -18,18 +17,7 @@ import { None, Option, Some, none, some } from '../src';
 import { AsyncErr, AsyncOk } from '../src/result/async-result';
 import { And, Equal, MaybePromise, Ternary } from '../src/util';
 
-function expectResultUnwrap<TResult extends AnyResult | AnyAsyncResult>(_result: TResult) {
-  return {
-    toBe: <TUnwrap, TUnwrapErr>(
-      _val: And<
-        Equal<ReturnType<TResult['unwrap']>, TUnwrap>,
-        Equal<ReturnType<TResult['unwrapErr']>, TUnwrapErr>
-      >,
-    ) => {},
-  };
-}
-
-function expectUnwrap<TResult extends AnyResult | AnyAsyncResult>(result: TResult) {
+function expectU<TResult extends AnyResult>(result: TResult) {
   return {
     toBe: async <TUnwrap, TUnwrapErr>(
       isOk: Ternary<
@@ -42,8 +30,8 @@ function expectUnwrap<TResult extends AnyResult | AnyAsyncResult>(result: TResul
       >,
       unwrappedValue: Awaited<TUnwrap | TUnwrapErr>,
     ) => {
-      if (isOk) expect(await result.unwrap()).toBe(unwrappedValue);
-      else expect(await result.unwrapErr()).toBe(unwrappedValue);
+      if (isOk) expect(await result.unwrap()).toStrictEqual(unwrappedValue);
+      else expect(await result.unwrapErr()).toStrictEqual(unwrappedValue);
     },
   };
 }
@@ -56,13 +44,15 @@ function throws(): 'value' {
   throw new Error('error');
 }
 
-async function returnsAsync(): Promise<'value'> {
+async function returnsAsync(): P<'value'> {
   return 'value';
 }
 
-async function throwsAsync(): Promise<'value'> {
+async function throwsAsync(): P<'value'> {
   throw new Error('error');
 }
+
+type P<T> = Promise<T>;
 
 const okVal = ok('value' as const);
 const asyncOkVal = asyncOk('value' as const);
@@ -79,18 +69,26 @@ const lateErr = err('late' as const);
 const asyncLateOk = asyncOk('late' as const);
 const asyncLateErr = asyncErr('late' as const);
 
-const okRes1 = ok('value1') as Result<'value1', 'error1'>;
-const okRes2 = ok('value2') as Result<'value2', 'error2'>;
-const errRes1 = err('error1') as Result<'value1', 'error1'>;
-const errRes2 = err('error2') as Result<'value2', 'error2'>;
+const okRes1 = ok('v1') as Result<'v1', 'e1'>;
+const okRes2 = ok('v2') as Result<'v2', 'e2'>;
+const errRes1 = err('e1') as Result<'v1', 'e1'>;
+const errRes2 = err('e2') as Result<'v2', 'e2'>;
+const asyncOkRes1 = asyncOk('v1') as AsyncResult<Result<'v1', 'e1'>>;
+const asyncOkRes2 = asyncOk('v2') as AsyncResult<Result<'v2', 'e2'>>;
+const asyncErrRes1 = asyncErr('e1') as AsyncResult<Result<'v1', 'e1'>>;
+const asyncErrRes2 = asyncErr('e2') as AsyncResult<Result<'v2', 'e2'>>;
+
 const okResVal = result(returns);
 const errResVal = result(throws);
 const asyncOkResVal = asyncResult(returnsAsync);
 const asyncErrResVal = asyncResult(throwsAsync);
 
+type ResVal = typeof okResVal;
+type AsyncResVal = typeof asyncOkResVal;
+
 describe('Result', () => {
   it('should have type-safe `ok` and `err` properties', async () => {
-    function expectIsOkIsErr<TResult extends AnyResult | AnyAsyncResult>(result: TResult) {
+    function expectIsOkIsErr<TResult extends AnyResult>(result: TResult) {
       return {
         toBe: async <
           TIsOk,
@@ -103,7 +101,7 @@ describe('Result', () => {
           isOk: Ternary<TIsEqual, Awaited<TIsOk>, never>,
           isErr: Ternary<TIsEqual, Awaited<TIsErr>, never>,
         ) => {
-          // TODO how to add context to this so that if it fails, we know under which circumstances it failed
+          // TODO how to add context to this so that if it fails, we know under which circumstances it failed?
           expect(await result.isOk).toBe(isOk);
           expect(await result.isErr).toBe(isErr);
         },
@@ -115,24 +113,26 @@ describe('Result', () => {
       expectIsOkIsErr(errVal).toBe<false, true>(false, true),
       expectIsOkIsErr(okResVal).toBe<boolean, boolean>(true, false),
       expectIsOkIsErr(errResVal).toBe<boolean, boolean>(false, true),
-      expectIsOkIsErr(asyncOkVal).toBe<Promise<true>, Promise<false>>(true, false),
-      expectIsOkIsErr(asyncErrVal).toBe<Promise<false>, Promise<true>>(false, true),
-      expectIsOkIsErr(asyncOkResVal).toBe<Promise<boolean>, Promise<boolean>>(true, false),
-      expectIsOkIsErr(asyncErrResVal).toBe<Promise<boolean>, Promise<boolean>>(false, true),
+      expectIsOkIsErr(asyncOkVal).toBe<P<true>, P<false>>(true, false),
+      expectIsOkIsErr(asyncErrVal).toBe<P<false>, P<true>>(false, true),
+      expectIsOkIsErr(asyncOkResVal).toBe<P<boolean>, P<boolean>>(true, false),
+      expectIsOkIsErr(asyncErrResVal).toBe<P<boolean>, P<boolean>>(false, true),
     ]);
   });
 
   it('should type-narrow based on `isOk` and `isErr` checks', () => {
     // TODO is this possible for AsyncResult?
-    expectResultUnwrap(okResVal).toBe<'value', unknown>(true);
+    expectU(okResVal).toBe<'value', unknown>(true, 'value');
     expectTypeOf(okResVal).not.toHaveProperty('value');
     expectTypeOf(okResVal).not.toHaveProperty('error');
 
     if (okResVal.isOk) {
-      expectResultUnwrap(okResVal).toBe<'value', never>(true);
+      expectU(okResVal).toBe<'value', never>(true, 'value');
       expectTypeOf(okResVal).toHaveProperty('value');
+      expectTypeOf(okResVal).not.toHaveProperty('error');
     } else {
-      expectResultUnwrap(okResVal).toBe<never, unknown>(true);
+      expectU(okResVal).toBe<never, unknown>(true, 'value');
+      expectTypeOf(okResVal).not.toHaveProperty('value');
       expectTypeOf(okResVal).toHaveProperty('error');
     }
   });
@@ -153,80 +153,80 @@ describe('Result', () => {
     await Promise.all([
       expectPredicate(okVal.isOkAnd(pTrue)).toBe<true>(true),
       expectPredicate(okVal.isOkAnd(pFalse)).toBe<false>(false),
-      expectPredicate(okVal.isOkAnd(pAsyncTrue)).toBe<Promise<true>>(true),
-      expectPredicate(okVal.isOkAnd(pAsyncFalse)).toBe<Promise<false>>(false),
-      expectPredicate(asyncOkVal.isOkAnd(pTrue)).toBe<Promise<true>>(true),
-      expectPredicate(asyncOkVal.isOkAnd(pFalse)).toBe<Promise<false>>(false),
-      expectPredicate(asyncOkVal.isOkAnd(pAsyncTrue)).toBe<Promise<true>>(true),
-      expectPredicate(asyncOkVal.isOkAnd(pAsyncFalse)).toBe<Promise<false>>(false),
+      expectPredicate(okVal.isOkAnd(pAsyncTrue)).toBe<P<true>>(true),
+      expectPredicate(okVal.isOkAnd(pAsyncFalse)).toBe<P<false>>(false),
+      expectPredicate(asyncOkVal.isOkAnd(pTrue)).toBe<P<true>>(true),
+      expectPredicate(asyncOkVal.isOkAnd(pFalse)).toBe<P<false>>(false),
+      expectPredicate(asyncOkVal.isOkAnd(pAsyncTrue)).toBe<P<true>>(true),
+      expectPredicate(asyncOkVal.isOkAnd(pAsyncFalse)).toBe<P<false>>(false),
 
       expectPredicate(errVal.isOkAnd(pTrue)).toBe<false>(false),
       expectPredicate(errVal.isOkAnd(pFalse)).toBe<false>(false),
       expectPredicate(errVal.isOkAnd(pAsyncTrue)).toBe<false>(false),
       expectPredicate(errVal.isOkAnd(pAsyncFalse)).toBe<false>(false),
-      expectPredicate(asyncErrVal.isOkAnd(pTrue)).toBe<Promise<false>>(false),
-      expectPredicate(asyncErrVal.isOkAnd(pFalse)).toBe<Promise<false>>(false),
-      expectPredicate(asyncErrVal.isOkAnd(pAsyncTrue)).toBe<Promise<false>>(false),
-      expectPredicate(asyncErrVal.isOkAnd(pAsyncFalse)).toBe<Promise<false>>(false),
+      expectPredicate(asyncErrVal.isOkAnd(pTrue)).toBe<P<false>>(false),
+      expectPredicate(asyncErrVal.isOkAnd(pFalse)).toBe<P<false>>(false),
+      expectPredicate(asyncErrVal.isOkAnd(pAsyncTrue)).toBe<P<false>>(false),
+      expectPredicate(asyncErrVal.isOkAnd(pAsyncFalse)).toBe<P<false>>(false),
 
       expectPredicate(okResVal.isOkAnd(pTrue)).toBe<boolean>(true),
       expectPredicate(okResVal.isOkAnd(pFalse)).toBe<false>(false),
-      expectPredicate(okResVal.isOkAnd(pAsyncTrue)).toBe<false | Promise<true>>(true),
-      expectPredicate(okResVal.isOkAnd(pAsyncFalse)).toBe<false | Promise<false>>(false),
-      expectPredicate(asyncOkResVal.isOkAnd(pTrue)).toBe<Promise<boolean>>(true),
-      expectPredicate(asyncOkResVal.isOkAnd(pFalse)).toBe<Promise<false>>(false),
-      expectPredicate(asyncOkResVal.isOkAnd(pAsyncTrue)).toBe<Promise<boolean>>(true),
-      expectPredicate(asyncOkResVal.isOkAnd(pAsyncFalse)).toBe<Promise<false>>(false),
+      expectPredicate(okResVal.isOkAnd(pAsyncTrue)).toBe<false | P<true>>(true),
+      expectPredicate(okResVal.isOkAnd(pAsyncFalse)).toBe<false | P<false>>(false),
+      expectPredicate(asyncOkResVal.isOkAnd(pTrue)).toBe<P<boolean>>(true),
+      expectPredicate(asyncOkResVal.isOkAnd(pFalse)).toBe<P<false>>(false),
+      expectPredicate(asyncOkResVal.isOkAnd(pAsyncTrue)).toBe<P<boolean>>(true),
+      expectPredicate(asyncOkResVal.isOkAnd(pAsyncFalse)).toBe<P<false>>(false),
 
       expectPredicate(errResVal.isOkAnd(pTrue)).toBe<boolean>(false),
       expectPredicate(errResVal.isOkAnd(pFalse)).toBe<false>(false),
-      expectPredicate(errResVal.isOkAnd(pAsyncTrue)).toBe<false | Promise<true>>(false),
-      expectPredicate(errResVal.isOkAnd(pAsyncFalse)).toBe<false | Promise<false>>(false),
-      expectPredicate(asyncErrResVal.isOkAnd(pTrue)).toBe<Promise<boolean>>(false),
-      expectPredicate(asyncErrResVal.isOkAnd(pFalse)).toBe<Promise<false>>(false),
-      expectPredicate(asyncErrResVal.isOkAnd(pAsyncTrue)).toBe<Promise<boolean>>(false),
-      expectPredicate(asyncErrResVal.isOkAnd(pAsyncFalse)).toBe<Promise<false>>(false),
+      expectPredicate(errResVal.isOkAnd(pAsyncTrue)).toBe<false | P<true>>(false),
+      expectPredicate(errResVal.isOkAnd(pAsyncFalse)).toBe<false | P<false>>(false),
+      expectPredicate(asyncErrResVal.isOkAnd(pTrue)).toBe<P<boolean>>(false),
+      expectPredicate(asyncErrResVal.isOkAnd(pFalse)).toBe<P<false>>(false),
+      expectPredicate(asyncErrResVal.isOkAnd(pAsyncTrue)).toBe<P<boolean>>(false),
+      expectPredicate(asyncErrResVal.isOkAnd(pAsyncFalse)).toBe<P<false>>(false),
 
       expectPredicate(okVal.isErrAnd(pTrue)).toBe<false>(false),
       expectPredicate(okVal.isErrAnd(pFalse)).toBe<false>(false),
       expectPredicate(okVal.isErrAnd(pAsyncTrue)).toBe<false>(false),
       expectPredicate(okVal.isErrAnd(pAsyncFalse)).toBe<false>(false),
-      expectPredicate(asyncOkVal.isErrAnd(pTrue)).toBe<Promise<false>>(false),
-      expectPredicate(asyncOkVal.isErrAnd(pFalse)).toBe<Promise<false>>(false),
-      expectPredicate(asyncOkVal.isErrAnd(pAsyncTrue)).toBe<Promise<false>>(false),
-      expectPredicate(asyncOkVal.isErrAnd(pAsyncFalse)).toBe<Promise<false>>(false),
+      expectPredicate(asyncOkVal.isErrAnd(pTrue)).toBe<P<false>>(false),
+      expectPredicate(asyncOkVal.isErrAnd(pFalse)).toBe<P<false>>(false),
+      expectPredicate(asyncOkVal.isErrAnd(pAsyncTrue)).toBe<P<false>>(false),
+      expectPredicate(asyncOkVal.isErrAnd(pAsyncFalse)).toBe<P<false>>(false),
 
       expectPredicate(errVal.isErrAnd(pTrue)).toBe<true>(true),
       expectPredicate(errVal.isErrAnd(pFalse)).toBe<false>(false),
-      expectPredicate(errVal.isErrAnd(pAsyncTrue)).toBe<Promise<true>>(true),
-      expectPredicate(errVal.isErrAnd(pAsyncFalse)).toBe<Promise<false>>(false),
-      expectPredicate(asyncErrVal.isErrAnd(pTrue)).toBe<Promise<true>>(true),
-      expectPredicate(asyncErrVal.isErrAnd(pFalse)).toBe<Promise<false>>(false),
-      expectPredicate(asyncErrVal.isErrAnd(pAsyncTrue)).toBe<Promise<true>>(true),
-      expectPredicate(asyncErrVal.isErrAnd(pAsyncFalse)).toBe<Promise<false>>(false),
+      expectPredicate(errVal.isErrAnd(pAsyncTrue)).toBe<P<true>>(true),
+      expectPredicate(errVal.isErrAnd(pAsyncFalse)).toBe<P<false>>(false),
+      expectPredicate(asyncErrVal.isErrAnd(pTrue)).toBe<P<true>>(true),
+      expectPredicate(asyncErrVal.isErrAnd(pFalse)).toBe<P<false>>(false),
+      expectPredicate(asyncErrVal.isErrAnd(pAsyncTrue)).toBe<P<true>>(true),
+      expectPredicate(asyncErrVal.isErrAnd(pAsyncFalse)).toBe<P<false>>(false),
 
       expectPredicate(okResVal.isErrAnd(pTrue)).toBe<boolean>(false),
       expectPredicate(okResVal.isErrAnd(pFalse)).toBe<false>(false),
-      expectPredicate(okResVal.isErrAnd(pAsyncTrue)).toBe<false | Promise<true>>(false),
-      expectPredicate(okResVal.isErrAnd(pAsyncFalse)).toBe<false | Promise<false>>(false),
-      expectPredicate(asyncOkResVal.isErrAnd(pTrue)).toBe<Promise<boolean>>(false),
-      expectPredicate(asyncOkResVal.isErrAnd(pFalse)).toBe<Promise<false>>(false),
-      expectPredicate(asyncOkResVal.isErrAnd(pAsyncTrue)).toBe<Promise<boolean>>(false),
-      expectPredicate(asyncOkResVal.isErrAnd(pAsyncFalse)).toBe<Promise<false>>(false),
+      expectPredicate(okResVal.isErrAnd(pAsyncTrue)).toBe<false | P<true>>(false),
+      expectPredicate(okResVal.isErrAnd(pAsyncFalse)).toBe<false | P<false>>(false),
+      expectPredicate(asyncOkResVal.isErrAnd(pTrue)).toBe<P<boolean>>(false),
+      expectPredicate(asyncOkResVal.isErrAnd(pFalse)).toBe<P<false>>(false),
+      expectPredicate(asyncOkResVal.isErrAnd(pAsyncTrue)).toBe<P<boolean>>(false),
+      expectPredicate(asyncOkResVal.isErrAnd(pAsyncFalse)).toBe<P<false>>(false),
 
       expectPredicate(errResVal.isErrAnd(pTrue)).toBe<boolean>(true),
       expectPredicate(errResVal.isErrAnd(pFalse)).toBe<false>(false),
-      expectPredicate(errResVal.isErrAnd(pAsyncTrue)).toBe<false | Promise<true>>(true),
-      expectPredicate(errResVal.isErrAnd(pAsyncFalse)).toBe<false | Promise<false>>(false),
-      expectPredicate(asyncErrResVal.isErrAnd(pTrue)).toBe<Promise<boolean>>(true),
-      expectPredicate(asyncErrResVal.isErrAnd(pFalse)).toBe<Promise<false>>(false),
-      expectPredicate(asyncErrResVal.isErrAnd(pAsyncTrue)).toBe<Promise<boolean>>(true),
-      expectPredicate(asyncErrResVal.isErrAnd(pAsyncFalse)).toBe<Promise<false>>(false),
+      expectPredicate(errResVal.isErrAnd(pAsyncTrue)).toBe<false | P<true>>(true),
+      expectPredicate(errResVal.isErrAnd(pAsyncFalse)).toBe<false | P<false>>(false),
+      expectPredicate(asyncErrResVal.isErrAnd(pTrue)).toBe<P<boolean>>(true),
+      expectPredicate(asyncErrResVal.isErrAnd(pFalse)).toBe<P<false>>(false),
+      expectPredicate(asyncErrResVal.isErrAnd(pAsyncTrue)).toBe<P<boolean>>(true),
+      expectPredicate(asyncErrResVal.isErrAnd(pAsyncFalse)).toBe<P<false>>(false),
     ]);
   });
 
   it('should facilitate inspection of `ok` and `err` values with `inspect` and `inspectErr`', async () => {
-    function expectInspect<TResult extends AnyResult | AnyAsyncResult>(result: TResult) {
+    function expectInspect<TResult extends AnyResult>(result: TResult) {
       return {
         toBe: async <
           TInspect,
@@ -238,7 +238,7 @@ describe('Result', () => {
         >(
           isOk: Ternary<TIsEqual, boolean, never>,
           isAsync: Ternary<TIsEqual, boolean, never>,
-          value: unknown,
+          value: Ternary<TIsEqual, unknown, never>,
         ) => {
           const inspectMockFn = vi.fn();
           const inspectResult = result.inspect((v) => {
@@ -329,39 +329,39 @@ describe('Result', () => {
   });
 
   it('should unwrap the contained `ok` value and throw on `err` with `unwrap` and `unwrapErr`', async () => {
-    expectResultUnwrap(okVal).toBe<'value', never>(true);
+    expectU(okVal).toBe<'value', never>(true, 'value');
     expect(okVal.unwrap()).toBe('value');
     expect(() => okVal.unwrapErr()).toThrow("Attempted to unwrapErr an 'ok' value: value");
 
-    expectResultUnwrap(errVal).toBe<never, 'error'>(true);
+    expectU(errVal).toBe<never, 'error'>(false, 'error');
     expect(() => errVal.unwrap()).toThrow('error');
     expect(errVal.unwrapErr()).toBe('error');
 
-    expectResultUnwrap(okResVal).toBe<'value', unknown>(true);
+    expectU(okResVal).toBe<'value', unknown>(true, 'value');
     expect(okResVal.unwrap()).toBe('value');
     expect(() => okResVal.unwrapErr()).toThrow("Attempted to unwrapErr an 'ok' value: value");
 
-    expectResultUnwrap(errResVal).toBe<'value', unknown>(true);
+    expectU(errResVal).toBe<'value', unknown>(false, Error('error'));
     expect(() => errResVal.unwrap()).toThrow('error');
     expect(errResVal.unwrapErr()).toStrictEqual(Error('error'));
 
-    expectResultUnwrap(asyncOkVal).toBe<Promise<'value'>, Promise<never>>(true);
+    expectU(asyncOkVal).toBe<P<'value'>, P<never>>(true, 'value');
     expect(await asyncOkVal.unwrap()).toBe('value');
     expect(() => asyncOkVal.unwrapErr()).rejects.toThrow(
       "Attempted to unwrapErr an 'ok' value: value",
     );
 
-    expectResultUnwrap(asyncErrVal).toBe<Promise<never>, Promise<'error'>>(true);
+    expectU(asyncErrVal).toBe<P<never>, P<'error'>>(false, 'error');
     expect(() => asyncErrVal.unwrap()).rejects.toThrow('error');
     expect(await asyncErrVal.unwrapErr()).toBe('error');
 
-    expectResultUnwrap(asyncOkResVal).toBe<Promise<'value'>, Promise<unknown>>(true);
+    expectU(asyncOkResVal).toBe<P<'value'>, P<unknown>>(true, 'value');
     expect(await asyncOkResVal.unwrap()).toBe('value');
     expect(() => asyncOkResVal.unwrapErr()).rejects.toThrow(
       "Attempted to unwrapErr an 'ok' value: value",
     );
 
-    expectResultUnwrap(asyncErrResVal).toBe<Promise<'value'>, Promise<unknown>>(true);
+    expectU(asyncErrResVal).toBe<P<'value'>, P<unknown>>(false, Error('error'));
     expect(() => asyncErrResVal.unwrap()).rejects.toThrow('error');
     expect(await asyncErrResVal.unwrapErr()).toStrictEqual(Error('error'));
   });
@@ -370,7 +370,7 @@ describe('Result', () => {
     const dfVal = 'default' as const;
     const aDfVal = Promise.resolve(dfVal);
     const dfFn = () => dfVal;
-    const aDfFn = async () => dfVal;
+    const aDfFn = () => aDfVal;
 
     function expectUnwrap<T>(value: T) {
       return {
@@ -385,44 +385,42 @@ describe('Result', () => {
       expectUnwrap(okVal.unwrapOr(aDfVal)).toBe<'value'>('value'),
       expectUnwrap(okVal.unwrapOrElse(dfFn)).toBe<'value'>('value'),
       expectUnwrap(okVal.unwrapOrElse(aDfFn)).toBe<'value'>('value'),
-      expectUnwrap(asyncOkVal.unwrapOr(dfVal)).toBe<Promise<'value'>>('value'),
-      expectUnwrap(asyncOkVal.unwrapOr(aDfVal)).toBe<Promise<'value'>>('value'),
-      expectUnwrap(asyncOkVal.unwrapOrElse(dfFn)).toBe<Promise<'value'>>('value'),
-      expectUnwrap(asyncOkVal.unwrapOrElse(aDfFn)).toBe<Promise<'value'>>('value'),
+      expectUnwrap(asyncOkVal.unwrapOr(dfVal)).toBe<P<'value'>>('value'),
+      expectUnwrap(asyncOkVal.unwrapOr(aDfVal)).toBe<P<'value'>>('value'),
+      expectUnwrap(asyncOkVal.unwrapOrElse(dfFn)).toBe<P<'value'>>('value'),
+      expectUnwrap(asyncOkVal.unwrapOrElse(aDfFn)).toBe<P<'value'>>('value'),
 
       expectUnwrap(errVal.unwrapOr(dfVal)).toBe<'default'>('default'),
-      expectUnwrap(errVal.unwrapOr(aDfVal)).toBe<Promise<'default'>>('default'),
+      expectUnwrap(errVal.unwrapOr(aDfVal)).toBe<P<'default'>>('default'),
       expectUnwrap(errVal.unwrapOrElse(dfFn)).toBe<'default'>('default'),
-      expectUnwrap(errVal.unwrapOrElse(aDfFn)).toBe<Promise<'default'>>('default'),
-      expectUnwrap(asyncErrVal.unwrapOr(dfVal)).toBe<Promise<'default'>>('default'),
-      expectUnwrap(asyncErrVal.unwrapOr(aDfVal)).toBe<Promise<'default'>>('default'),
-      expectUnwrap(asyncErrVal.unwrapOrElse(dfFn)).toBe<Promise<'default'>>('default'),
-      expectUnwrap(asyncErrVal.unwrapOrElse(aDfFn)).toBe<Promise<'default'>>('default'),
+      expectUnwrap(errVal.unwrapOrElse(aDfFn)).toBe<P<'default'>>('default'),
+      expectUnwrap(asyncErrVal.unwrapOr(dfVal)).toBe<P<'default'>>('default'),
+      expectUnwrap(asyncErrVal.unwrapOr(aDfVal)).toBe<P<'default'>>('default'),
+      expectUnwrap(asyncErrVal.unwrapOrElse(dfFn)).toBe<P<'default'>>('default'),
+      expectUnwrap(asyncErrVal.unwrapOrElse(aDfFn)).toBe<P<'default'>>('default'),
 
       expectUnwrap(okResVal.unwrapOr(dfVal)).toBe<'value' | 'default'>('value'),
-      expectUnwrap(okResVal.unwrapOr(aDfVal)).toBe<'value' | Promise<'default'>>('value'),
+      expectUnwrap(okResVal.unwrapOr(aDfVal)).toBe<'value' | P<'default'>>('value'),
       expectUnwrap(okResVal.unwrapOrElse(dfFn)).toBe<'value' | 'default'>('value'),
-      expectUnwrap(okResVal.unwrapOrElse(aDfFn)).toBe<'value' | Promise<'default'>>('value'),
-      expectUnwrap(asyncOkResVal.unwrapOr(dfVal)).toBe<Promise<'value' | 'default'>>('value'),
-      expectUnwrap(asyncOkResVal.unwrapOr(aDfVal)).toBe<Promise<'value' | 'default'>>('value'),
-      expectUnwrap(asyncOkResVal.unwrapOrElse(dfFn)).toBe<Promise<'value' | 'default'>>('value'),
-      expectUnwrap(asyncOkResVal.unwrapOrElse(aDfFn)).toBe<Promise<'value' | 'default'>>('value'),
+      expectUnwrap(okResVal.unwrapOrElse(aDfFn)).toBe<'value' | P<'default'>>('value'),
+      expectUnwrap(asyncOkResVal.unwrapOr(dfVal)).toBe<P<'value' | 'default'>>('value'),
+      expectUnwrap(asyncOkResVal.unwrapOr(aDfVal)).toBe<P<'value' | 'default'>>('value'),
+      expectUnwrap(asyncOkResVal.unwrapOrElse(dfFn)).toBe<P<'value' | 'default'>>('value'),
+      expectUnwrap(asyncOkResVal.unwrapOrElse(aDfFn)).toBe<P<'value' | 'default'>>('value'),
 
       expectUnwrap(errResVal.unwrapOr(dfVal)).toBe<'value' | 'default'>('default'),
-      expectUnwrap(errResVal.unwrapOr(aDfVal)).toBe<'value' | Promise<'default'>>('default'),
+      expectUnwrap(errResVal.unwrapOr(aDfVal)).toBe<'value' | P<'default'>>('default'),
       expectUnwrap(errResVal.unwrapOrElse(dfFn)).toBe<'value' | 'default'>('default'),
-      expectUnwrap(errResVal.unwrapOrElse(aDfFn)).toBe<'value' | Promise<'default'>>('default'),
-      expectUnwrap(asyncErrResVal.unwrapOr(dfVal)).toBe<Promise<'value' | 'default'>>('default'),
-      expectUnwrap(asyncErrResVal.unwrapOr(aDfVal)).toBe<Promise<'value' | 'default'>>('default'),
-      expectUnwrap(asyncErrResVal.unwrapOrElse(dfFn)).toBe<Promise<'value' | 'default'>>('default'),
-      expectUnwrap(asyncErrResVal.unwrapOrElse(aDfFn)).toBe<Promise<'value' | 'default'>>(
-        'default',
-      ),
+      expectUnwrap(errResVal.unwrapOrElse(aDfFn)).toBe<'value' | P<'default'>>('default'),
+      expectUnwrap(asyncErrResVal.unwrapOr(dfVal)).toBe<P<'value' | 'default'>>('default'),
+      expectUnwrap(asyncErrResVal.unwrapOr(aDfVal)).toBe<P<'value' | 'default'>>('default'),
+      expectUnwrap(asyncErrResVal.unwrapOrElse(dfFn)).toBe<P<'value' | 'default'>>('default'),
+      expectUnwrap(asyncErrResVal.unwrapOrElse(aDfFn)).toBe<P<'value' | 'default'>>('default'),
     ]);
   });
 
   it('should convert to respective `Option` types using `ok` and `err`', async () => {
-    function expectOkErr<TResult extends AnyResult | AnyAsyncResult>(result: TResult) {
+    function expectOkErr<TResult extends AnyResult>(result: TResult) {
       return {
         toBe: async <TOk extends MaybePromise<AnyOption>, TErr extends MaybePromise<AnyOption>>(
           isOk: Ternary<
@@ -430,7 +428,7 @@ describe('Result', () => {
             boolean,
             never
           >,
-          value: ReturnType<(TOk | TErr)['unwrap']>,
+          value: ReturnType<Awaited<TOk | TErr>['unwrap']>,
         ) => {
           const o = await result.ok();
           expect(o.isSome).toBe(isOk);
@@ -453,13 +451,10 @@ describe('Result', () => {
       expectOkErr(okResVal).toBe<Option<'value'>, Option<unknown>>(true, 'value'),
       expectOkErr(errResVal).toBe<Option<'value'>, Option<unknown>>(false, Error('error')),
       // TODO AsyncOption
-      expectOkErr(asyncOkVal).toBe<Promise<Some<'value'>>, Promise<None>>(true, 'value'),
-      expectOkErr(asyncErrVal).toBe<Promise<None>, Promise<Some<'error'>>>(false, 'error'),
-      expectOkErr(asyncOkResVal).toBe<Promise<Option<'value'>>, Promise<Option<unknown>>>(
-        true,
-        'value',
-      ),
-      expectOkErr(asyncErrResVal).toBe<Promise<Option<'value'>>, Promise<Option<unknown>>>(
+      expectOkErr(asyncOkVal).toBe<P<Some<'value'>>, P<None>>(true, 'value'),
+      expectOkErr(asyncErrVal).toBe<P<None>, P<Some<'error'>>>(false, 'error'),
+      expectOkErr(asyncOkResVal).toBe<P<Option<'value'>>, P<Option<unknown>>>(true, 'value'),
+      expectOkErr(asyncErrResVal).toBe<P<Option<'value'>>, P<Option<unknown>>>(
         false,
         Error('error'),
       ),
@@ -501,48 +496,85 @@ describe('Result', () => {
     expect(errTransposed.isSome).toBe(true);
     expect(errTransposed.unwrap().isErr).toBe(true);
     expect(errTransposed.unwrap().unwrapErr()).toBe('error');
+
+    const asyncOkNone = asyncOk(none).transpose();
+    expectTypeOf(asyncOkNone).toEqualTypeOf<Promise<None>>(); // TODO AsyncNone
+    // expect(asyncOkNone.isNone).resolves.toBe(true);
+
+    const asyncOkSome = asyncOk(some('value' as const)).transpose();
+    expectTypeOf(asyncOkSome).toEqualTypeOf<Promise<Some<Ok<'value'>>>>(); // TODO AsyncSome
+    // expect(asyncOkSome.isSome).resolves.toBe(true);
+
+    const asyncOkTransposed = asyncOkVal.transpose();
+    expectTypeOf(asyncOkTransposed).toEqualTypeOf<Promise<Some<Ok<'value'>>>>(); // TODO AsyncSome
+    // expect(asyncOkSome.isSome).resolves.toBe(true);
+
+    const asyncErrNone = asyncErr(none).transpose();
+    expectTypeOf(asyncErrNone).toEqualTypeOf<Promise<Some<Err<None>>>>(); // TODO AsyncSome
+    // expect(asyncErrNone.isSome).resolves.toBe(true);
+
+    const asyncErrSome = asyncErr(some('value' as const)).transpose();
+    expectTypeOf(asyncErrSome).toEqualTypeOf<Promise<Some<Err<Some<'value'>>>>>(); // TODO AsyncSome
+    // expect(asyncErrSome.isSome).resolves.toBe(true);
+
+    const asyncErrTransposed = asyncErrVal.transpose();
+    expectTypeOf(asyncErrTransposed).toEqualTypeOf<Promise<Some<Err<'error'>>>>(); // TODO AsyncSome
+    // expect(asyncErrTransposed.isSome).resolves.toBe(true);
   });
 
-  it('should flatten a `Result` for at most one level', () => {
-    const singleOk = ok('value' as const).flatten();
-    expectResultUnwrap(singleOk).toBe<'value', never>(true);
-    expect(singleOk.unwrap()).toBe('value');
+  it('should flatten a `Result` for at most one level', async () => {
+    await Promise.all([
+      expectU(okVal.flatten()).toBe<'value', never>(true, 'value'),
+      expectU(ok(okVal).flatten()).toBe<'value', never>(true, 'value'),
+      expectU(err(okVal).flatten()).toBe<never, Ok<'value'>>(false, okVal),
+      expectU(asyncOk(okVal).flatten()).toBe<P<'value'>, P<never>>(true, 'value'),
+      expectU(asyncErr(okVal).flatten()).toBe<P<never>, P<Ok<'value'>>>(false, okVal),
 
-    const singleErr = err('error' as const).flatten();
-    expectResultUnwrap(singleErr).toBe<never, 'error'>(true);
-    expect(singleErr.unwrapErr()).toBe('error');
+      expectU(errVal.flatten()).toBe<never, 'error'>(false, 'error'),
+      expectU(ok(errVal).flatten()).toBe<never, 'error'>(false, 'error'),
+      expectU(err(errVal).flatten()).toBe<never, Err<'error'>>(false, errVal),
+      expectU(asyncOk(errVal).flatten()).toBe<P<never>, P<'error'>>(false, 'error'),
+      expectU(asyncErr(errVal).flatten()).toBe<P<never>, P<Err<'error'>>>(false, errVal),
 
-    const singleOkRes = okResVal.flatten();
-    expectResultUnwrap(singleOkRes).toBe<'value', unknown>(true);
-    expect(singleOkRes.unwrap()).toBe('value');
+      expectU(asyncOkVal.flatten()).toBe<P<'value'>, P<never>>(true, 'value'),
+      expectU(ok(asyncOkVal).flatten()).toBe<P<'value'>, P<never>>(true, 'value'),
+      expectU(err(asyncOkVal).flatten()).toBe<never, AsyncOk<'value'>>(false, okVal),
+      expectU(asyncOk(asyncOkVal).flatten()).toBe<P<'value'>, P<never>>(true, 'value'),
+      expectU(asyncErr(asyncOkVal).flatten()).toBe<P<never>, P<Ok<'value'>>>(false, okVal),
 
-    const singleErrRes = errResVal.flatten();
-    expectResultUnwrap(singleErrRes).toBe<'value', unknown>(true);
-    expect(singleErrRes.unwrapErr()).toStrictEqual(Error('error'));
+      expectU(asyncErrVal.flatten()).toBe<P<never>, P<'error'>>(false, 'error'),
+      expectU(ok(asyncErrVal).flatten()).toBe<P<never>, P<'error'>>(false, 'error'),
+      expectU(err(asyncErrVal).flatten()).toBe<never, AsyncErr<'error'>>(false, errVal),
+      expectU(asyncOk(asyncErrVal).flatten()).toBe<P<never>, P<'error'>>(false, 'error'),
+      expectU(asyncErr(asyncErrVal).flatten()).toBe<P<never>, P<Err<'error'>>>(false, errVal),
 
-    const okOk = ok(ok('value' as const)).flatten();
-    expectResultUnwrap(okOk).toBe<'value', never>(true);
-    expect(okOk.unwrap()).toBe('value');
+      expectU(okResVal.flatten()).toBe<'value', unknown>(true, 'value'),
+      expectU(ok(okResVal).flatten()).toBe<'value', unknown>(true, 'value'),
+      expectU(err(okResVal).flatten()).toBe<never, ResVal>(false, okResVal),
+      expectU(asyncOk(okResVal).flatten()).toBe<P<'value'>, P<unknown>>(true, 'value'),
+      expectU(asyncErr(okResVal).flatten()).toBe<P<never>, P<ResVal>>(false, okVal),
 
-    const okErr = ok(err('error' as const)).flatten();
-    expectResultUnwrap(okErr).toBe<never, 'error'>(true);
-    expect(okErr.unwrapErr()).toBe('error');
+      expectU(errResVal.flatten()).toBe<'value', unknown>(false, Error('error')),
+      expectU(ok(errResVal).flatten()).toBe<'value', unknown>(false, Error('error')),
+      expectU(err(errResVal).flatten()).toBe<never, ResVal>(false, errResVal),
+      expectU(asyncOk(errResVal).flatten()).toBe<P<'value'>, P<unknown>>(false, Error('error')),
+      expectU(asyncErr(errResVal).flatten()).toBe<P<never>, P<ResVal>>(false, errResVal),
 
-    const errOk = err(ok('value' as const)).flatten();
-    expectResultUnwrap(errOk).toBe<never, Ok<'value'>>(true);
-    expect(errOk.unwrapErr().unwrap()).toBe('value');
+      expectU(asyncOkResVal.flatten()).toBe<P<'value'>, P<unknown>>(true, 'value'),
+      expectU(ok(asyncOkResVal).flatten()).toBe<P<'value'>, P<unknown>>(true, 'value'),
+      expectU(err(asyncOkResVal).flatten()).toBe<never, AsyncResVal>(false, okResVal),
+      expectU(asyncOk(asyncOkResVal).flatten()).toBe<P<'value'>, Promise<unknown>>(true, 'value'),
+      expectU(asyncErr(asyncOkResVal).flatten()).toBe<P<never>, P<ResVal>>(false, okVal),
 
-    const errErr = err(err('error' as const)).flatten();
-    expectResultUnwrap(errErr).toBe<never, Err<'error'>>(true);
-    expect(errErr.unwrapErr().unwrapErr()).toBe('error');
-
-    const okOkOk = ok(ok(ok('value' as const))).flatten();
-    expectResultUnwrap(okOkOk).toBe<Ok<'value'>, never>(true);
-    expect(okOkOk.unwrap().unwrap()).toBe('value');
-
-    const okOkRes = (ok(ok('value')) as Result<Result<'value', 'error2'>, 'error1'>).flatten();
-    expectResultUnwrap(okOkRes).toBe<'value', 'error1' | 'error2'>(true);
-    expect(okOkRes.unwrap()).toBe('value');
+      expectU(asyncErrResVal.flatten()).toBe<P<'value'>, P<unknown>>(false, Error('error')),
+      expectU(ok(asyncErrResVal).flatten()).toBe<P<'value'>, P<unknown>>(false, Error('error')),
+      expectU(err(asyncErrResVal).flatten()).toBe<never, AsyncResVal>(false, errResVal),
+      expectU(asyncOk(asyncErrResVal).flatten()).toBe<P<'value'>, P<unknown>>(
+        false,
+        Error('error'),
+      ),
+      expectU(asyncErr(asyncErrResVal).flatten()).toBe<P<never>, P<ResVal>>(false, errResVal),
+    ]);
   });
 
   it('should map a function `ok` and `err` values using `map` and `mapErr`', async () => {
@@ -551,9 +583,9 @@ describe('Result', () => {
     const asyncMapFn = async (v: string) => mapFn(v);
     const amef = async (v: unknown) => mapErrFn(v);
 
-    function expectMap<T extends AnyResult | AnyAsyncResult>(value: T) {
+    function expectMap<T extends AnyResult>(value: T) {
       return {
-        toBe: async <TValue extends AnyResult | AnyAsyncResult>(
+        toBe: async <TValue extends AnyResult>(
           isOk: Ternary<Equal<T, TValue>, boolean, never>,
           v: ReturnType<Awaited<TValue>['unwrap'] | Awaited<TValue>['unwrapErr']>,
         ) => {
@@ -609,279 +641,381 @@ describe('Result', () => {
     ]);
   });
 
-  it('should map function or return default value with `mapOr` and `mapOrElse`', () => {
+  it('should map function or return default value with `mapOr` and `mapOrElse`', async () => {
+    function expectMap(value: 0 | 1 | 2) {
+      return expect(value);
+    }
+
+    function expectAsyncMap(value: Promise<0 | 1 | 2>) {
+      return expect(value);
+    }
+
+    function expectHalfAsyncMap(value: 0 | Promise<1 | 2>) {
+      return expect(value);
+    }
+
+    const def = 0 as const;
+    const defFn = () => def;
     const mapFn = (v: string) => (v === 'value' ? 1 : 2);
-    const expectMappedType = (v: 0 | 1 | 2) => v;
-
-    const okMapOr = okVal.mapOr(0, mapFn);
-    const okMapOrElse = okVal.mapOrElse(() => 0 as const, mapFn);
-    expectMappedType(okMapOr);
-    expectMappedType(okMapOrElse);
-    expect(okMapOr).toBe(1);
-    expect(okMapOrElse).toBe(1);
-
-    const errMapOr = errVal.mapOr(0, mapFn);
-    const errMapOrElse = errVal.mapOrElse(() => 0 as const, mapFn);
-    expectMappedType(errMapOr);
-    expectMappedType(errMapOrElse);
-    expect(errMapOr).toBe(0);
-    expect(errMapOrElse).toBe(0);
-
-    const okResMapOr = okResVal.mapOr(0, mapFn);
-    const okResMapOrElse = okResVal.mapOrElse(() => 0 as const, mapFn);
-    expectMappedType(okResMapOr);
-    expectMappedType(okResMapOrElse);
-    expect(okResMapOr).toBe(1);
-    expect(okResMapOrElse).toBe(1);
-
-    const errResMapOr = errResVal.mapOr(0, mapFn);
-    const errResMapOrElse = errResVal.mapOrElse(() => 0 as const, mapFn);
-    expectMappedType(errResMapOr);
-    expectMappedType(errResMapOrElse);
-    expect(errResMapOr).toBe(0);
-    expect(errResMapOrElse).toBe(0);
-  });
-
-  it('should apply the logical `and` operation between result values', async () => {
-    type PN = Promise<never>;
+    const asyncMapFn = (v: string): Promise<1 | 2> => Promise.resolve(mapFn(v));
 
     await Promise.all([
-      expectUnwrap(earlyOk.and(lateOk)).toBe<'late', never>(true, 'late'),
-      expectUnwrap(earlyOk.and(lateErr)).toBe<never, 'late'>(false, 'late'),
-      expectUnwrap(earlyOk.and(asyncLateOk)).toBe<Promise<'late'>, Promise<never>>(true, 'late'),
-      expectUnwrap(earlyOk.and(asyncLateErr)).toBe<Promise<never>, Promise<'late'>>(false, 'late'),
-      expectUnwrap(earlyOk.and(okRes2)).toBe<'value2', 'error2'>(true, 'value2'),
-      expectUnwrap(earlyOk.and(errRes2)).toBe<'value2', 'error2'>(false, 'error2'),
+      expectMap(okVal.mapOr(def, mapFn)).toBe(1),
+      expectAsyncMap(okVal.mapOr(def, asyncMapFn)).resolves.toBe(1),
+      expectMap(okVal.mapOrElse(defFn, mapFn)).toBe(1),
+      expectAsyncMap(okVal.mapOrElse(defFn, asyncMapFn)).resolves.toBe(1),
 
-      expectUnwrap(earlyErr.and(lateOk)).toBe<never, 'early'>(false, 'early'),
-      expectUnwrap(earlyErr.and(lateErr)).toBe<never, 'early'>(false, 'early'),
-      expectUnwrap(earlyErr.and(asyncLateOk)).toBe<never, 'early'>(false, 'early'),
-      expectUnwrap(earlyErr.and(asyncLateErr)).toBe<never, 'early'>(false, 'early'),
-      expectUnwrap(earlyErr.and(okRes2)).toBe<never, 'early'>(false, 'early'),
-      expectUnwrap(earlyErr.and(errRes2)).toBe<never, 'early'>(false, 'early'),
+      expectMap(errVal.mapOr(def, mapFn)).toBe(0),
+      expectMap(errVal.mapOr(def, asyncMapFn)).toBe(0),
+      expectMap(errVal.mapOrElse(defFn, mapFn)).toBe(0),
+      expectMap(errVal.mapOrElse(defFn, asyncMapFn)).toBe(0),
 
-      expectUnwrap(asyncEarlyOk.and(lateOk)).toBe<Promise<'late'>, PN>(true, 'late'),
-      expectUnwrap(asyncEarlyOk.and(lateErr)).toBe<Promise<'late'>, PN>(true, 'late'),
-      expectUnwrap(asyncEarlyOk.and(asyncLateOk)).toBe<Promise<'late'>, PN>(true, 'late'),
-      expectUnwrap(asyncEarlyOk.and(asyncLateErr)).toBe<Promise<'late'>, PN>(true, 'late'),
-      expectUnwrap(asyncEarlyOk.and(okRes2)).toBe<Promise<'late'>, PN>(true, 'late'),
-      expectUnwrap(asyncEarlyOk.and(errRes2)).toBe<Promise<'late'>, PN>(true, 'late'),
+      expectAsyncMap(asyncOkVal.mapOr(def, mapFn)).resolves.toBe(1),
+      expectAsyncMap(asyncOkVal.mapOr(def, asyncMapFn)).resolves.toBe(1),
+      expectAsyncMap(asyncOkVal.mapOrElse(defFn, mapFn)).resolves.toBe(1),
+      expectAsyncMap(asyncOkVal.mapOrElse(defFn, asyncMapFn)).resolves.toBe(1),
 
-      expectUnwrap(okRes1.and(lateOk)).toBe<'late', 'error1'>(true, 'late'),
-      expectUnwrap(okRes1.and(lateErr)).toBe<never, 'error1' | 'late'>(false, 'late'),
-      expectUnwrap(okRes1.and(asyncLateOk)).toBe<Promise<'late'>, 'error1' | PN>(true, 'late'),
-      expectUnwrap(okRes1.and(asyncLateErr)).toBe<PN, 'error1' | Promise<'late'>>(false, 'late'),
-      expectUnwrap(okRes1.and(okRes2)).toBe<'value2', 'error1' | 'error2'>(true, 'value2'),
-      expectUnwrap(okRes1.and(errRes2)).toBe<'value2', 'error1' | 'error2'>(false, 'error2'),
+      expectAsyncMap(asyncErrVal.mapOr(def, mapFn)).resolves.toBe(0),
+      expectAsyncMap(asyncErrVal.mapOr(def, asyncMapFn)).resolves.toBe(0),
+      expectAsyncMap(asyncErrVal.mapOrElse(defFn, mapFn)).resolves.toBe(0),
+      expectAsyncMap(asyncErrVal.mapOrElse(defFn, asyncMapFn)).resolves.toBe(0),
 
-      expectUnwrap(errRes1.and(lateOk)).toBe<'late', 'error1'>(false, 'error1'),
-      expectUnwrap(errRes1.and(lateErr)).toBe<never, 'error1' | 'late'>(false, 'error1'),
-      expectUnwrap(errRes1.and(asyncLateOk)).toBe<Promise<'late'>, 'error1' | PN>(false, 'error1'),
-      expectUnwrap(errRes1.and(asyncLateErr)).toBe<PN, 'error1' | Promise<'late'>>(false, 'error1'),
-      expectUnwrap(errRes1.and(okRes2)).toBe<'value2', 'error1' | 'error2'>(false, 'error1'),
-      expectUnwrap(errRes1.and(errRes2)).toBe<'value2', 'error1' | 'error2'>(false, 'error1'),
+      expectMap(okResVal.mapOr(def, mapFn)).toBe(1),
+      expectHalfAsyncMap(okResVal.mapOr(def, asyncMapFn)).resolves.toBe(1),
+      expectMap(okResVal.mapOrElse(defFn, mapFn)).toBe(1),
+      expectHalfAsyncMap(okResVal.mapOrElse(defFn, asyncMapFn)).resolves.toBe(1),
+
+      expectMap(errResVal.mapOr(def, mapFn)).toBe(0),
+      expectHalfAsyncMap(errResVal.mapOr(def, asyncMapFn)).toBe(0),
+      expectMap(errResVal.mapOrElse(defFn, mapFn)).toBe(0),
+      expectHalfAsyncMap(errResVal.mapOrElse(defFn, asyncMapFn)).toBe(0),
+
+      expectAsyncMap(asyncOkResVal.mapOr(def, mapFn)).resolves.toBe(1),
+      expectAsyncMap(asyncOkResVal.mapOr(def, asyncMapFn)).resolves.toBe(1),
+      expectAsyncMap(asyncOkResVal.mapOrElse(defFn, mapFn)).resolves.toBe(1),
+      expectAsyncMap(asyncOkResVal.mapOrElse(defFn, asyncMapFn)).resolves.toBe(1),
+
+      expectAsyncMap(asyncErrResVal.mapOr(def, mapFn)).resolves.toBe(0),
+      expectAsyncMap(asyncErrResVal.mapOr(def, asyncMapFn)).resolves.toBe(0),
+      expectAsyncMap(asyncErrResVal.mapOrElse(defFn, mapFn)).resolves.toBe(0),
+      expectAsyncMap(asyncErrResVal.mapOrElse(defFn, asyncMapFn)).resolves.toBe(0),
     ]);
   });
 
-  it('should apply the logical `or` operation between result values', () => {
-    const okOk = earlyOk.or(lateOk);
-    expectResultUnwrap(okOk).toBe<'early', never>(true);
-    expect(okOk.unwrap()).toBe('early');
+  it('should apply the logical `and` operation between result values', async () => {
+    await Promise.all([
+      expectU(earlyOk.and(lateOk)).toBe<'late', never>(true, 'late'),
+      expectU(earlyOk.and(lateErr)).toBe<never, 'late'>(false, 'late'),
+      expectU(earlyOk.and(asyncLateOk)).toBe<P<'late'>, P<never>>(true, 'late'),
+      expectU(earlyOk.and(asyncLateErr)).toBe<P<never>, P<'late'>>(false, 'late'),
+      expectU(earlyOk.and(okRes2)).toBe<'v2', 'e2'>(true, 'v2'),
+      expectU(earlyOk.and(errRes2)).toBe<'v2', 'e2'>(false, 'e2'),
+      expectU(earlyOk.and(asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(earlyOk.and(asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2'),
 
-    const okErr = earlyOk.or(lateErr);
-    expectResultUnwrap(okErr).toBe<'early', never>(true);
-    expect(okErr.unwrap()).toBe('early');
+      expectU(earlyErr.and(lateOk)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.and(lateErr)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.and(asyncLateOk)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.and(asyncLateErr)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.and(okRes2)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.and(errRes2)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.and(asyncOkRes2)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.and(asyncErrRes2)).toBe<never, 'early'>(false, 'early'),
 
-    const okResOk = earlyOk.or(okRes2);
-    expectResultUnwrap(okResOk).toBe<'early', never>(true);
-    expect(okResOk.unwrap()).toBe('early');
+      expectU(asyncEarlyOk.and(lateOk)).toBe<P<'late'>, P<never>>(true, 'late'),
+      expectU(asyncEarlyOk.and(lateErr)).toBe<P<never>, P<'late'>>(false, 'late'),
+      expectU(asyncEarlyOk.and(asyncLateOk)).toBe<P<'late'>, P<never>>(true, 'late'),
+      expectU(asyncEarlyOk.and(asyncLateErr)).toBe<P<never>, P<'late'>>(false, 'late'),
+      expectU(asyncEarlyOk.and(okRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(asyncEarlyOk.and(errRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2'),
+      expectU(asyncEarlyOk.and(asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(asyncEarlyOk.and(asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2'),
 
-    const okResErr = earlyOk.or(errRes2);
-    expectResultUnwrap(okResErr).toBe<'early', never>(true);
-    expect(okResErr.unwrap()).toBe('early');
+      expectU(asyncEarlyErr.and(lateOk)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.and(lateErr)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.and(asyncLateOk)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.and(asyncLateErr)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.and(okRes2)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.and(errRes2)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.and(asyncOkRes2)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.and(asyncErrRes2)).toBe<P<never>, P<'early'>>(false, 'early'),
 
-    const errOk = earlyErr.or(lateOk);
-    expectResultUnwrap(errOk).toBe<'late', never>(true);
-    expect(errOk.unwrap()).toBe('late');
+      expectU(okRes1.and(lateOk)).toBe<'late', 'e1'>(true, 'late'),
+      expectU(okRes1.and(lateErr)).toBe<never, 'e1' | 'late'>(false, 'late'),
+      expectU(okRes1.and(asyncLateOk)).toBe<P<'late'>, 'e1' | P<never>>(true, 'late'),
+      expectU(okRes1.and(asyncLateErr)).toBe<P<never>, 'e1' | P<'late'>>(false, 'late'),
+      expectU(okRes1.and(okRes2)).toBe<'v2', 'e1' | 'e2'>(true, 'v2'),
+      expectU(okRes1.and(errRes2)).toBe<'v2', 'e1' | 'e2'>(false, 'e2'),
+      expectU(okRes1.and(asyncOkRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(true, 'v2'),
+      expectU(okRes1.and(asyncErrRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e2'),
 
-    const errErr = earlyErr.or(lateErr);
-    expectResultUnwrap(errErr).toBe<never, 'late'>(true);
-    expect(errErr.unwrapErr()).toBe('late');
+      expectU(errRes1.and(lateOk)).toBe<'late', 'e1'>(false, 'e1'),
+      expectU(errRes1.and(lateErr)).toBe<never, 'e1' | 'late'>(false, 'e1'),
+      expectU(errRes1.and(asyncLateOk)).toBe<P<'late'>, 'e1' | P<never>>(false, 'e1'),
+      expectU(errRes1.and(asyncLateErr)).toBe<P<never>, 'e1' | P<'late'>>(false, 'e1'),
+      expectU(errRes1.and(okRes2)).toBe<'v2', 'e1' | 'e2'>(false, 'e1'),
+      expectU(errRes1.and(errRes2)).toBe<'v2', 'e1' | 'e2'>(false, 'e1'),
+      expectU(errRes1.and(asyncOkRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1'),
+      expectU(errRes1.and(asyncErrRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1'),
 
-    const errResOk = earlyErr.or(okRes2);
-    expectResultUnwrap(errResOk).toBe<'value2', 'error2'>(true);
-    expect(errResOk.unwrap()).toBe('value2');
+      expectU(asyncOkRes1.and(lateOk)).toBe<P<'late'>, P<'e1'>>(true, 'late'),
+      expectU(asyncOkRes1.and(lateErr)).toBe<P<never>, P<'e1' | 'late'>>(false, 'late'),
+      expectU(asyncOkRes1.and(asyncLateOk)).toBe<P<'late'>, P<'e1'>>(true, 'late'),
+      expectU(asyncOkRes1.and(asyncLateErr)).toBe<P<never>, P<'e1' | 'late'>>(false, 'late'),
+      expectU(asyncOkRes1.and(okRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(true, 'v2'),
+      expectU(asyncOkRes1.and(errRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e2'),
+      expectU(asyncOkRes1.and(asyncOkRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(true, 'v2'),
+      expectU(asyncOkRes1.and(asyncErrRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e2'),
 
-    const errResErr = earlyErr.or(errRes2);
-    expectResultUnwrap(errResErr).toBe<'value2', 'error2'>(true);
-    expect(errResErr.unwrapErr()).toBe('error2');
-
-    const resOkOk = okRes1.or(lateOk);
-    expectResultUnwrap(resOkOk).toBe<'value1' | 'late', never>(true);
-    expect(resOkOk.unwrap()).toBe('value1');
-
-    const resOkErr = okRes1.or(lateErr);
-    expectResultUnwrap(resOkErr).toBe<'value1', 'late'>(true);
-    expect(resOkErr.unwrap()).toBe('value1');
-
-    const resOkResOk = okRes1.or(okRes2);
-    expectResultUnwrap(resOkResOk).toBe<'value1' | 'value2', 'error2'>(true);
-    expect(resOkResOk.unwrap()).toBe('value1');
-
-    const resOkResErr = okRes1.or(errRes2);
-    expectResultUnwrap(resOkResErr).toBe<'value1' | 'value2', 'error2'>(true);
-    expect(resOkResErr.unwrap()).toBe('value1');
-
-    const resErrOk = errRes1.or(lateOk);
-    expectResultUnwrap(resErrOk).toBe<'value1' | 'late', never>(true);
-    expect(resErrOk.unwrap()).toBe('late');
-
-    const resErrErr = errRes1.or(lateErr);
-    expectResultUnwrap(resErrErr).toBe<'value1', 'late'>(true);
-    expect(resErrErr.unwrapErr()).toBe('late');
-
-    const resErrResOk = errRes1.or(okRes2);
-    expectResultUnwrap(resErrResOk).toBe<'value1' | 'value2', 'error2'>(true);
-    expect(resErrResOk.unwrap()).toBe('value2');
-
-    const resErrResErr = errRes1.or(errRes2);
-    expectResultUnwrap(resErrResErr).toBe<'value1' | 'value2', 'error2'>(true);
-    expect(resErrResErr.unwrapErr()).toBe('error2');
+      expectU(asyncErrRes1.and(lateOk)).toBe<P<'late'>, P<'e1'>>(false, 'e1'),
+      expectU(asyncErrRes1.and(lateErr)).toBe<P<never>, P<'e1' | 'late'>>(false, 'e1'),
+      expectU(asyncErrRes1.and(asyncLateOk)).toBe<P<'late'>, P<'e1'>>(false, 'e1'),
+      expectU(asyncErrRes1.and(asyncLateErr)).toBe<P<never>, P<'e1' | 'late'>>(false, 'e1'),
+      expectU(asyncErrRes1.and(okRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1'),
+      expectU(asyncErrRes1.and(errRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1'),
+      expectU(asyncErrRes1.and(asyncOkRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1'),
+      expectU(asyncErrRes1.and(asyncErrRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1'),
+    ]);
   });
 
-  it('should facilitate `andThen` chaining for result transformations', () => {
-    const okOk = earlyOk.andThen(() => lateOk);
-    expectResultUnwrap(okOk).toBe<'late', never>(true);
-    expect(okOk.unwrap()).toBe('late');
+  it('should apply the logical `or` operation between result values', async () => {
+    await Promise.all([
+      expectU(earlyOk.or(lateOk)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.or(lateErr)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.or(asyncLateOk)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.or(asyncLateErr)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.or(okRes2)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.or(errRes2)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.or(asyncOkRes2)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.or(asyncErrRes2)).toBe<'early', never>(true, 'early'),
 
-    const okErr = earlyOk.andThen(() => lateErr);
-    expectResultUnwrap(okErr).toBe<never, 'late'>(true);
-    expect(okErr.unwrapErr()).toBe('late');
+      expectU(earlyErr.or(lateOk)).toBe<'late', never>(true, 'late'),
+      expectU(earlyErr.or(lateErr)).toBe<never, 'late'>(false, 'late'),
+      expectU(earlyErr.or(asyncLateOk)).toBe<P<'late'>, P<never>>(true, 'late'),
+      expectU(earlyErr.or(asyncLateErr)).toBe<P<never>, P<'late'>>(false, 'late'),
+      expectU(earlyErr.or(okRes2)).toBe<'v2', 'e2'>(true, 'v2'),
+      expectU(earlyErr.or(errRes2)).toBe<'v2', 'e2'>(false, 'e2'),
+      expectU(earlyErr.or(asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(earlyErr.or(asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2'),
 
-    const okResOk = earlyOk.andThen(() => okRes2);
-    expectResultUnwrap(okResOk).toBe<'value2', 'error2'>(true);
-    expect(okResOk.unwrap()).toBe('value2');
+      expectU(asyncEarlyOk.or(lateOk)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.or(lateErr)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.or(asyncLateOk)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.or(asyncLateErr)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.or(okRes2)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.or(errRes2)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.or(asyncOkRes2)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.or(asyncErrRes2)).toBe<P<'early'>, P<never>>(true, 'early'),
 
-    const okResErr = earlyOk.andThen(() => errRes2);
-    expectResultUnwrap(okResErr).toBe<'value2', 'error2'>(true);
-    expect(okResErr.unwrapErr()).toBe('error2');
+      expectU(asyncEarlyErr.or(lateOk)).toBe<P<'late'>, P<never>>(true, 'late'),
+      expectU(asyncEarlyErr.or(lateErr)).toBe<P<never>, P<'late'>>(false, 'late'),
+      expectU(asyncEarlyErr.or(asyncLateOk)).toBe<P<'late'>, P<never>>(true, 'late'),
+      expectU(asyncEarlyErr.or(asyncLateErr)).toBe<P<never>, P<'late'>>(false, 'late'),
+      expectU(asyncEarlyErr.or(okRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(asyncEarlyErr.or(errRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2'),
+      expectU(asyncEarlyErr.or(asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(asyncEarlyErr.or(asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2'),
 
-    const errOk = earlyErr.andThen(() => lateOk);
-    expectResultUnwrap(errOk).toBe<never, 'early'>(true);
-    expect(errOk.unwrapErr()).toBe('early');
+      expectU(okRes1.or(lateOk)).toBe<'v1' | 'late', never>(true, 'v1'),
+      expectU(okRes1.or(lateErr)).toBe<'v1', 'late'>(true, 'v1'),
+      expectU(okRes1.or(asyncLateOk)).toBe<'v1' | P<'late'>, P<never>>(true, 'v1'),
+      expectU(okRes1.or(asyncLateErr)).toBe<'v1' | P<never>, P<'late'>>(true, 'v1'),
+      expectU(okRes1.or(okRes2)).toBe<'v1' | 'v2', 'e2'>(true, 'v1'),
+      expectU(okRes1.or(errRes2)).toBe<'v1' | 'v2', 'e2'>(true, 'v1'),
+      expectU(okRes1.or(asyncOkRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1'),
+      expectU(okRes1.or(asyncErrRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1'),
 
-    const errErr = earlyErr.andThen(() => lateErr);
-    expectResultUnwrap(errErr).toBe<never, 'early'>(true);
-    expect(errErr.unwrapErr()).toBe('early');
+      expectU(errRes1.or(lateOk)).toBe<'v1' | 'late', never>(true, 'late'),
+      expectU(errRes1.or(lateErr)).toBe<'v1', 'late'>(false, 'late'),
+      expectU(errRes1.or(asyncLateOk)).toBe<'v1' | P<'late'>, P<never>>(true, 'late'),
+      expectU(errRes1.or(asyncLateErr)).toBe<'v1' | P<never>, P<'late'>>(false, 'late'),
+      expectU(errRes1.or(okRes2)).toBe<'v1' | 'v2', 'e2'>(true, 'v2'),
+      expectU(errRes1.or(errRes2)).toBe<'v1' | 'v2', 'e2'>(false, 'e2'),
+      expectU(errRes1.or(asyncOkRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(errRes1.or(asyncErrRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(false, 'e2'),
 
-    const errResOk = earlyErr.andThen(() => okRes2);
-    expectResultUnwrap(errResOk).toBe<never, 'early'>(true);
-    expect(errResOk.unwrapErr()).toBe('early');
+      expectU(asyncOkRes1.or(lateOk)).toBe<P<'v1' | 'late'>, P<never>>(true, 'v1'),
+      expectU(asyncOkRes1.or(lateErr)).toBe<P<'v1'>, P<'late'>>(true, 'v1'),
+      expectU(asyncOkRes1.or(asyncLateOk)).toBe<P<'v1' | 'late'>, P<never>>(true, 'v1'),
+      expectU(asyncOkRes1.or(asyncLateErr)).toBe<P<'v1'>, P<'late'>>(true, 'v1'),
+      expectU(asyncOkRes1.or(okRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1'),
+      expectU(asyncOkRes1.or(errRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1'),
+      expectU(asyncOkRes1.or(asyncOkRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1'),
+      expectU(asyncOkRes1.or(asyncErrRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1'),
 
-    const errResErr = earlyErr.andThen(() => errRes2);
-    expectResultUnwrap(errResErr).toBe<never, 'early'>(true);
-    expect(errResErr.unwrapErr()).toBe('early');
-
-    const resOkOk = okRes1.andThen(() => lateOk);
-    expectResultUnwrap(resOkOk).toBe<'late', 'error1'>(true);
-    expect(resOkOk.unwrap()).toBe('late');
-
-    const resOkErr = okRes1.andThen(() => lateErr);
-    expectResultUnwrap(resOkErr).toBe<never, 'error1' | 'late'>(true);
-    expect(resOkErr.unwrapErr()).toBe('late');
-
-    const resOkResOk = okRes1.andThen(() => okRes2);
-    expectResultUnwrap(resOkResOk).toBe<'value2', 'error1' | 'error2'>(true);
-    expect(resOkResOk.unwrap()).toBe('value2');
-
-    const resOkResErr = okRes1.andThen(() => errRes2);
-    expectResultUnwrap(resOkResErr).toBe<'value2', 'error1' | 'error2'>(true);
-    expect(resOkResErr.unwrapErr()).toBe('error2');
-
-    const resErrOk = errRes1.andThen(() => lateOk);
-    expectResultUnwrap(resErrOk).toBe<'late', 'error1'>(true);
-    expect(resErrOk.unwrapErr()).toBe('error1');
-
-    const resErrErr = errRes1.andThen(() => lateErr);
-    expectResultUnwrap(resErrErr).toBe<never, 'error1' | 'late'>(true);
-    expect(resErrErr.unwrapErr()).toBe('error1');
-
-    const resErrResOk = errRes1.andThen(() => okRes2);
-    expectResultUnwrap(resErrResOk).toBe<'value2', 'error1' | 'error2'>(true);
-    expect(resErrResOk.unwrapErr()).toBe('error1');
-
-    const resErrResErr = errRes1.andThen(() => errRes2);
-    expectResultUnwrap(resErrResErr).toBe<'value2', 'error1' | 'error2'>(true);
-    expect(resErrResErr.unwrapErr()).toBe('error1');
+      expectU(asyncErrRes1.or(lateOk)).toBe<P<'v1' | 'late'>, P<never>>(true, 'late'),
+      expectU(asyncErrRes1.or(lateErr)).toBe<P<'v1'>, P<'late'>>(false, 'late'),
+      expectU(asyncErrRes1.or(asyncLateOk)).toBe<P<'v1' | 'late'>, P<never>>(true, 'late'),
+      expectU(asyncErrRes1.or(asyncLateErr)).toBe<P<'v1'>, P<'late'>>(false, 'late'),
+      expectU(asyncErrRes1.or(okRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(asyncErrRes1.or(errRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(false, 'e2'),
+      expectU(asyncErrRes1.or(asyncOkRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(asyncErrRes1.or(asyncErrRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(false, 'e2'),
+    ]);
   });
 
-  it('should facilitate `orElse` chaining for error handling in results', () => {
-    const okOk = earlyOk.orElse(() => lateOk);
-    expectResultUnwrap(okOk).toBe<'early', never>(true);
-    expect(okOk.unwrap()).toBe('early');
+  it('should facilitate `andThen` chaining for result transformations', async () => {
+    await Promise.all([
+      expectU(earlyOk.andThen(() => lateOk)).toBe<'late', never>(true, 'late'),
+      expectU(earlyOk.andThen(() => lateErr)).toBe<never, 'late'>(false, 'late'),
+      expectU(earlyOk.andThen(() => asyncLateOk)).toBe<P<'late'>, P<never>>(true, 'late'),
+      expectU(earlyOk.andThen(() => asyncLateErr)).toBe<P<never>, P<'late'>>(false, 'late'),
+      expectU(earlyOk.andThen(() => okRes2)).toBe<'v2', 'e2'>(true, 'v2'),
+      expectU(earlyOk.andThen(() => errRes2)).toBe<'v2', 'e2'>(false, 'e2'),
+      expectU(earlyOk.andThen(() => asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(earlyOk.andThen(() => asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2'),
 
-    const okErr = earlyOk.orElse(() => lateErr);
-    expectResultUnwrap(okErr).toBe<'early', never>(true);
-    expect(okErr.unwrap()).toBe('early');
+      expectU(earlyErr.andThen(() => lateOk)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.andThen(() => lateErr)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.andThen(() => asyncLateOk)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.andThen(() => asyncLateErr)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.andThen(() => okRes2)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.andThen(() => errRes2)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.andThen(() => asyncOkRes2)).toBe<never, 'early'>(false, 'early'),
+      expectU(earlyErr.andThen(() => asyncErrRes2)).toBe<never, 'early'>(false, 'early'),
 
-    const okResOk = earlyOk.orElse(() => okRes2);
-    expectResultUnwrap(okResOk).toBe<'early', never>(true);
-    expect(okResOk.unwrap()).toBe('early');
+      expectU(asyncEarlyOk.andThen(() => lateOk)).toBe<P<'late'>, P<never>>(true, 'late'),
+      expectU(asyncEarlyOk.andThen(() => lateErr)).toBe<P<never>, P<'late'>>(false, 'late'),
+      expectU(asyncEarlyOk.andThen(() => asyncLateOk)).toBe<P<'late'>, P<never>>(true, 'late'),
+      expectU(asyncEarlyOk.andThen(() => asyncLateErr)).toBe<P<never>, P<'late'>>(false, 'late'),
+      expectU(asyncEarlyOk.andThen(() => okRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(asyncEarlyOk.andThen(() => errRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2'),
+      expectU(asyncEarlyOk.andThen(() => asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(asyncEarlyOk.andThen(() => asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2'),
 
-    const okResErr = earlyOk.orElse(() => errRes2);
-    expectResultUnwrap(okResErr).toBe<'early', never>(true);
-    expect(okResErr.unwrap()).toBe('early');
+      expectU(asyncEarlyErr.andThen(() => lateOk)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.andThen(() => lateErr)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.andThen(() => asyncLateOk)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.andThen(() => asyncLateErr)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.andThen(() => okRes2)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.andThen(() => errRes2)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.andThen(() => asyncOkRes2)).toBe<P<never>, P<'early'>>(false, 'early'),
+      expectU(asyncEarlyErr.andThen(() => asyncErrRes2)).toBe<P<never>, P<'early'>>(false, 'early'),
 
-    const errOk = earlyErr.orElse(() => lateOk);
-    expectResultUnwrap(errOk).toBe<'late', never>(true);
-    expect(errOk.unwrap()).toBe('late');
+      expectU(okRes1.andThen(() => lateOk)).toBe<'late', 'e1'>(true, 'late'),
+      expectU(okRes1.andThen(() => lateErr)).toBe<never, 'e1' | 'late'>(false, 'late'),
+      expectU(okRes1.andThen(() => asyncLateOk)).toBe<P<'late'>, 'e1' | P<never>>(true, 'late'),
+      expectU(okRes1.andThen(() => asyncLateErr)).toBe<P<never>, 'e1' | P<'late'>>(false, 'late'),
+      expectU(okRes1.andThen(() => okRes2)).toBe<'v2', 'e1' | 'e2'>(true, 'v2'),
+      expectU(okRes1.andThen(() => errRes2)).toBe<'v2', 'e1' | 'e2'>(false, 'e2'),
+      expectU(okRes1.andThen(() => asyncOkRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(true, 'v2'),
+      expectU(okRes1.andThen(() => asyncErrRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e2'),
 
-    const errErr = earlyErr.orElse(() => lateErr);
-    expectResultUnwrap(errErr).toBe<never, 'late'>(true);
-    expect(errErr.unwrapErr()).toBe('late');
+      expectU(errRes1.andThen(() => lateOk)).toBe<'late', 'e1'>(false, 'e1'),
+      expectU(errRes1.andThen(() => lateErr)).toBe<never, 'e1' | 'late'>(false, 'e1'),
+      expectU(errRes1.andThen(() => asyncLateOk)).toBe<P<'late'>, 'e1' | P<never>>(false, 'e1'),
+      expectU(errRes1.andThen(() => asyncLateErr)).toBe<P<never>, 'e1' | P<'late'>>(false, 'e1'),
+      expectU(errRes1.andThen(() => okRes2)).toBe<'v2', 'e1' | 'e2'>(false, 'e1'),
+      expectU(errRes1.andThen(() => errRes2)).toBe<'v2', 'e1' | 'e2'>(false, 'e1'),
+      expectU(errRes1.andThen(() => asyncOkRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1'),
+      expectU(errRes1.andThen(() => asyncErrRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1'),
 
-    const errResOk = earlyErr.orElse(() => okRes2);
-    expectResultUnwrap(errResOk).toBe<'value2', 'error2'>(true);
-    expect(errResOk.unwrap()).toBe('value2');
+      expectU(asyncOkRes1.andThen(() => lateOk)).toBe<P<'late'>, P<'e1'>>(true, 'late'),
+      expectU(asyncOkRes1.andThen(() => lateErr)).toBe<P<never>, P<'e1' | 'late'>>(false, 'late'),
+      expectU(asyncOkRes1.andThen(() => asyncLateOk)).toBe<P<'late'>, P<'e1'>>(true, 'late'),
+      expectU(asyncOkRes1.andThen(() => asyncLateErr)).toBe<P<never>, P<'e1' | 'late'>>(
+        false,
+        'late',
+      ),
+      expectU(asyncOkRes1.andThen(() => okRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(true, 'v2'),
+      expectU(asyncOkRes1.andThen(() => errRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e2'),
+      expectU(asyncOkRes1.andThen(() => asyncOkRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(true, 'v2'),
+      expectU(asyncOkRes1.andThen(() => asyncErrRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e2'),
 
-    const errResErr = earlyErr.orElse(() => errRes2);
-    expectResultUnwrap(errResErr).toBe<'value2', 'error2'>(true);
-    expect(errResErr.unwrapErr()).toBe('error2');
-
-    const resOkOk = okRes1.orElse(() => lateOk);
-    expectResultUnwrap(resOkOk).toBe<'value1' | 'late', never>(true);
-    expect(resOkOk.unwrap()).toBe('value1');
-
-    const resOkErr = okRes1.orElse(() => lateErr);
-    expectResultUnwrap(resOkErr).toBe<'value1', 'late'>(true);
-    expect(resOkErr.unwrap()).toBe('value1');
-
-    const resOkResOk = okRes1.orElse(() => okRes2);
-    expectResultUnwrap(resOkResOk).toBe<'value1' | 'value2', 'error2'>(true);
-    expect(resOkResOk.unwrap()).toBe('value1');
-
-    const resOkResErr = okRes1.orElse(() => errRes2);
-    expectResultUnwrap(resOkResErr).toBe<'value1' | 'value2', 'error2'>(true);
-    expect(resOkResErr.unwrap()).toBe('value1');
-
-    const resErrOk = errRes1.orElse(() => lateOk);
-    expectResultUnwrap(resErrOk).toBe<'value1' | 'late', never>(true);
-    expect(resErrOk.unwrap()).toBe('late');
-
-    const resErrErr = errRes1.orElse(() => lateErr);
-    expectResultUnwrap(resErrErr).toBe<'value1', 'late'>(true);
-    expect(resErrErr.unwrapErr()).toBe('late');
-
-    const resErrResOk = errRes1.orElse(() => okRes2);
-    expectResultUnwrap(resErrResOk).toBe<'value1' | 'value2', 'error2'>(true);
-    expect(resErrResOk.unwrap()).toBe('value2');
-
-    const resErrResErr = errRes1.orElse(() => errRes2);
-    expectResultUnwrap(resErrResErr).toBe<'value1' | 'value2', 'error2'>(true);
-    expect(resErrResErr.unwrapErr()).toBe('error2');
+      expectU(asyncErrRes1.andThen(() => lateOk)).toBe<P<'late'>, P<'e1'>>(false, 'e1'),
+      expectU(asyncErrRes1.andThen(() => lateErr)).toBe<P<never>, P<'e1' | 'late'>>(false, 'e1'),
+      expectU(asyncErrRes1.andThen(() => asyncLateOk)).toBe<P<'late'>, P<'e1'>>(false, 'e1'),
+      expectU(asyncErrRes1.andThen(() => asyncLateErr)).toBe<P<never>, P<'e1' | 'late'>>(
+        false,
+        'e1',
+      ),
+      expectU(asyncErrRes1.andThen(() => okRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1'),
+      expectU(asyncErrRes1.andThen(() => errRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1'),
+      expectU(asyncErrRes1.andThen(() => asyncOkRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1'),
+      expectU(asyncErrRes1.andThen(() => asyncErrRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1'),
+    ]);
   });
 
-  it('should emulate Rust\'s "match" syntax', () => {
+  it('should facilitate `orElse` chaining for error handling in results', async () => {
+    await Promise.all([
+      expectU(earlyOk.orElse(() => lateOk)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.orElse(() => lateErr)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.orElse(() => asyncLateOk)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.orElse(() => asyncLateErr)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.orElse(() => okRes2)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.orElse(() => errRes2)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.orElse(() => asyncOkRes2)).toBe<'early', never>(true, 'early'),
+      expectU(earlyOk.orElse(() => asyncErrRes2)).toBe<'early', never>(true, 'early'),
+
+      expectU(earlyErr.orElse(() => lateOk)).toBe<'late', never>(true, 'late'),
+      expectU(earlyErr.orElse(() => lateErr)).toBe<never, 'late'>(false, 'late'),
+      expectU(earlyErr.orElse(() => asyncLateOk)).toBe<P<'late'>, P<never>>(true, 'late'),
+      expectU(earlyErr.orElse(() => asyncLateErr)).toBe<P<never>, P<'late'>>(false, 'late'),
+      expectU(earlyErr.orElse(() => okRes2)).toBe<'v2', 'e2'>(true, 'v2'),
+      expectU(earlyErr.orElse(() => errRes2)).toBe<'v2', 'e2'>(false, 'e2'),
+      expectU(earlyErr.orElse(() => asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(earlyErr.orElse(() => asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2'),
+
+      expectU(asyncEarlyOk.orElse(() => lateOk)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.orElse(() => lateErr)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.orElse(() => asyncLateOk)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.orElse(() => asyncLateErr)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.orElse(() => okRes2)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.orElse(() => errRes2)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.orElse(() => asyncOkRes2)).toBe<P<'early'>, P<never>>(true, 'early'),
+      expectU(asyncEarlyOk.orElse(() => asyncErrRes2)).toBe<P<'early'>, P<never>>(true, 'early'),
+
+      expectU(asyncEarlyErr.orElse(() => lateOk)).toBe<P<'late'>, P<never>>(true, 'late'),
+      expectU(asyncEarlyErr.orElse(() => lateErr)).toBe<P<never>, P<'late'>>(false, 'late'),
+      expectU(asyncEarlyErr.orElse(() => asyncLateOk)).toBe<P<'late'>, P<never>>(true, 'late'),
+      expectU(asyncEarlyErr.orElse(() => asyncLateErr)).toBe<P<never>, P<'late'>>(false, 'late'),
+      expectU(asyncEarlyErr.orElse(() => okRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(asyncEarlyErr.orElse(() => errRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2'),
+      expectU(asyncEarlyErr.orElse(() => asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(asyncEarlyErr.orElse(() => asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2'),
+
+      expectU(okRes1.orElse(() => lateOk)).toBe<'v1' | 'late', never>(true, 'v1'),
+      expectU(okRes1.orElse(() => lateErr)).toBe<'v1', 'late'>(true, 'v1'),
+      expectU(okRes1.orElse(() => asyncLateOk)).toBe<'v1' | P<'late'>, P<never>>(true, 'v1'),
+      expectU(okRes1.orElse(() => asyncLateErr)).toBe<'v1' | P<never>, P<'late'>>(true, 'v1'),
+      expectU(okRes1.orElse(() => okRes2)).toBe<'v1' | 'v2', 'e2'>(true, 'v1'),
+      expectU(okRes1.orElse(() => errRes2)).toBe<'v1' | 'v2', 'e2'>(true, 'v1'),
+      expectU(okRes1.orElse(() => asyncOkRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1'),
+      expectU(okRes1.orElse(() => asyncErrRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1'),
+
+      expectU(errRes1.orElse(() => lateOk)).toBe<'v1' | 'late', never>(true, 'late'),
+      expectU(errRes1.orElse(() => lateErr)).toBe<'v1', 'late'>(false, 'late'),
+      expectU(errRes1.orElse(() => asyncLateOk)).toBe<'v1' | P<'late'>, P<never>>(true, 'late'),
+      expectU(errRes1.orElse(() => asyncLateErr)).toBe<'v1' | P<never>, P<'late'>>(false, 'late'),
+      expectU(errRes1.orElse(() => okRes2)).toBe<'v1' | 'v2', 'e2'>(true, 'v2'),
+      expectU(errRes1.orElse(() => errRes2)).toBe<'v1' | 'v2', 'e2'>(false, 'e2'),
+      expectU(errRes1.orElse(() => asyncOkRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(errRes1.orElse(() => asyncErrRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(false, 'e2'),
+
+      expectU(asyncOkRes1.orElse(() => lateOk)).toBe<P<'v1' | 'late'>, P<never>>(true, 'v1'),
+      expectU(asyncOkRes1.orElse(() => lateErr)).toBe<P<'v1'>, P<'late'>>(true, 'v1'),
+      expectU(asyncOkRes1.orElse(() => asyncLateOk)).toBe<P<'v1' | 'late'>, P<never>>(true, 'v1'),
+      expectU(asyncOkRes1.orElse(() => asyncLateErr)).toBe<P<'v1'>, P<'late'>>(true, 'v1'),
+      expectU(asyncOkRes1.orElse(() => okRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1'),
+      expectU(asyncOkRes1.orElse(() => errRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1'),
+      expectU(asyncOkRes1.orElse(() => asyncOkRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1'),
+      expectU(asyncOkRes1.orElse(() => asyncErrRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1'),
+
+      expectU(asyncErrRes1.orElse(() => lateOk)).toBe<P<'v1' | 'late'>, P<never>>(true, 'late'),
+      expectU(asyncErrRes1.orElse(() => lateErr)).toBe<P<'v1'>, P<'late'>>(false, 'late'),
+      expectU(asyncErrRes1.orElse(() => asyncLateOk)).toBe<P<'v1' | 'late'>, P<never>>(
+        true,
+        'late',
+      ),
+      expectU(asyncErrRes1.orElse(() => asyncLateErr)).toBe<P<'v1'>, P<'late'>>(false, 'late'),
+      expectU(asyncErrRes1.orElse(() => okRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(asyncErrRes1.orElse(() => errRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(false, 'e2'),
+      expectU(asyncErrRes1.orElse(() => asyncOkRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v2'),
+      expectU(asyncErrRes1.orElse(() => asyncErrRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(false, 'e2'),
+    ]);
+  });
+
+  it('should emulate Rust\'s "match" syntax', async () => {
     const mockFn = vi.fn();
 
     const okMatch = okVal.match({
@@ -918,40 +1052,114 @@ describe('Result', () => {
     expectTypeOf(errMatch).toEqualTypeOf<'error'>();
     expect(errMatch).toBe('error');
 
-    const okResMatch = okRes1.match({
+    const asyncOkMatch = asyncOkVal.match({
       ok: (value) => {
-        expectTypeOf(value).toEqualTypeOf<'value1'>();
-        expect(value).toBe('value1');
+        expectTypeOf(value).toEqualTypeOf<'value'>();
+        expect(value).toBe('value');
         mockFn();
         return value;
       },
       err: (error) => {
-        expectTypeOf(error).toEqualTypeOf<'error1'>();
-        expect(error).toBe('error1');
+        expectTypeOf(error).toEqualTypeOf<never>();
+        mockFn();
+        return error;
+      },
+    });
+    expect(mockFn).toHaveBeenCalledTimes(2);
+    expectTypeOf(asyncOkMatch).toEqualTypeOf<P<'value'>>();
+    await expect(asyncOkMatch).resolves.toBe('value');
+    expect(mockFn).toHaveBeenCalledTimes(3);
+
+    const asyncErrMatch = asyncOkVal.match({
+      ok: (value) => {
+        expectTypeOf(value).toEqualTypeOf<'value'>();
+        mockFn();
+        return value;
+      },
+      err: (error) => {
+        expectTypeOf(error).toEqualTypeOf<never>();
+        expect(error).toBe('error');
         mockFn();
         return error;
       },
     });
     expect(mockFn).toHaveBeenCalledTimes(3);
-    expectTypeOf(okResMatch).toEqualTypeOf<'value1' | 'error1'>();
-    expect(okResMatch).toBe('value1');
+    expectTypeOf(asyncErrMatch).toEqualTypeOf<P<'value'>>();
+    await expect(asyncErrMatch).resolves.toBe('value');
+    expect(mockFn).toHaveBeenCalledTimes(4);
 
-    const errResMatch = errRes1.match({
+    const okResMatch = okRes1.match({
       ok: (value) => {
-        expectTypeOf(value).toEqualTypeOf<'value1'>();
-        expect(value).toBe('value1');
+        expectTypeOf(value).toEqualTypeOf<'v1'>();
+        expect(value).toBe('v1');
         mockFn();
         return value;
       },
       err: (error) => {
-        expectTypeOf(error).toEqualTypeOf<'error1'>();
-        expect(error).toBe('error1');
+        expectTypeOf(error).toEqualTypeOf<'e1'>();
+        expect(error).toBe('e1');
         mockFn();
         return error;
       },
     });
-    expect(mockFn).toHaveBeenCalledTimes(4);
-    expectTypeOf(errResMatch).toEqualTypeOf<'value1' | 'error1'>();
-    expect(errResMatch).toBe('error1');
+    expect(mockFn).toHaveBeenCalledTimes(5);
+    expectTypeOf(okResMatch).toEqualTypeOf<'v1' | 'e1'>();
+    expect(okResMatch).toBe('v1');
+
+    const errResMatch = errRes1.match({
+      ok: (value) => {
+        expectTypeOf(value).toEqualTypeOf<'v1'>();
+        expect(value).toBe('v1');
+        mockFn();
+        return value;
+      },
+      err: (error) => {
+        expectTypeOf(error).toEqualTypeOf<'e1'>();
+        expect(error).toBe('e1');
+        mockFn();
+        return error;
+      },
+    });
+    expect(mockFn).toHaveBeenCalledTimes(6);
+    expectTypeOf(errResMatch).toEqualTypeOf<'v1' | 'e1'>();
+    expect(errResMatch).toBe('e1');
+
+    const asyncOkResMatch = asyncOkRes1.match({
+      ok: (value) => {
+        expectTypeOf(value).toEqualTypeOf<'v1'>();
+        expect(value).toBe('v1');
+        mockFn();
+        return value;
+      },
+      err: (error) => {
+        expectTypeOf(error).toEqualTypeOf<'e1'>();
+        expect(error).toBe('e1');
+        mockFn();
+        return error;
+      },
+    });
+    expect(mockFn).toHaveBeenCalledTimes(6);
+    expectTypeOf(asyncOkResMatch).toEqualTypeOf<P<'v1' | 'e1'>>();
+    await expect(asyncOkResMatch).resolves.toBe('v1');
+    expect(mockFn).toHaveBeenCalledTimes(7);
+
+    const asyncErrResMatch = asyncErrRes1.match({
+      ok: (value) => {
+        expectTypeOf(value).toEqualTypeOf<'v1'>();
+        expect(value).toBe('v1');
+        mockFn();
+        return value;
+      },
+      err: (error) => {
+        expectTypeOf(error).toEqualTypeOf<'e1'>();
+        expect(error).toBe('e1');
+        mockFn();
+        return error;
+      },
+    });
+    expect(mockFn).toHaveBeenCalledTimes(7);
+    expectTypeOf(asyncErrResMatch).toEqualTypeOf<P<'v1' | 'e1'>>();
+    await expect(asyncErrResMatch).resolves.toBe('e1');
+    expect(mockFn).toHaveBeenCalledTimes(8);
   });
 });

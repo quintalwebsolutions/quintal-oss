@@ -1,6 +1,6 @@
+export { type AnyResult, isAnyResult } from './util';
 export {
   type Result,
-  type AnyResult,
   type Ok,
   type Err,
   result,
@@ -9,7 +9,8 @@ export {
 } from './result';
 export {
   type AsyncResult,
-  type AnyAsyncResult,
+  type AsyncOk,
+  type AsyncErr,
   asyncResult,
   asyncOk,
   asyncErr,

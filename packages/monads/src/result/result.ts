@@ -1,11 +1,11 @@
 import { None, Some, none, some } from '../option';
 import { isAnyOption } from '../option/util';
 import { MaybePromise } from '../util';
-import { AnyAsyncResult, AsyncErr, AsyncOk, AsyncResult } from './async-result';
+import { AsyncErr, AsyncOk, AsyncResult } from './async-result';
 import { ResultConstructor } from './result-constructor';
-import { ResultMatch, isAnyResult } from './util';
+import { AnyResult, ResultMatch, isAnyResult } from './util';
 
-export class Ok<T> implements ResultConstructor<T, { IsOk: true; IsAsync: false }> {
+export class Ok<T> implements ResultConstructor<T, 'OK'> {
   protected _value: T;
 
   constructor(value: T) {
@@ -74,6 +74,7 @@ export class Ok<T> implements ResultConstructor<T, { IsOk: true; IsAsync: false 
   }
 
   transpose(): T extends None ? T : Some<Ok<T extends Some<infer TSome> ? TSome : T>> {
+    // TODO achieve without cast?
     type Cast = T extends None ? T : Some<Ok<T extends Some<infer TSome> ? TSome : T>>;
 
     const v = this.value;
@@ -83,6 +84,7 @@ export class Ok<T> implements ResultConstructor<T, { IsOk: true; IsAsync: false 
   }
 
   flatten(): T extends AnyResult ? T : Ok<T> {
+    // TODO achieve without cast?
     type Cast = T extends AnyResult ? T : Ok<T>;
 
     const v = this.value;
@@ -91,6 +93,7 @@ export class Ok<T> implements ResultConstructor<T, { IsOk: true; IsAsync: false 
   }
 
   map<U>(fn: (value: T) => U): U extends Promise<infer TValue> ? AsyncOk<TValue> : Ok<U> {
+    // TODO achieve without cast?
     type Cast = U extends Promise<infer TValue> ? AsyncOk<TValue> : Ok<U>;
 
     const mappedValue = fn(this.value);
@@ -102,19 +105,19 @@ export class Ok<T> implements ResultConstructor<T, { IsOk: true; IsAsync: false 
     return this;
   }
 
-  mapOr<U>(_defaultValue: U, fn: (value: T) => U): U {
+  mapOr<D, U>(_defaultValue: D, fn: (value: T) => U): U {
     return fn(this.value);
   }
 
-  mapOrElse<U>(_defaultFn: (error: never) => U, fn: (value: T) => U): U {
+  mapOrElse<D, U>(_defaultFn: (error: never) => D, fn: (value: T) => U): U {
     return fn(this.value);
   }
 
-  and<R extends AnyResult | AnyAsyncResult>(resB: R): R {
+  and<R extends AnyResult>(resB: R): R {
     return resB;
   }
 
-  or<R extends AnyResult | AnyAsyncResult>(_resB: R): Ok<T> {
+  or<R extends AnyResult>(_resB: R): Ok<T> {
     return this;
   }
 
@@ -131,7 +134,7 @@ export class Ok<T> implements ResultConstructor<T, { IsOk: true; IsAsync: false 
   }
 }
 
-export class Err<E> implements ResultConstructor<E, { IsOk: false; IsAsync: false }> {
+export class Err<E> implements ResultConstructor<E, 'ERR'> {
   protected _error: E;
 
   constructor(error: E) {
@@ -219,19 +222,19 @@ export class Err<E> implements ResultConstructor<E, { IsOk: false; IsAsync: fals
     return err(mappedError) as Cast;
   }
 
-  mapOr<U>(defaultValue: U, _fn: (value: never) => U): U {
+  mapOr<D, U>(defaultValue: D, _fn: (value: never) => U): D {
     return defaultValue;
   }
 
-  mapOrElse<U>(defaultFn: (error: E) => U, _fn: (value: never) => U): U {
+  mapOrElse<D, U>(defaultFn: (error: E) => D, _fn: (value: never) => U): D {
     return defaultFn(this.error);
   }
 
-  and<R extends AnyResult | AnyAsyncResult>(_resB: R): Err<E> {
+  and<R extends AnyResult>(_resB: R): Err<E> {
     return this;
   }
 
-  or<R extends AnyResult | AnyAsyncResult>(resB: R): R {
+  or<R extends AnyResult>(resB: R): R {
     return resB;
   }
 
@@ -249,9 +252,6 @@ export class Err<E> implements ResultConstructor<E, { IsOk: false; IsAsync: fals
 }
 
 export type Result<T, E> = Ok<T> | Err<E>;
-
-// biome-ignore lint/suspicious/noExplicitAny: This type exists solely for generic parameters to extend
-export type AnyResult = Result<any, any>;
 
 export function ok<T>(value: T): Ok<T> {
   return new Ok(value);

@@ -7,6 +7,7 @@ import { AsyncErr, AsyncOk } from './async-result';
 import { Err, Ok } from './result';
 import { AnyResult, ResultMatch } from './util';
 
+// TODO ASYNC variant to share docs?
 type Variant = 'OK' | 'ERR';
 type Eval<V extends Variant, TIsOk, TIsErr> = V extends 'OK'
   ? TIsOk

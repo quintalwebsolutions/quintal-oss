@@ -1,8 +1,8 @@
+export { type AnyOption, isAnyOption } from './util';
 export {
   type Option,
-  type AnyOption,
-  type None,
   type Some,
-  none,
+  type None,
   some,
+  none,
 } from './option';

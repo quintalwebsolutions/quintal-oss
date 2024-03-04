@@ -1,6 +1,6 @@
 # Monads
 
-A collection of monads (Result, Option) for TypeScript, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/). 
+A collection of monads (Result, Option) for TypeScript, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/).
 
 - 🦀 Implements all relevant methods from Rust
 - ✅ CommonJS and ES Modules support
@@ -13,7 +13,6 @@ You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/
 
 ## Roadmap
 
-- [ ] Gracefully handle async method chaining
 - [ ] Figure out a way to emulate [Rust's question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-)
 - [ ] Serialize and deserialize monads for API usage
 - [ ] Write docs on [Rust's must-use property](https://doc.rust-lang.org/std/result/#results-must-be-used)
@@ -27,7 +26,7 @@ The type `Result<T, E>` is used for returning and propagating errors. It has the
 - `ok(value: T)`, representing success;
 - `err(error: E)`, representing error.
 
-Functions return `Result` whenever errors are expected and recoverable. It signifies that the absence of a return value is due to an error or an exceptional situation that the caller needs to handle specifically. For cases where having no value is expected, have a look at the `Option` type. 
+Functions return `Result` whenever errors are expected and recoverable. It signifies that the absence of a return value is due to an error or an exceptional situation that the caller needs to handle specifically. For cases where having no value is expected, have a look at the `Option` type.
 
 A simple function returning `Result` might be defined and used like so:
 
@@ -71,12 +70,15 @@ enum AuthenticateUserError {
 async function authenticateUser(
   username: string,
   password: string,
-// AsyncResult allows to handle async functions in a Result context
+  // AsyncResult allows to handle async functions in a Result context
 ): AsyncResult<User, AuthenticateUserError> {
   // Wrap the dangerous db call with `asyncResult` to catch the error if it's thrown.
   // `usersResult` is of type `AsyncResult<User[], unknown>`.
   const usersResult = asyncResult(() =>
-    db.select().from(users).where({ username: eq(users.username, username) }),
+    db
+      .select()
+      .from(users)
+      .where({ username: eq(users.username, username) }),
   );
 
   // If there was an error, log it and replace with our own error type.
@@ -204,7 +206,7 @@ The type `Option<T>` represents an optional value. It has the following variants
 - `some(value: T)`, representing the presence of a value;
 - `none`, representing the absence of a value.
 
-Functions return `Option` whenever the absence of a value is a normal, expected part of the function's behaviour (e.g. initial values, optional function parameters, return values for functions that are not defined over their entire input range). It signifies that having no value is a routine possibility, not necessarily a problem or error. For those cases, have a look at the `Result` type. 
+Functions return `Option` whenever the absence of a value is a normal, expected part of the function's behaviour (e.g. initial values, optional function parameters, return values for functions that are not defined over their entire input range). It signifies that having no value is a routine possibility, not necessarily a problem or error. For those cases, have a look at the `Result` type.
 
 A simple function returning `Option` might be defined like so:
 
@@ -222,7 +224,7 @@ function safeDivide(numerator: number, denominator: number): Option<number> {
 const message = safeDivide(10, 0).match({
   some: (value) => `The value is: ${value}`,
   none: () => 'Dividing by 0 is undefined',
-})
+});
 ```
 
 ### Method Overview
@@ -246,8 +248,8 @@ These methods extract the contained value from an `Option<T>` when it is the `so
 
 #### Transforming the contained value
 
-- `okOr` transforms `Option<T>` into `Result<T, E>, mapping `some(value)` to `ok(value)` and `none` to `err` using the provided default `err` value.
-- `okOrElse` transforms `Option<T>` into `Result<T, E>`, mapping `some(value)` to `ok(value)` and `none` to a value of `err` using the provided function. 
+- `okOr` transforms `Option<T>` into `Result<T, E>, mapping `some(value)`to`ok(value)`and`none`to`err`using the provided default`err` value.
+- `okOrElse` transforms `Option<T>` into `Result<T, E>`, mapping `some(value)` to `ok(value)` and `none` to a value of `err` using the provided function.
 - `transpose` transforms an `Option` of a `Result` into a `Result` of an `Option`.
 - `flatten` removes at most one level of nesting from an `Option<Option<T>>`.
 - `map` transforms `Option<T>` into `Option<U>` by applying the provided function to the contained value of `some` and leaving `none` values unchanged.

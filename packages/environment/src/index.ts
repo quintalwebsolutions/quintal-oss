@@ -105,8 +105,7 @@ function createProxy<TEnvValues extends EnvValues>(
           variableName,
         );
 
-      if (targetValue.isServerOnly && !isServer)
-        return onAccessError(variableName);
+      if (targetValue.isServerOnly && !isServer) return onAccessError(variableName);
 
       return target[prop];
     },

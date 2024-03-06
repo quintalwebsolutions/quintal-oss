@@ -18,9 +18,7 @@ export default defineConfig({
       formats,
       fileName: (format) => fileName[format],
     },
-    build: {
-      outDir: '.dist',
-    },
+    outDir: '.dist',
   },
   test: {
     // TODO

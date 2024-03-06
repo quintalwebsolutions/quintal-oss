@@ -8,17 +8,12 @@ type PluginArgs = {
 };
 
 /** Utility type to define a custom plugin value */
-export type Plugin<
-  TInternalValue,
-  TPluginArgs extends PluginArgs = Record<string, unknown>,
-> = {
+export type Plugin<TInternalValue, TPluginArgs extends PluginArgs = Record<string, unknown>> = {
   internalValue: TInternalValue;
   serializedValue: keyof TPluginArgs extends 'serializedValue'
     ? TPluginArgs['serializedValue']
     : TInternalValue;
-  emptyValue: keyof TPluginArgs extends 'emptyValue'
-    ? TPluginArgs['emptyValue']
-    : null;
+  emptyValue: keyof TPluginArgs extends 'emptyValue' ? TPluginArgs['emptyValue'] : null;
 };
 
 export type AnyPlugin = {
@@ -39,9 +34,7 @@ export type PluginObject<TPlugin extends AnyPlugin> = (null extends
       /** Define the default initial value for this field, unless otherwise specified by the hook user */
       defaultInitialValue: TPlugin['internalValue'] | TPlugin['emptyValue'];
     }) &
-  (TPlugin['serializedValue'] extends
-    | TPlugin['internalValue']
-    | TPlugin['emptyValue']
+  (TPlugin['serializedValue'] extends TPlugin['internalValue'] | TPlugin['emptyValue']
     ? {
         /** Optional (default: `(value) => value`), define how to parse a single raw value to an internal value */
         parse?: (
@@ -54,9 +47,7 @@ export type PluginObject<TPlugin extends AnyPlugin> = (null extends
           value: TPlugin['serializedValue'],
         ) => TPlugin['internalValue'] | TPlugin['emptyValue'];
       }) &
-  (
-    | TPlugin['internalValue']
-    | TPlugin['emptyValue'] extends TPlugin['serializedValue']
+  (TPlugin['internalValue'] | TPlugin['emptyValue'] extends TPlugin['serializedValue']
     ? {
         /** Optional (default: `(value) => value`), define how to display a single internal value in the raw input */
         serialize?: (

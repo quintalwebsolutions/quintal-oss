@@ -7,7 +7,6 @@
     "generate": "ts-node ./scripts/generate.ts",
     "lint": "turbo run lint",
     "lint:check": "syncpack lint && turbo run lint:check",
-    "postinstall": "pnpm build",
     "sync": "syncpack fix-mismatches && syncpack format",
     "test": "turbo run test"
   },

@@ -6,8 +6,8 @@ export type NumberPluginValue = PluginValue<NumberPlugin>;
 
 export const numberPlugin: PluginObject<NumberPlugin> = {
   parse: (value) => {
-    const parsedValue = parseFloat(value);
-    return !isNaN(parsedValue) ? parsedValue : null;
+    const parsedValue = Number.parseFloat(value);
+    return !Number.isNaN(parsedValue) ? parsedValue : null;
   },
   serialize: (value) => value?.toString() ?? '',
 };

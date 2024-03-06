@@ -1,5 +1,5 @@
 import { describe, expectTypeOf, it } from 'vitest';
-import type { Optional, Many, UnwrapValue, Value, UnwrapValues } from '../src';
+import type { Many, Optional, UnwrapValue, UnwrapValues, Value } from '../src';
 
 type Ser = 'serialized';
 type Opt = 'optional';
@@ -146,9 +146,7 @@ describe('useForm', () => {
     type ManyOptArb = Many<Optional<Arb>>;
     expectTypeOf<UnwrapValue<ManyOptArb>>().toEqualTypeOf<(Int | Emp)[]>();
     type OptManyOptArb = Optional<Many<Optional<Arb>>>;
-    expectTypeOf<UnwrapValue<OptManyOptArb>>().toEqualTypeOf<
-      (Int | Emp)[] | null
-    >();
+    expectTypeOf<UnwrapValue<OptManyOptArb>>().toEqualTypeOf<(Int | Emp)[] | null>();
     expectTypeOf<UnwrapValue<OptManyOptArb, Ser>>().toEqualTypeOf<Ser>();
 
     type DeepNested = {

@@ -41,8 +41,7 @@ describe('renderPlugin', () => {
         <render />
       </tr>
     `);
-    expect(allDefaultsTable.head.rows[0]?.cells[0]?.render())
-      .toMatchInlineSnapshot(`
+    expect(allDefaultsTable.head.rows[0]?.cells[0]?.render()).toMatchInlineSnapshot(`
       <th
         id="allDefaultsTable-headRow-0-headCell-column"
       >
@@ -63,8 +62,7 @@ describe('renderPlugin', () => {
         <render />
       </tr>
     `);
-    expect(allDefaultsTable.body.rows[0]?.cells[0]?.render())
-      .toMatchInlineSnapshot(`
+    expect(allDefaultsTable.body.rows[0]?.cells[0]?.render()).toMatchInlineSnapshot(`
       <td
         id="allDefaultsTable-bodyRow-0-bodyCell-column"
       >
@@ -164,9 +162,7 @@ describe('renderPlugin', () => {
         column: {
           renderHeadCell: () => null,
           renderBodyCell: (props) => {
-            expectTypeOf(props)
-              .toHaveProperty('rawValue')
-              .toEqualTypeOf<null>();
+            expectTypeOf(props).toHaveProperty('rawValue').toEqualTypeOf<null>();
             return null;
           },
         },
@@ -174,9 +170,7 @@ describe('renderPlugin', () => {
       [],
     );
 
-    expectTypeOf(table)
-      .toHaveProperty('render')
-      .toMatchTypeOf<RenderFunction>();
+    expectTypeOf(table).toHaveProperty('render').toMatchTypeOf<RenderFunction>();
 
     expectTypeOf(table)
       .toHaveProperty('head')
@@ -217,9 +211,7 @@ describe('renderPlugin', () => {
 
   it('takes into account the props that previously added plugins added to output objects', () => {
     type Row = { column: null };
-    type Plugin = P<
-      PaginationPlugin<Row> | RenderPlugin<Row, P<PaginationPlugin<Row>>>
-    >;
+    type Plugin = P<PaginationPlugin<Row> | RenderPlugin<Row, P<PaginationPlugin<Row>>>>;
 
     makeTable<Row, Plugin>(
       'table',

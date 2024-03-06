@@ -1,5 +1,6 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import type {
+  BodyValue,
   DefaultValuePlugin,
   P,
   Plugins as BasePlugins,
@@ -11,11 +12,11 @@ import { defaultValuePlugin, makeTable } from '../../src';
 const getTableValues = (table: Table<BaseRow, BasePlugins>): object[] =>
   table.body.rows.map((row) =>
     Object.entries(row.values).reduce(
-      (prev, [colName, colValue]) => ({
-        ...prev,
-        [colName]: colValue.rawValue,
-      }),
-      {},
+      (prev, [colName, colValue]) => {
+        prev[colName] = colValue;
+        return prev;
+      },
+      {} as Record<string, BodyValue<unknown>>,
     ),
   );
 
@@ -36,12 +37,8 @@ describe('defaultValuePlugin', () => {
         col1: { defaultValue: 42 },
         col2: {
           defaultValue: (row) => {
-            expectTypeOf(row)
-              .toHaveProperty('col1')
-              .toEqualTypeOf<number | null | undefined>();
-            expectTypeOf(row)
-              .toHaveProperty('col2')
-              .toEqualTypeOf<string | null | undefined>();
+            expectTypeOf(row).toHaveProperty('col1').toEqualTypeOf<number | null | undefined>();
+            expectTypeOf(row).toHaveProperty('col2').toEqualTypeOf<string | null | undefined>();
             return row.col1?.toString() ?? 'Empty';
           },
         },

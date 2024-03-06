@@ -6,20 +6,20 @@ import type {
   BodyCellBase,
   BodyRow,
   BodyRowBase,
+  DefinePluginArgs,
+  GlobalInputFromPlugins,
   Head,
   HeadBase,
   HeadCell,
   HeadCellBase,
   HeadRow,
   HeadRowBase,
+  Plugin,
+  PluginObject,
+  Plugins,
+  Row,
   Table,
   TableBase,
-  PluginObject,
-  Plugin,
-  Plugins,
-  GlobalInputFromPlugins,
-  DefinePluginArgs,
-  Row,
 } from '../types';
 
 type RenderFunc<Props extends object> = (props: Props) => ReactElement | null;
@@ -33,20 +33,16 @@ type RenderHeadFunc<TRow extends Row, TPlugins extends Plugins> = RenderFunc<
 type RenderHeadRowFunc<TRow extends Row, TPlugins extends Plugins> = RenderFunc<
   HeadRowBase<RenderPluginArgs<TRow, TPlugins>> & HeadRow<TPlugins>
 >;
-type RenderHeadCellFunc<TPlugins extends Plugins> = RenderFunc<
-  HeadCellBase & HeadCell<TPlugins>
->;
+type RenderHeadCellFunc<TPlugins extends Plugins> = RenderFunc<HeadCellBase & HeadCell<TPlugins>>;
 type RenderBodyFunc<TRow extends Row, TPlugins extends Plugins> = RenderFunc<
   BodyBase<TRow, RenderPluginArgs<TRow, TPlugins>> & Body<TRow, TPlugins>
 >;
 type RenderBodyRowFunc<TRow extends Row, TPlugins extends Plugins> = RenderFunc<
   BodyRowBase<TRow, RenderPluginArgs<TRow, TPlugins>> & BodyRow<TRow, TPlugins>
 >;
-type RenderBodyCellFunc<
-  TRow extends Row,
-  TPlugins extends Plugins,
-  TValue,
-> = RenderFunc<BodyCellBase<TRow, TValue> & BodyCell<TRow, TPlugins, TValue>>;
+type RenderBodyCellFunc<TRow extends Row, TPlugins extends Plugins, TValue> = RenderFunc<
+  BodyCellBase<TRow, TValue> & BodyCell<TRow, TPlugins, TValue>
+>;
 
 type RenderPluginGlobalInput<TRow extends Row, TPlugins extends Plugins> = {
   renderTable?: RenderTableFunc<TRow, TPlugins>;
@@ -58,11 +54,7 @@ type RenderPluginGlobalInput<TRow extends Row, TPlugins extends Plugins> = {
   renderBodyCell?: RenderBodyCellFunc<TRow, TPlugins, unknown>;
 };
 
-type RenderPluginColumnInput<
-  TRow extends Row,
-  TPlugins extends Plugins,
-  TValue,
-> = {
+type RenderPluginColumnInput<TRow extends Row, TPlugins extends Plugins, TValue> = {
   renderHeadCell?: RenderHeadCellFunc<TPlugins>;
   renderBodyCell?: RenderBodyCellFunc<TRow, TPlugins, TValue>;
 };
@@ -71,21 +63,14 @@ type RenderPluginOutput = {
   render: () => ReactElement | null;
 };
 
-type RenderPluginArgs<
-  TRow extends Row,
-  TPlugins extends Plugins,
-> = DefinePluginArgs<
+type RenderPluginArgs<TRow extends Row, TPlugins extends Plugins> = DefinePluginArgs<
   TRow,
   {
     input: {
       global: RenderPluginGlobalInput<TRow, TPlugins>;
       column: RenderPluginColumnInput<TRow, TPlugins, unknown>;
       columnMap: {
-        [ColumnName in keyof TRow]: RenderPluginColumnInput<
-          TRow,
-          TPlugins,
-          TRow[ColumnName]
-        >;
+        [ColumnName in keyof TRow]: RenderPluginColumnInput<TRow, TPlugins, TRow[ColumnName]>;
       };
     };
     output: {
@@ -147,9 +132,9 @@ const defaultRenderBodyRow: RenderBodyRowFunc<Row, Plugins> = (props) => (
   </tr>
 );
 
-const defaultRenderBodyCell: RenderBodyCellFunc<Row, Plugins, unknown> = (
-  props,
-) => <td id={props.id}>{props.serializedValue}</td>;
+const defaultRenderBodyCell: RenderBodyCellFunc<Row, Plugins, unknown> = (props) => (
+  <td id={props.id}>{props.serializedValue}</td>
+);
 
 // TODO this plugin definition is not very elegant
 export function renderPlugin<TRow extends Row, TPlugins extends Plugins>(
@@ -176,9 +161,7 @@ export function renderPlugin<TRow extends Row, TPlugins extends Plugins>(
     },
     transformHeadCell: (headCell, _state, _setState, { column }) => {
       const renderHeadCell =
-        column.renderHeadCell ??
-        options.renderHeadCell ??
-        defaultRenderHeadCell;
+        column.renderHeadCell ?? options.renderHeadCell ?? defaultRenderHeadCell;
       return { ...headCell, render: () => renderHeadCell(headCell) };
     },
     transformBody: (body) => {
@@ -193,9 +176,7 @@ export function renderPlugin<TRow extends Row, TPlugins extends Plugins>(
     },
     transformBodyCell: (bodyCell, _state, _setState, { column }) => {
       const renderBodyCell =
-        column.renderBodyCell ??
-        options.renderBodyCell ??
-        defaultRenderBodyCell;
+        column.renderBodyCell ?? options.renderBodyCell ?? defaultRenderBodyCell;
       // @ts-expect-error This errors for some reason.
       return { ...bodyCell, render: () => renderBodyCell(bodyCell) };
     },

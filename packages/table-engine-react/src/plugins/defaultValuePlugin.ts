@@ -1,10 +1,4 @@
-import type {
-  DefinePluginArgs,
-  Row,
-  GlobalInputFromPlugins,
-  Plugin,
-  PluginObject,
-} from '../types';
+import type { DefinePluginArgs, GlobalInputFromPlugins, Plugin, PluginObject, Row } from '../types';
 
 type DefaultValue<TRow extends Row, TValue> = TValue | ((row: TRow) => TValue);
 
@@ -31,12 +25,9 @@ export type DefaultValuePluginArgs<TRow extends Row> = DefinePluginArgs<
   }
 >;
 
-export type DefaultValuePlugin<TRow extends Row> = Plugin<
-  DefaultValuePluginArgs<TRow>
->;
+export type DefaultValuePlugin<TRow extends Row> = Plugin<DefaultValuePluginArgs<TRow>>;
 
-const defaultIsEmptyFunc: IsEmptyFunc<unknown> = (value) =>
-  value === undefined || value === null;
+const defaultIsEmptyFunc: IsEmptyFunc<unknown> = (value) => value === undefined || value === null;
 
 function getDefaultValue<TRow extends Row, TValue>(
   defaultValue: DefaultValue<TRow, TValue>,
@@ -52,8 +43,7 @@ export function defaultValuePlugin<TRow extends Row>(
 ): PluginObject<TRow, DefaultValuePluginArgs<TRow>> {
   return {
     transformValue: (value, _state, _setState, { row, column }) => {
-      const isEmptyFunc =
-        column.isEmpty ?? options.isEmpty ?? defaultIsEmptyFunc;
+      const isEmptyFunc = column.isEmpty ?? options.isEmpty ?? defaultIsEmptyFunc;
       const isEmpty = isEmptyFunc(value);
       if ('defaultValue' in column && isEmpty)
         return getDefaultValue(column.defaultValue, row) as TRow[keyof TRow];

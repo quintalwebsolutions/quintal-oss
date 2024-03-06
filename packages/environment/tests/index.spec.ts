@@ -9,9 +9,7 @@ describe('environment', () => {
         values: {
           environment: {
             value: process.env.NEXT_PUBLIC_ENVIRONMENT,
-            schema: z
-              .enum(['DEVELOPMENT', 'PREVIEW', 'PRODUCTION'])
-              .default('DEVELOPMENT'),
+            schema: z.enum(['DEVELOPMENT', 'PREVIEW', 'PRODUCTION']).default('DEVELOPMENT'),
           },
           port: {
             value: process.env.PORT,
@@ -108,15 +106,11 @@ describe('environment', () => {
     };
 
     const clientEnvironment = createEnvironment({ isServer: false, values });
-    expect(
-      () => clientEnvironment.serverOnly,
-    ).toThrowErrorMatchingInlineSnapshot(
+    expect(() => clientEnvironment.serverOnly).toThrowErrorMatchingInlineSnapshot(
       `[Error: ❌ Attempted to access server-side environment variable 'serverOnly' on the client]`,
     );
     expect(clientEnvironment.notServerOnly).toBe('world');
-    expect(
-      () => clientEnvironment.nested.serverOnly,
-    ).toThrowErrorMatchingInlineSnapshot(
+    expect(() => clientEnvironment.nested.serverOnly).toThrowErrorMatchingInlineSnapshot(
       `[Error: ❌ Attempted to access server-side environment variable 'nested.serverOnly' on the client]`,
     );
     expect(clientEnvironment.nested.notServerOnly).toBe('worldNested');

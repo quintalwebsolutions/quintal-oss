@@ -26,8 +26,7 @@ describe('makeBody', () => {
       jobs: {
         label: 'Job Stats',
         serialize: ({ amount, salary }) => {
-          const separate = (n: number): string =>
-            String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          const separate = (n: number): string => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
           return `${separate(amount)} jobs with $${separate(salary)} salary`;
         },
       },
@@ -78,16 +77,13 @@ describe('makeBody', () => {
 
     const bodyRow = body.rows[0];
     expect(bodyRow).not.toBeUndefined();
-    expectTypeOf(bodyRow)
-      .exclude<undefined>()
-      .toHaveProperty('values')
-      .toMatchTypeOf<{
-        language: BodyValue<string>;
-        isStronglyTyped: BodyValue<boolean | null>;
-        undefined: BodyValue<undefined>;
-        jobs: BodyValue<{ amount: number; salary: number }>;
-        unserialized: BodyValue<{ value: string }>;
-      }>();
+    expectTypeOf(bodyRow).exclude<undefined>().toHaveProperty('values').toMatchTypeOf<{
+      language: BodyValue<string>;
+      isStronglyTyped: BodyValue<boolean | null>;
+      undefined: BodyValue<undefined>;
+      jobs: BodyValue<{ amount: number; salary: number }>;
+      unserialized: BodyValue<{ value: string }>;
+    }>();
 
     expect(bodyRow?.values).toMatchInlineSnapshot(`
       {

@@ -41,34 +41,28 @@ describe('makeHead', () => {
       });
     }
 
-    const { head, originalHead } = makeHead<Row, Plugins>(
-      tableId,
-      plugins,
-      state,
-      setState,
-      {
-        requiredString: {
-          label: 'String',
-        },
-        optionalString: {
-          // TODO defaultValuePlugin
-          // defaultValue: "string",
-        },
-        requiredObject: {},
-        optionalObject: {
-          // TODO defaultValuePlugin
-          // defaultValue: (row) => {
-          //   expectTypeOf(row).toEqualTypeOf<Row>();
-          //   return row.requiredObject;
-          // },
-          serialize: (value, row) => {
-            expectTypeOf(value).toEqualTypeOf<{ hello: 'world' } | null>();
-            expectTypeOf(row).toEqualTypeOf<Row>();
-            return 'object';
-          },
+    const { head, originalHead } = makeHead<Row, Plugins>(tableId, plugins, state, setState, {
+      requiredString: {
+        label: 'String',
+      },
+      optionalString: {
+        // TODO defaultValuePlugin
+        // defaultValue: "string",
+      },
+      requiredObject: {},
+      optionalObject: {
+        // TODO defaultValuePlugin
+        // defaultValue: (row) => {
+        //   expectTypeOf(row).toEqualTypeOf<Row>();
+        //   return row.requiredObject;
+        // },
+        serialize: (value, row) => {
+          expectTypeOf(value).toEqualTypeOf<{ hello: 'world' } | null>();
+          expectTypeOf(row).toEqualTypeOf<Row>();
+          return 'object';
         },
       },
-    );
+    });
 
     expect(head.rows[0]?.cells).toHaveLength(4);
     expect(head).toEqual(originalHead);

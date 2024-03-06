@@ -1,20 +1,47 @@
 {
   "name": "@quintal/form-engine-react",
   "version": "0.0.0",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "license": "MIT",
+  "description": "A headless, declarative, lightweight form engine for React apps with first-class TypeScript support.",
+  "keywords": [
+    "react",
+    "form",
+    "hook",
+    "validation",
+    "headless",
+    "typescript"
+  ],
+  "author": {
+    "name": "William Ford",
+    "email": "william@quintalwebsolutions.com",
+    "url": "https://quintalwebsolutions.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quintalwebsolutions/quintal-oss.git",
+    "directory": "packages/form-engine-react"
+  },
+  "homepage": "https://github.com/quintalwebsolutions/quintal-oss/tree/main/packages/form-engine-react#readme",
+  "bugs": "https://github.com/quintalwebsolutions/quintal-oss/labels/%40quintal%2Fform-engine-react",
+  "main": "./.dist/index.cjs",
+  "module": "./.dist/index.mjs",
+  "types": "./.dist/index.d.ts",
+  "files": [
+    ".dist"
+  ],
   "scripts": {
     "build": "run-s build:*",
-    "build:clean": "shx rm -rf dist",
+    "build:clean": "shx rm -rf .dist",
     "build:code": "vite build",
-    "clean": "shx rm -rf .coverage .turbo dist node_modules",
+    "clean": "shx rm -rf .config .coverage .coverage-ts .dist .docs .turbo node_modules",
     "dev": "vitest --watch",
     "lint": "pnpm lint:fix && pnpm lint:types",
-    "lint:check": "eslint .",
-    "lint:fix": "pnpm lint:check --fix",
-    "lint:types": "tsc",
-    "test": "vitest"
+    "lint:check": "biome ci .",
+    "lint:fix": "biome check --apply .",
+    "lint:types": "tsc --noEmit",
+    "test": "run-s test:*",
+    "test:source": "vitest",
+    "test:types": "typescript-coverage-report --outputDir .coverage-ts --strict"
   },
   "peerDependencies": {
     "react": "^18.2.0"

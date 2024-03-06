@@ -1,16 +1,9 @@
 {
   "name": "@quintal/config",
   "version": "0.2.0",
-  "files": [
-    "tsconfig/**",
-    "nextjs.js",
-    "vite.js"
-  ],
+  "files": ["tsconfig/**", "nextjs.js", "vite.js"],
   "scripts": {
-    "clean": "shx rm -rf .turbo node_modules",
-    "lint": "pnpm lint:fix",
-    "lint:check": "eslint .",
-    "lint:fix": "pnpm lint:check --fix"
+    "clean": "shx rm -rf .turbo node_modules"
   },
   "dependencies": {
     "@vitejs/plugin-react": "4.2.1",

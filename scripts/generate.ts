@@ -137,6 +137,7 @@ async function makePackageReadme(packageDir: string, name: string, p: Package): 
     ...(readmeContent.match(/^#+ .+/gm)?.map((header) => {
       const level = (header.match(/^#+/g)?.[0].length ?? 2) - 2;
       const text = header.replace(/^#+ /, '');
+      if (level < 0) return '';
       return `${' '.repeat(level * 2)}- [${text}](#${text.toLowerCase().replace(/\s+/g, '-')})`;
     }) ?? []),
     '',
@@ -206,9 +207,9 @@ async function makePackageJson(packageDir: string, name: string, p: Package): Pr
       'test:source': 'vitest',
       'test:types': 'typescript-coverage-report --outputDir .coverage-ts --strict',
     },
+    peerDependencies: packageJson?.peerDependencies,
     dependencies: packageJson?.dependencies,
     devDependencies: packageJson?.devDependencies,
-    peerDependencies: packageJson?.peerDependencies,
   };
 
   await fs.promises.writeFile(filePath, `${JSON.stringify(content, null, 2)}\n`);

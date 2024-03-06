@@ -1,10 +1,22 @@
 import type { Packages } from './scripts';
 
 export const packages: Packages = {
-  test: {
-    title: 'Test',
-    description: 'Test description',
-    keywords: ['key', 'words'],
+  config: {
+    title: 'Config',
+    description:
+      'the solution to the infamous [Node.JS Config Hell Problem](https://deno.com/blog/node-config-hell).',
+    keywords: ['config', 'hell', 'typescript', 'dotfiles'],
+  },
+  environment: {
+    title: 'Environment',
+    description: 'Framework-agnostic environment variable validation for TypeScript',
+    keywords: ['environment', 'validation', 'typescript', 'zod'],
+  },
+  'form-engine-react': {
+    title: 'Quintal React Form Engine',
+    description:
+      'A headless, declarative, lightweight form engine for React apps with first-class TypeScript support.',
+    keywords: ['react', 'form', 'hook', 'validation', 'headless', 'typescript'],
   },
   monads: {
     title: 'Monads',
@@ -29,9 +41,9 @@ export const packages: Packages = {
       },
     ],
   },
-  // environment: {
-  //   title: 'Environment',
-  //   description: 'Framework-agnostic environment variable validation for TypeScript',
-  //   keywords: ['environment', 'validation', 'zod'],
-  // },
+  'table-engine-react': {
+    title: 'Quintal React Table Engine',
+    description: 'A headless, declarative, lightweight, type-safe table engine for React apps.',
+    keywords: ['react', 'table', 'hook', 'headless', 'typescript'],
+  },
 };

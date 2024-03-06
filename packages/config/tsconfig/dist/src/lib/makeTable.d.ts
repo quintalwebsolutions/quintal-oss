@@ -1,3 +1,0 @@
-import type { Table, Columns, Data, PluginArray, Row, PersistentStateFromPlugins, SetStateFromPlugins, Plugins } from '../types';
-export declare function makeTable<TRow extends Row, TPlugins extends Plugins>(id: string, plugins: PluginArray<TRow, TPlugins>, persistentState: PersistentStateFromPlugins<TPlugins>, setState: SetStateFromPlugins<TPlugins>, columns: Columns<TRow, TPlugins>, data: Data<TRow>): Table<TRow, TPlugins>;
-//# sourceMappingURL=makeTable.d.ts.map

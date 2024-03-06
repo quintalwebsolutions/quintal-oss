@@ -25,3 +25,5 @@ jobs:
 
       - name: Collect coverage
         uses: "./.github/actions/collect_coverage"
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

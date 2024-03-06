@@ -1,7 +1,0 @@
-import type { Plugin, PluginObject, PluginValue } from '../lib';
-export type NumberPlugin = Plugin<number, {
-    serializedValue: string;
-}>;
-export type NumberPluginValue = PluginValue<NumberPlugin>;
-export declare const numberPlugin: PluginObject<NumberPlugin>;
-//# sourceMappingURL=numberPlugin.d.ts.map

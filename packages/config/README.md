@@ -14,6 +14,7 @@ You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/
 ## Table of Contents
 
 - [Getting Started](#getting-started)
+- [Plan](#plan)
 - [Example](#example)
 
 ## Getting Started

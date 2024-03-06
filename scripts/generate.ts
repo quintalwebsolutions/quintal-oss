@@ -48,6 +48,10 @@ async function makeCoverageYml(rootDir: string): Promise<void> {
   const head = [
     'name: Collect coverage from all packages',
     '',
+    'inputs:',
+    '  token:',
+    '    required: true',
+    '',
     'runs:',
     '  using: composite',
     '  steps:',
@@ -61,10 +65,7 @@ async function makeCoverageYml(rootDir: string): Promise<void> {
       '    fail_ci_if_error: true',
       `    file: ./packages/${packageName}/.coverage/coverage-final.json`,
       `    flags: ${packageName}`,
-      '    token: ${{ secrets.CODECOV_TOKEN }}',
-      // TODO env in inputs?
-      '  env:',
-      '    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}',
+      '    token: ${{ inputs.token }}',
     ]
       .map((line) => ' '.repeat(4) + line)
       .join('\n'),

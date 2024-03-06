@@ -1,3 +1,0 @@
-import type { TableBase, Columns, Data, Row, StateFromPlugins, PluginArray, SetStateFromPlugins, Plugins } from '../types';
-export declare function makeBody<TRow extends Row, TPlugins extends Plugins>(tableId: string, plugins: PluginArray<TRow, TPlugins>, state: StateFromPlugins<TPlugins>, setState: SetStateFromPlugins<TPlugins>, columns: Columns<TRow, TPlugins>, data: Data<TRow>): Pick<TableBase<TRow, TPlugins>, 'body' | 'originalBody'>;
-//# sourceMappingURL=makeBody.d.ts.map

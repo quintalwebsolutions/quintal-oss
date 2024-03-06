@@ -1,7 +1,3 @@
-"@quintal/test":
-  - changed-files:
-    - any-glob-to-any-file: packages/test/*
-
 "@quintal/config":
   - changed-files:
     - any-glob-to-any-file: packages/config/*

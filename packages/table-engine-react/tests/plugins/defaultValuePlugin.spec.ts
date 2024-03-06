@@ -1,6 +1,5 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import type {
-  BodyValue,
   DefaultValuePlugin,
   P,
   Plugins as BasePlugins,
@@ -13,10 +12,10 @@ const getTableValues = (table: Table<BaseRow, BasePlugins>): object[] =>
   table.body.rows.map((row) =>
     Object.entries(row.values).reduce(
       (prev, [colName, colValue]) => {
-        prev[colName] = colValue;
+        prev[colName] = colValue.rawValue;
         return prev;
       },
-      {} as Record<string, BodyValue<unknown>>,
+      {} as Record<string, unknown>,
     ),
   );
 

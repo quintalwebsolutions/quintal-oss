@@ -6,10 +6,7 @@ node_modules
 .coverage-ts
 
 # Generated output
-dist
 .dist
-.docs
-.config
 
 # Logs
 *.log*

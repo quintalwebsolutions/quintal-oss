@@ -1,0 +1,3 @@
+import type { Columns, TableBase, StateFromPlugins, PluginArray, Row, Plugins, SetStateFromPlugins } from '../types';
+export declare function makeHead<TRow extends Row, TPlugins extends Plugins>(tableId: string, plugins: PluginArray<TRow, TPlugins>, state: StateFromPlugins<TPlugins>, setState: SetStateFromPlugins<TPlugins>, columns: Columns<TRow, TPlugins>): Pick<TableBase<TRow, TPlugins>, 'head' | 'originalHead'>;
+//# sourceMappingURL=makeHead.d.ts.map

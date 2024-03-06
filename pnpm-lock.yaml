@@ -74,6 +74,9 @@ importers:
       typescript:
         specifier: 5.3.3
         version: 5.3.3
+      typescript-coverage-report:
+        specifier: 1.0.0
+        version: 1.0.0(react@18.2.0)(typescript@5.3.3)
       vite:
         specifier: 5.1.4
         version: 5.1.4(@types/node@20.11.24)
@@ -91,7 +94,7 @@ importers:
         version: link:../config
       '@testing-library/react':
         specifier: 14.2.1
-        version: 14.2.1(react-dom@18.2.0)(react@18.2.0)
+        version: 14.2.1(react@18.2.0)
       '@types/node':
         specifier: 20.11.24
         version: 20.11.24
@@ -110,6 +113,9 @@ importers:
       typescript:
         specifier: 5.3.3
         version: 5.3.3
+      typescript-coverage-report:
+        specifier: 1.0.0
+        version: 1.0.0(react@18.2.0)(typescript@5.3.3)
       vite:
         specifier: 5.1.4
         version: 5.1.4(@types/node@20.11.24)
@@ -136,7 +142,7 @@ importers:
         version: 5.3.3
       typescript-coverage-report:
         specifier: 1.0.0
-        version: 1.0.0(typescript@5.3.3)
+        version: 1.0.0(react@18.2.0)(typescript@5.3.3)
       vite:
         specifier: 5.1.4
         version: 5.1.4(@types/node@20.11.24)
@@ -167,6 +173,9 @@ importers:
       typescript:
         specifier: 5.3.3
         version: 5.3.3
+      typescript-coverage-report:
+        specifier: 1.0.0
+        version: 1.0.0(react@18.2.0)(typescript@5.3.3)
       vite:
         specifier: 5.1.4
         version: 5.1.4(@types/node@20.11.24)
@@ -909,7 +918,7 @@ packages:
     requiresBuild: true
     optional: true
 
-  /@hypnosphi/create-react-context@0.3.1(prop-types@15.8.1):
+  /@hypnosphi/create-react-context@0.3.1(prop-types@15.8.1)(react@18.2.0):
     resolution: {integrity: sha512-V1klUed202XahrWJLLOT3EXNeCpFHCcJntdFGI15ntCwau+jfT386w7OFTMaCqOgXUH1fa0w/I1oZs+i/Rfr0A==}
     peerDependencies:
       prop-types: ^15.0.0
@@ -917,6 +926,7 @@ packages:
     dependencies:
       gud: 1.0.0
       prop-types: 15.8.1
+      react: 18.2.0
       warning: 4.0.3
     dev: true
 
@@ -1265,7 +1275,7 @@ packages:
       string-argv: 0.3.2
     dev: false
 
-  /@semantic-ui-react/event-stack@3.1.3:
+  /@semantic-ui-react/event-stack@3.1.3(react@18.2.0):
     resolution: {integrity: sha512-FdTmJyWvJaYinHrKRsMLDrz4tTMGdFfds299Qory53hBugiDvGC0tEJf+cHsi5igDwWb/CLOgOiChInHwq8URQ==}
     peerDependencies:
       react: ^16.0.0 || ^17.0.0 || ^18.0.0
@@ -1273,13 +1283,14 @@ packages:
     dependencies:
       exenv: 1.2.2
       prop-types: 15.8.1
+      react: 18.2.0
     dev: true
 
   /@sinclair/typebox@0.27.8:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
     dev: true
 
-  /@stardust-ui/react-component-event-listener@0.38.0:
+  /@stardust-ui/react-component-event-listener@0.38.0(react@18.2.0):
     resolution: {integrity: sha512-sIP/e0dyOrrlb8K7KWumfMxj/gAifswTBC4o68Aa+C/GA73ccRp/6W1VlHvF/dlOR4KLsA+5SKnhjH36xzPsWg==}
     peerDependencies:
       react: ^16.8.0
@@ -1287,9 +1298,10 @@ packages:
     dependencies:
       '@babel/runtime': 7.23.4
       prop-types: 15.8.1
+      react: 18.2.0
     dev: true
 
-  /@stardust-ui/react-component-ref@0.38.0:
+  /@stardust-ui/react-component-ref@0.38.0(react@18.2.0):
     resolution: {integrity: sha512-xjs6WnvJVueSIXMWw0C3oWIgAPpcD03qw43oGOjUXqFktvpNkB73JoKIhS4sCrtQxBdct75qqr4ZL6JiyPcESw==}
     peerDependencies:
       react: ^16.8.0
@@ -1297,6 +1309,7 @@ packages:
     dependencies:
       '@babel/runtime': 7.23.4
       prop-types: 15.8.1
+      react: 18.2.0
       react-is: 16.13.1
     dev: true
 
@@ -1320,7 +1333,7 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
-  /@testing-library/react@14.2.1(react-dom@18.2.0)(react@18.2.0):
+  /@testing-library/react@14.2.1(react@18.2.0):
     resolution: {integrity: sha512-sGdjws32ai5TLerhvzThYFbpnF9XtL65Cjf+gB0Dhr29BGqK+mAeN7SURSdu+eqgET4ANcWoC7FQpkaiGvBr+A==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -1331,7 +1344,6 @@ packages:
       '@testing-library/dom': 9.3.3
       '@types/react-dom': 18.2.16
       react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
     dev: true
 
   /@tsconfig/node10@1.0.9:
@@ -3702,6 +3714,7 @@ packages:
       loose-envify: 1.4.0
       react: 18.2.0
       scheduler: 0.23.0
+    dev: false
 
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
@@ -3715,16 +3728,17 @@ packages:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
     dev: true
 
-  /react-popper@1.3.11:
+  /react-popper@1.3.11(react@18.2.0):
     resolution: {integrity: sha512-VSA/bS+pSndSF2fiasHK/PTEEAyOpX60+H5EPAjoArr8JGm+oihu4UbrqcEBpQibJxBVCpYyjAX7abJ+7DoYVg==}
     peerDependencies:
       react: 0.14.x || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
       '@babel/runtime': 7.23.4
-      '@hypnosphi/create-react-context': 0.3.1(prop-types@15.8.1)
+      '@hypnosphi/create-react-context': 0.3.1(prop-types@15.8.1)(react@18.2.0)
       deep-equal: 1.1.2
       popper.js: 1.16.1
       prop-types: 15.8.1
+      react: 18.2.0
       typed-styles: 0.0.7
       warning: 4.0.3
     dev: true
@@ -3932,23 +3946,25 @@ packages:
     resolution: {integrity: sha512-CtuThmgHNg7zIZWAXi3AsyIzA3n4xx7aNyjwC2VJldO2LMVDhFK+63xGqq6CsJH4rTAt6/M+N4GhZiDYPx9eUw==}
     dependencies:
       loose-envify: 1.4.0
+    dev: false
 
-  /semantic-ui-react@0.88.2:
+  /semantic-ui-react@0.88.2(react@18.2.0):
     resolution: {integrity: sha512-+02kN2z8PuA/cMdvDUsHhbJmBzxxgOXVHMFr9XK7zGb0wkW9A6OPQMFokWz7ozlVtKjN6r7zsb+Qvjk/qq1OWw==}
     peerDependencies:
       react: ^16.8.0
       react-dom: ^16.8.0
     dependencies:
       '@babel/runtime': 7.23.4
-      '@semantic-ui-react/event-stack': 3.1.3
-      '@stardust-ui/react-component-event-listener': 0.38.0
-      '@stardust-ui/react-component-ref': 0.38.0
+      '@semantic-ui-react/event-stack': 3.1.3(react@18.2.0)
+      '@stardust-ui/react-component-event-listener': 0.38.0(react@18.2.0)
+      '@stardust-ui/react-component-ref': 0.38.0(react@18.2.0)
       classnames: 2.5.1
       keyboard-key: 1.1.0
       lodash: 4.17.21
       prop-types: 15.8.1
+      react: 18.2.0
       react-is: 16.13.1
-      react-popper: 1.3.11
+      react-popper: 1.3.11(react@18.2.0)
       shallowequal: 1.1.0
     dev: true
 
@@ -4563,7 +4579,7 @@ packages:
     resolution: {integrity: sha512-pzP0PWoZUhsECYjABgCGQlRGL1n7tOHsgwYv3oIiEpJwGhFTuty/YNeduxQYzXXa3Ge5BdT6sHYIQYpl4uJ+5Q==}
     dev: true
 
-  /typescript-coverage-report@1.0.0(typescript@5.3.3):
+  /typescript-coverage-report@1.0.0(react@18.2.0)(typescript@5.3.3):
     resolution: {integrity: sha512-ys/DG6eaO0XaHZIPZobJQLj9lUPSOIa1xt5Pz6tvr7QAWRt3OSCuMLiPduWtg7oTeZcOHqG90owA/zOeyZdq3g==}
     hasBin: true
     peerDependencies:
@@ -4575,8 +4591,9 @@ packages:
       cli-table3: 0.6.3
       commander: 5.1.0
       ncp: 2.0.0
+      react: 18.2.0
       rimraf: 3.0.2
-      semantic-ui-react: 0.88.2
+      semantic-ui-react: 0.88.2(react@18.2.0)
       type-coverage-core: 2.27.1(typescript@5.3.3)
       typescript: 5.3.3
     dev: true

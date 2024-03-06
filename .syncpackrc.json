@@ -14,10 +14,9 @@
   "semverRange": "",
   "sortAz": [
     "contributors",
+    "peerDependencies",
     "dependencies",
     "devDependencies",
-    "keywords",
-    "peerDependencies",
     "resolutions",
     "scripts"
   ],

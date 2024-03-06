@@ -8,6 +8,54 @@
 [![Pull requests welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CONTRIBUTING.md)
 
 A collection of monads (Result, Option) for TypeScript, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/).
+
+## Features
+
+- 🦀 Implements all relevant methods from Rust,
+- ✅ CommonJS and ES Modules support,
+- 📖 Extensive documentation,
+- ⚖️ Super lightweight (only ~1kb gzipped),
+- 🙅 0 dependencies,
+- 🧪 100% test coverage.
+
+You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/docs/@quintal/monads)
+
+## Roadmap
+
+- [ ] Figure out a way to emulate [Rust's question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-)
+- [ ] Serialize and deserialize monads for API usage
+- [ ] Write docs on [Rust's must-use property](https://doc.rust-lang.org/std/result/#results-must-be-used)
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Result](#result)
+  - [Method Overview](#method-overview)
+    - [Querying the contained value](#querying-the-contained-value)
+    - [Extracting the contained value](#extracting-the-contained-value)
+    - [Transforming the contained value](#transforming-the-contained-value)
+    - [Boolean operators](#boolean-operators)
+    - [Rust syntax utilities](#rust-syntax-utilities)
+- [Option](#option)
+  - [Method Overview](#method-overview)
+    - [Querying the contained value](#querying-the-contained-value)
+    - [Extracting the contained value](#extracting-the-contained-value)
+    - [Transforming the contained value](#transforming-the-contained-value)
+    - [Boolean operators](#boolean-operators)
+    - [Rust syntax utilities](#rust-syntax-utilities)
+- [Acknowledgement](#acknowledgement)
+
+## Getting Started
+
+```sh
+pnpm add @quintal/monads
+# or
+bun add @quintal/monads
+# or
+yarn add @quintal/monads
+# or
+npm install @quintal/monads
+```
 <!-- END AUTO-GENERATED: Add custom documentation after this comment -->
 
 ## Result

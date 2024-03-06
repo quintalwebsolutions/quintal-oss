@@ -31,6 +31,7 @@ export default defineConfig({
       provider: 'v8',
       include: ['src/**/*.ts'],
       reportsDirectory: '.coverage',
+      reporter: ['json'],
     },
     environment: 'happy-dom',
   },

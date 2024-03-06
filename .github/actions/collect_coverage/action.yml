@@ -1,14 +1,24 @@
 name: Collect coverage from all packages
 
-# TODO
 runs:
   using: composite
   steps:
-    - name: Placeholder
-      shell: bash
-      run: echo placeholder
-    # - name: Upload @quintal/result coverage to Codecov # or codacy?
-    #   uses: codecov/codecov-action@v2
-    #   with:
-    #     files: ./packages/react-form/.coverage/coverage-final.json
-    #     flags: react-form
+    - name: Upload @quintal/test coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        fail_ci_if_error: true
+        file: ./packages/test/.coverage/coverage-final.json
+        flags: test
+        token: ${{ secrets.CODECOV_TOKEN }}
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Upload @quintal/monads coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        fail_ci_if_error: true
+        file: ./packages/monads/.coverage/coverage-final.json
+        flags: monads
+        token: ${{ secrets.CODECOV_TOKEN }}
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

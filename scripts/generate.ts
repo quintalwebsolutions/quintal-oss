@@ -11,8 +11,8 @@ export type Package = {
   // TODO https://docs.npmjs.com/cli/v10/configuring-npm/package-json#peerdependenciesmeta
   // peerDependencies?: {name: string, version: string, isOptional?: boolean}[];
   features?: { icon: string; text: string }[];
-  roadmap?: ({ text: string; checked?: boolean; level?: number } | string)[];
-  // examples?: { title: string; href: string }[];
+  roadmap?: { text: string; checked?: boolean; level?: number }[];
+  examples?: { title: string; href: string }[];
 };
 
 export type Packages = Record<string, Package>;
@@ -30,16 +30,66 @@ async function createDirIfNotExists(dir: string): Promise<boolean> {
   }
 }
 
-async function makePackageReadme(dir: string, name: string, p: Package): Promise<void> {
-  const filePath = path.join(dir, 'README.md');
-  const endMarker = '<!-- END AUTO-GENERATED: Add custom documentation after this comment -->';
+async function makeLabelerYml(rootDir: string): Promise<void> {
+  const filePath = path.join(rootDir, '.github', 'labeler.yml');
+  const content = Object.keys(packages).map((packageName) =>
+    [
+      `"@quintal/${packageName}":`,
+      '  - changed-files:',
+      `    - any-glob-to-any-file: packages/${packageName}/*`,
+    ].join('\n'),
+  );
+  await fs.promises.writeFile(filePath, `${content.join('\n\n')}\n`);
+}
+
+async function makeCoverageYml(rootDir: string): Promise<void> {
+  const filePath = path.join(rootDir, '.github', 'actions', 'collect_coverage', 'action.yml');
+
+  const head = [
+    'name: Collect coverage from all packages',
+    '',
+    'runs:',
+    '  using: composite',
+    '  steps:',
+  ];
+
+  const content = Object.keys(packages).map((packageName) =>
+    [
+      `- name: Upload @quintal/${packageName} coverage to Codecov`,
+      '  uses: codecov/codecov-action@v4',
+      '  with:',
+      '    fail_ci_if_error: true',
+      `    file: ./packages/${packageName}/.coverage/coverage-final.json`,
+      `    flags: ${packageName}`,
+      '    token: ${{ secrets.CODECOV_TOKEN }}',
+      // TODO env in inputs?
+      '  env:',
+      '    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}',
+    ]
+      .map((line) => ' '.repeat(4) + line)
+      .join('\n'),
+  );
+
+  await fs.promises.writeFile(filePath, `${head.join('\n')}\n${content.join('\n\n')}\n`);
+}
+
+async function makePackageReadme(packageDir: string, name: string, p: Package): Promise<void> {
+  const filePath = path.join(packageDir, 'README.md');
+  const readmeEndMarker =
+    '<!-- END AUTO-GENERATED: Add custom documentation after this comment -->';
   const readme = await fs.promises.readFile(filePath, 'utf-8').catch(() => '');
-  const readmeContent = readme.substring(readme.indexOf(endMarker) + endMarker.length);
+  const readmeContent = readme.substring(readme.indexOf(readmeEndMarker) + readmeEndMarker.length);
 
   const packageName = `@quintal/${name}`;
   const uriPackageName = encodeURIComponent(packageName);
   const shieldsRoot = 'https://img.shields.io';
   const style = '?style=flat-square';
+
+  const makeListSection = <T>(
+    arr: T[] | undefined,
+    title: string,
+    makeItem: (item: T, index: number) => string,
+  ) => (arr && arr.length > 0 ? [`## ${title}`, '', ...arr.map(makeItem), ''] : []);
 
   const readmeHead = [
     // Title
@@ -61,22 +111,63 @@ async function makePackageReadme(dir: string, name: string, p: Package): Promise
     p.description,
     '',
 
-    // TODO features
+    // Features
+    ...makeListSection(
+      p.features,
+      'Features',
+      ({ icon, text }, i) => `- ${icon} ${text}${i + 1 === p.features?.length ? '.' : ','}`,
+    ),
 
+    // Tsdocs
     `You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/docs/${packageName})`,
     '',
 
-    // TODO ToC
-    // TODO Roadmap
-    // TODO Getting started
-    // TODO Examples
+    // Roadmap
+    ...makeListSection(
+      p.roadmap,
+      'Roadmap',
+      ({ level: l, checked: c, text: t }) => `${' '.repeat((l ?? 0) * 2)}- [${c ? 'x' : ' '}] ${t}`,
+    ),
+
+    // Table of Contents
+    '## Table of Contents',
+    '',
+    '- [Getting Started](#getting-started)',
+    ...(p.examples && p.examples.length > 0 ? ['- [Examples](#examples)'] : []),
+    ...(readmeContent.match(/^#+ .+/gm)?.map((header) => {
+      const level = (header.match(/^#+/g)?.[0].length ?? 2) - 2;
+      const text = header.replace(/^#+ /, '');
+      return `${' '.repeat(level * 2)}- [${text}](#${text.toLowerCase().replace(/\s+/g, '-')})`;
+    }) ?? []),
+    '',
+
+    // Getting Started
+    '## Getting Started',
+    '',
+    '```sh',
+    `pnpm add ${packageName}`,
+    '# or',
+    `bun add ${packageName}`,
+    '# or',
+    `yarn add ${packageName}`,
+    '# or',
+    `npm install ${packageName}`,
+    '```',
+
+    // Examples
+    ...makeListSection(
+      p.examples,
+      'Examples',
+      (example) => `- [${example.title}](${example.href})`,
+    ),
+    '',
   ];
 
-  await fs.promises.writeFile(filePath, readmeHead.join('\n') + endMarker + readmeContent);
+  await fs.promises.writeFile(filePath, readmeHead.join('\n') + readmeEndMarker + readmeContent);
 }
 
-async function makePackageJson(dir: string, name: string, p: Package): Promise<void> {
-  const filePath = path.join(dir, 'package.json');
+async function makePackageJson(packageDir: string, name: string, p: Package): Promise<void> {
+  const filePath = path.join(packageDir, 'package.json');
   const packageJson = JSON.parse(await fs.promises.readFile(filePath, 'utf-8').catch(() => '{}'));
 
   const content = {
@@ -123,13 +214,13 @@ async function makePackageJson(dir: string, name: string, p: Package): Promise<v
   await fs.promises.writeFile(filePath, `${JSON.stringify(content, null, 2)}\n`);
 }
 
-async function makePackage(dir: string, name: string, p: Package): Promise<void> {
-  await createDirIfNotExists(dir);
+async function makePackage(packageDir: string, name: string, p: Package): Promise<void> {
+  await createDirIfNotExists(packageDir);
 
-  const srcDir = path.join(dir, 'src');
+  const srcDir = path.join(packageDir, 'src');
   const srcExists = await createDirIfNotExists(srcDir);
 
-  const testsDir = path.join(dir, 'tests');
+  const testsDir = path.join(packageDir, 'tests');
   const testsExists = await createDirIfNotExists(testsDir);
 
   if (!(srcExists || testsExists)) {
@@ -143,13 +234,18 @@ async function makePackage(dir: string, name: string, p: Package): Promise<void>
     );
   }
 
-  await makePackageJson(dir, name, p);
-  await makePackageReadme(dir, name, p);
+  await makePackageJson(packageDir, name, p);
+  await makePackageReadme(packageDir, name, p);
 }
 
 async function main(): Promise<void> {
+  const rootDir = path.join(__dirname, '..');
+
+  makeLabelerYml(rootDir);
+  makeCoverageYml(rootDir);
+
   for (const [name, p] of Object.entries(packages)) {
-    await makePackage(path.join(__dirname, '..', 'packages', name), name, p);
+    await makePackage(path.join(rootDir, 'packages', name), name, p);
   }
 }
 

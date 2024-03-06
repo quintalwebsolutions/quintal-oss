@@ -20,9 +20,13 @@ export const packages: Packages = {
       { icon: '🧪', text: '100% test coverage' },
     ],
     roadmap: [
-      "Figure out a way to emulate [Rust's question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-)",
-      'Serialize and deserialize monads for API usage',
-      "Write docs on [Rust's must-use property](https://doc.rust-lang.org/std/result/#results-must-be-used)",
+      {
+        text: "Figure out a way to emulate [Rust's question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-)",
+      },
+      { text: 'Serialize and deserialize monads for API usage' },
+      {
+        text: "Write docs on [Rust's must-use property](https://doc.rust-lang.org/std/result/#results-must-be-used)",
+      },
     ],
   },
   // environment: {

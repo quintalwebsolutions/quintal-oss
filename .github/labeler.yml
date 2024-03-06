@@ -1,8 +1,7 @@
-"@quintal/config":
-  - packages/config/*
+"@quintal/test":
+  - changed-files:
+    - any-glob-to-any-file: packages/test/*
 
-"@quintal/result":
-  - packages/result/*
-
-"@quintal/table-engine":
-  - packages/table-engine/*
+"@quintal/monads":
+  - changed-files:
+    - any-glob-to-any-file: packages/monads/*

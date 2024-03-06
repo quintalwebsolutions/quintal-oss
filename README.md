@@ -7,5 +7,4 @@ A package ecosystem dedicated to improving developer experience and type-safety 
 
 ## Roadmap
 
-- [ ] Add automatic code coverage collection per package using GitHub Actions
 - [ ] Add sponsor links to [package.json](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#funding) and READMEs

@@ -1,7 +1,11 @@
 {
   "name": "@quintal/config",
   "version": "0.2.0",
-  "files": ["tsconfig/**", "nextjs.js", "vite.js"],
+  "files": [
+    "tsconfig/**",
+    "nextjs.js",
+    "vite.js"
+  ],
   "scripts": {
     "clean": "shx rm -rf .turbo node_modules"
   },

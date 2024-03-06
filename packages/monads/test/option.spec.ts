@@ -1,10 +1,10 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import { AnyOption, Option, none, some } from '../src';
-import { Equal } from '../src/util';
+import { type AnyOption, type Option, none, some } from '../src';
+import type { Equal } from './util';
 
-function expectOptionUnwrap<TOption extends AnyOption>(_option: TOption) {
+function expectOptionUnwrap<Option extends AnyOption>(_option: Option) {
   return {
-    toBe: <TUnwrap>(_val: Equal<ReturnType<TOption['unwrap']>, TUnwrap>) => {},
+    toBe: <Unwrap>(_val: Equal<ReturnType<Option['unwrap']>, Unwrap>) => {},
   };
 }
 
@@ -56,7 +56,7 @@ describe('Option', () => {
     expect(() => noneOption1.expect('Should be some')).toThrow('Should be some');
   });
 
-  it('Allows to unwrap the option value', async () => {
+  it('Allows to unwrap the option value', () => {
     expectOptionUnwrap(someValue).toBe<'value'>(true);
     expect(someValue.unwrap()).toBe('value');
 

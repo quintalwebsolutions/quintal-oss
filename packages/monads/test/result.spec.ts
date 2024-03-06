@@ -1,11 +1,11 @@
-import { describe, expect, expectTypeOf, it, vi } from 'vitest';
+import { type Mock, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import {
-  AnyOption,
-  AnyResult,
-  AsyncResult,
-  Err,
-  Ok,
-  Result,
+  type AnyOption,
+  type AnyResult,
+  type AsyncResult,
+  type Err,
+  type Ok,
+  type Result,
   asyncErr,
   asyncOk,
   asyncResult,
@@ -13,22 +13,22 @@ import {
   ok,
   result,
 } from '../src';
-import { None, Option, Some, none, some } from '../src';
-import { AsyncErr, AsyncOk } from '../src/result/async-result';
-import { And, Equal, MaybePromise, Ternary } from '../src/util';
+import { type None, type Option, type Some, none, some } from '../src';
+import type { AsyncErr, AsyncOk } from '../src';
+import type { And, Equal, MaybePromise, Ternary } from './util';
 
-function expectU<TResult extends AnyResult>(result: TResult) {
+function expectU<Result extends AnyResult>(result: Result) {
   return {
-    toBe: async <TUnwrap, TUnwrapErr>(
+    toBe: async <Unwrap, UnwrapErr>(
       isOk: Ternary<
         And<
-          Equal<ReturnType<TResult['unwrap']>, TUnwrap>,
-          Equal<ReturnType<TResult['unwrapErr']>, TUnwrapErr>
+          Equal<ReturnType<Result['unwrap']>, Unwrap>,
+          Equal<ReturnType<Result['unwrapErr']>, UnwrapErr>
         >,
         boolean,
         never
       >,
-      unwrappedValue: Awaited<TUnwrap | TUnwrapErr>,
+      unwrappedValue: Awaited<Unwrap | UnwrapErr>,
     ) => {
       if (isOk) expect(await result.unwrap()).toStrictEqual(unwrappedValue);
       else expect(await result.unwrapErr()).toStrictEqual(unwrappedValue);
@@ -44,10 +44,12 @@ function throws(): 'value' {
   throw new Error('error');
 }
 
+// biome-ignore lint/nursery/useAwait: test
 async function returnsAsync(): P<'value'> {
   return 'value';
 }
 
+// biome-ignore lint/nursery/useAwait: test
 async function throwsAsync(): P<'value'> {
   throw new Error('error');
 }
@@ -240,49 +242,47 @@ describe('Result', () => {
           isAsync: Ternary<TIsEqual, boolean, never>,
           value: Ternary<TIsEqual, unknown, never>,
         ) => {
-          const inspectMockFn = vi.fn();
-          const inspectResult = result.inspect((v) => {
-            expect(v).toStrictEqual(value);
-            inspectMockFn();
-          });
-          if (isAsync) {
-            expect(inspectMockFn).toHaveBeenCalledTimes(0);
-            await inspectResult;
+          async function test(
+            inspectOk: boolean,
+            getResult: (mock: Mock) => AnyResult,
+          ): Promise<void> {
+            const mock = vi.fn();
+            const result = getResult(mock);
+            if (isAsync) {
+              expect(mock).toHaveBeenCalledTimes(0);
+              await result;
+            }
+            expect(mock).toHaveBeenCalledTimes((isOk && inspectOk) || !(isOk || inspectOk) ? 1 : 0);
           }
-          expect(inspectMockFn).toHaveBeenCalledTimes(isOk ? 1 : 0);
 
-          const inspectAsyncMockFn = vi.fn();
-          const asyncInspectResult = result.inspect(async (v) => {
-            expect(v).toStrictEqual(value);
-            inspectAsyncMockFn();
-          });
-          if (isAsync) {
-            expect(inspectAsyncMockFn).toHaveBeenCalledTimes(0);
-            await asyncInspectResult;
-          }
-          expect(inspectAsyncMockFn).toHaveBeenCalledTimes(isOk ? 1 : 0);
-
-          const inspectErrMockFn = vi.fn();
-          const inspectErrResult = result.inspectErr((e) => {
-            expect(e).toStrictEqual(value);
-            inspectErrMockFn();
-          });
-          if (isAsync) {
-            expect(inspectErrMockFn).toHaveBeenCalledTimes(0);
-            await inspectErrResult;
-          }
-          expect(inspectErrMockFn).toHaveBeenCalledTimes(isOk ? 0 : 1);
-
-          const inspectErrAsyncMockFn = vi.fn();
-          const asyncInspectErrResult = result.inspectErr(async (e) => {
-            expect(e).toStrictEqual(value);
-            inspectErrAsyncMockFn();
-          });
-          if (isAsync) {
-            expect(inspectErrAsyncMockFn).toHaveBeenCalledTimes(0);
-            await asyncInspectErrResult;
-          }
-          expect(inspectErrAsyncMockFn).toHaveBeenCalledTimes(isOk ? 0 : 1);
+          await Promise.all([
+            test(true, (mock) =>
+              result.inspect((v) => {
+                expect(v).toStrictEqual(value);
+                mock();
+              }),
+            ),
+            test(true, (mock) =>
+              // biome-ignore lint/nursery/useAwait: test
+              result.inspect(async (v) => {
+                expect(v).toStrictEqual(value);
+                mock();
+              }),
+            ),
+            test(false, (mock) =>
+              result.inspectErr((e) => {
+                expect(e).toStrictEqual(value);
+                mock();
+              }),
+            ),
+            test(false, (mock) =>
+              // biome-ignore lint/nursery/useAwait: test
+              result.inspectErr(async (e) => {
+                expect(e).toStrictEqual(value);
+                mock();
+              }),
+            ),
+          ]);
         },
       };
     }
@@ -439,8 +439,8 @@ describe('Result', () => {
           const e = await result.err();
           expect(e.isSome).toBe(!isOk);
           expect(e.isNone).toBe(isOk);
-          if (!isOk) expect(e.unwrap()).toStrictEqual(value);
-          else expect(e.unwrap).toThrow();
+          if (isOk) expect(e.unwrap).toThrow();
+          else expect(e.unwrap()).toStrictEqual(value);
         },
       };
     }

@@ -1,7 +1,7 @@
-import { Err, Ok, err, ok } from '../result';
-import { MaybePromise, Ternary } from '../util';
-import { OptionConstructor } from './option-constructor';
-import { AnyOption, OptionMatch } from './util';
+import { type Err, type Ok, err, ok } from '../result';
+import type { MaybePromise, Ternary } from '../util';
+import type { OptionConstructor } from './option-constructor';
+import type { AnyOption, OptionMatch } from './util';
 
 export class Some<T> implements OptionConstructor<T, 'SOME'> {
   protected _value: T;

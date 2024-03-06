@@ -1,9 +1,9 @@
-import { None, Some, none, some } from '../option';
-import { isAnyOption } from '../option/util';
-import { MaybePromise } from '../util';
-import { AsyncErr, AsyncOk, AsyncResult } from './async-result';
-import { ResultConstructor } from './result-constructor';
-import { AnyResult, ResultMatch, isAnyResult } from './util';
+import { type None, type Some, none, some } from '../option';
+import { isAnyOption } from '../option';
+import type { MaybePromise } from '../util';
+import { type AsyncErr, type AsyncOk, AsyncResult } from './async-result';
+import type { ResultConstructor } from './result-constructor';
+import { type AnyResult, type ResultMatch, isAnyResult } from './util';
 
 export class Ok<T> implements ResultConstructor<T, 'OK'> {
   protected _value: T;

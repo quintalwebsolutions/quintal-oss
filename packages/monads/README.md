@@ -1,21 +1,14 @@
 # Monads
 
+[![NPM version](https://img.shields.io/npm/v/@quintal/monads?style=flat-square)](https://npmjs.com/@quintal/monads)
+[![NPM downloads](https://img.shields.io/npm/dt/@quintal/monads?style=flat-square)](https://npmjs.com/@quintal/monads)
+[![License](https://img.shields.io/npm/l/@quintal/monads?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/LICENSE)
+[![Bundle size](https://img.shields.io/bundlephobia/minzip/@quintal/monads?style=flat-square)](https://bundlephobia.com/package/@quintal/monads)
+[![Dependencies](https://img.shields.io/librariesio/release/npm/@quintal/monads?style=flat-square)](https://libraries.io/npm/%40quintal%2Fmonads/)
+[![Pull requests welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CONTRIBUTING.md)
+
 A collection of monads (Result, Option) for TypeScript, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/).
-
-- 🦀 Implements all relevant methods from Rust
-- ✅ CommonJS and ES Modules support
-- 📖 Extensive documentation
-- ⚖️ Super lightweight (only ~1kb gzipped)
-- 🙅 0 dependencies
-- 🧪 100% test coverage
-
-You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/docs/@quintal/monads)
-
-## Roadmap
-
-- [ ] Figure out a way to emulate [Rust's question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-)
-- [ ] Serialize and deserialize monads for API usage
-- [ ] Write docs on [Rust's must-use property](https://doc.rust-lang.org/std/result/#results-must-be-used)
+<!-- END AUTO-GENERATED: Add custom documentation after this comment -->
 
 ## Result
 

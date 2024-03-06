@@ -1,6 +1,6 @@
-import { MaybePromise } from '../util';
-import { Err, Ok, Result, err, ok } from './result';
-import { AnyResult, ResultMatch } from './util';
+import type { MaybePromise } from '../util';
+import { type Err, type Ok, type Result, err, ok } from './result';
+import type { AnyResult, ResultMatch } from './util';
 
 type Value<R extends AnyResult> = ReturnType<R['unwrap']>;
 type Error<R extends AnyResult> = ReturnType<R['unwrapErr']>;
@@ -15,6 +15,7 @@ export class AsyncResult<R extends AnyResult> {
   }
 
   // TODO Cache promise result?
+  // biome-ignore lint/nursery/noThenProperty: We explicitly want to make this class thenable
   then<TResult1 = R, TResult2 = never>(
     onfulfilled?: (value: R) => TResult1 | PromiseLike<TResult1>,
     onrejected?: (reason: unknown) => TResult2 | PromiseLike<TResult2>,

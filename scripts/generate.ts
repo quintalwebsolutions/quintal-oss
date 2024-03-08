@@ -103,7 +103,7 @@ async function makeRootReadme(rootDir: string): Promise<void> {
     '-|-|-',
     ...Object.entries(packages).map(
       ([n, p]) =>
-        `\`@quintal/${n}\`|[![npm version](https://img.shields.io/npm/v/@quintal/${n}.svg?style=flat-square)](https://www.npmjs.com/package/@quintal/${n})|${p.description})`,
+        `\`@quintal/${n}\`|[![npm version](https://img.shields.io/npm/v/@quintal/${n}.svg?style=flat-square)](https://www.npmjs.com/package/@quintal/${n})|${p.description}`,
     ),
     '',
     '## Contributing to the project',
@@ -112,7 +112,7 @@ async function makeRootReadme(rootDir: string): Promise<void> {
     '',
     '## Support us',
     '',
-    "If you, or the company you work at, has been using one or more of our packages, please consider supporting us through GitHub Sponsors. This way, you're directly supporting our cause!",
+    "If you, or the company you work at, has found value in using one or more of our packages, please consider supporting us through GitHub Sponsors. This way, you're directly empowering us to fulfill our cause of improving developer experience and type-safety in the TypeScript community's day-to-day coding practices!",
     '',
   ];
 

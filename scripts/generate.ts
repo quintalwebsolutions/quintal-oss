@@ -74,6 +74,51 @@ async function makeCoverageYml(rootDir: string): Promise<void> {
   await fs.promises.writeFile(filePath, `${head.join('\n')}\n${content.join('\n\n')}\n`);
 }
 
+async function makeRootReadme(rootDir: string): Promise<void> {
+  const filePath = path.join(rootDir, 'README.md');
+
+  const repoName = 'quintalwebsolutions/quintal-oss';
+  const githubRoot = `https://github.com/${repoName}`;
+  const shieldsRoot = 'https://img.shields.io';
+  const style = '?style=flat-square';
+
+  const content = [
+    '# Quintal Open Source Software',
+    '',
+    `![Typescript](${shieldsRoot}/badge/TypeScript-007ACC${style}&logo=typescript&logoColor=white)`,
+    `[![Build status](${shieldsRoot}/github/actions/workflow/status/${repoName}/release.yml${style})](${githubRoot}/actions/workflows/release.yml)`,
+    `[![Code coverage](${shieldsRoot}/codecov/c/github/${repoName}${style}&token=3ORY9UP6H7&logo=codecov)](https://codecov.io/gh/${repoName})`,
+    `[![GitHub License](${shieldsRoot}/github/license/${repoName})](${githubRoot}/blob/main/LICENSE)`,
+    `[![Pull requests welcome](${shieldsRoot}/badge/PRs-welcome-brightgreen.svg${style})](${githubRoot}/blob/main/CONTRIBUTING.md)`,
+    `[![Contributor Covenant](${shieldsRoot}/badge/Contributor%20Covenant-2.1-4baaaa.svg${style})](${githubRoot}/blob/main/CODE_OF_CONDUCT.md)`,
+    // TODO code quality metrics
+    // [![LGTM Code quality grade: Typescript](https://img.shields.io/lgtm/grade/javascript/g/saphewilliam/saphe-packages.svg?logo=lgtm&logoWidth=18&style=flat-square)](https://lgtm.com/projects/g/saphewilliam/saphe-packages/context:javascript)
+    // [![Total LGTM alerts](https://img.shields.io/lgtm/alerts/g/saphewilliam/saphe-packages.svg?logo=lgtm&logoWidth=18&style=flat-square)](https://lgtm.com/projects/g/saphewilliam/saphe-packages/alerts/)
+    '',
+    'A package ecosystem dedicated to improving developer experience and type-safety in your next TypeScript project.',
+    '',
+    '## Packages',
+    '',
+    'name|version|description',
+    '-|-|-',
+    ...Object.entries(packages).map(
+      ([n, p]) =>
+        `\`@quintal/${n}\`|[![npm version](https://img.shields.io/npm/v/@quintal/${n}.svg?style=flat-square)](https://www.npmjs.com/package/@quintal/${n})|${p.description})`,
+    ),
+    '',
+    '## Contributing to the project',
+    '',
+    'The Quintal package ecosystem is open for contributions! Please read the [contributing guide](https://github.com/quintalwebsolutions/quintal-oss/blob/chore/nuke-eslint-prettier/CONTRIBUTING.md) for more details.',
+    '',
+    '## Support us',
+    '',
+    "If you, or the company you work at, has been using one or more of our packages, please consider supporting us through GitHub Sponsors. This way, you're directly supporting our cause!",
+    '',
+  ];
+
+  await fs.promises.writeFile(filePath, `${content.join('\n')}\n`);
+}
+
 async function makePackageReadme(packageDir: string, name: string, p: Package): Promise<void> {
   const filePath = path.join(packageDir, 'README.md');
   const readmeEndMarker =
@@ -83,6 +128,8 @@ async function makePackageReadme(packageDir: string, name: string, p: Package): 
 
   const packageName = `@quintal/${name}`;
   const uriPackageName = encodeURIComponent(packageName);
+  const repoName = 'quintalwebsolutions/quintal-oss';
+  const githubRoot = `https://github.com/${repoName}`;
   const shieldsRoot = 'https://img.shields.io';
   const style = '?style=flat-square';
 
@@ -100,12 +147,11 @@ async function makePackageReadme(packageDir: string, name: string, p: Package): 
     // Badges
     `[![NPM version](${shieldsRoot}/npm/v/${packageName}${style})](https://npmjs.com/${packageName})`,
     `[![NPM downloads](${shieldsRoot}/npm/dt/${packageName}${style})](https://npmjs.com/${packageName})`,
-    `[![License](${shieldsRoot}/npm/l/${packageName}${style})](https://github.com/quintalwebsolutions/quintal-oss/blob/main/LICENSE)`,
+    `[![License](${shieldsRoot}/npm/l/${packageName}${style})](${githubRoot}/blob/main/LICENSE)`,
     `[![Bundle size](${shieldsRoot}/bundlephobia/minzip/${packageName}${style})](https://bundlephobia.com/package/${packageName})`,
     `[![Dependencies](${shieldsRoot}/librariesio/release/npm/${packageName}${style})](https://libraries.io/npm/${uriPackageName}/)`,
-    // TODO
-    // `[![Code coverage](${shieldsRoot}/codecov/c/github${repo}${style}&flag=${name}&logo=codecov&token=62N8FTE2CV)](https://codecov.io/gh/saphewilliam/saphe-packages)`,
-    `[![Pull requests welcome](${shieldsRoot}/badge/PRs-welcome-brightgreen.svg${style})](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CONTRIBUTING.md)`,
+    `[![Code coverage](${shieldsRoot}/codecov/c/github/${repoName}${style}&token=3ORY9UP6H7&flag=${name}&logo=codecov)](https://codecov.io/gh/${repoName})`,
+    `[![Pull requests welcome](${shieldsRoot}/badge/PRs-welcome-brightgreen.svg${style})](${githubRoot}/blob/main/CONTRIBUTING.md)`,
     '',
 
     // Description
@@ -243,12 +289,14 @@ async function makePackage(packageDir: string, name: string, p: Package): Promis
 async function main(): Promise<void> {
   const rootDir = path.join(__dirname, '..');
 
-  makeLabelerYml(rootDir);
-  makeCoverageYml(rootDir);
-
-  for (const [name, p] of Object.entries(packages)) {
-    await makePackage(path.join(rootDir, 'packages', name), name, p);
-  }
+  await Promise.all([
+    makeRootReadme(rootDir),
+    makeLabelerYml(rootDir),
+    makeCoverageYml(rootDir),
+    ...Object.entries(packages).map(([name, p]) =>
+      makePackage(path.join(rootDir, 'packages', name), name, p),
+    ),
+  ]);
 }
 
 main()

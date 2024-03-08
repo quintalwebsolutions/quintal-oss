@@ -26,7 +26,7 @@
     }
   ],
   "extensions": {
-    "recommendations": ["biomejs.biome", "esbenp.prettier-vscode"]
+    "recommendations": ["biomejs.biome", "aaron-bond.better-comments"]
   },
   "settings": {
     "search.exclude": {
@@ -47,8 +47,5 @@
     },
     "typescript.tsdk": "node_modules/typescript/lib",
     "typescript.enablePromptUseWorkspaceTsdk": true,
-    "[markdown]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode",
-    }
   }
 }

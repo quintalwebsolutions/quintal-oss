@@ -22,9 +22,9 @@ name|version|description
 
 ## Contributing to the project
 
-The Quintal package ecosystem is open for contributions! Please read the [contributing guide](https://github.com/quintalwebsolutions/quintal-oss/blob/chore/nuke-eslint-prettier/CONTRIBUTING.md) for more details.
+The Quintal package ecosystem is open for contributions! Please read the [contributing guide](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CONTRIBUTING.md) for more details.
 
 ## Support us
 
-If you, or the company you work at, has found value in using one or more of our packages, please consider supporting us through GitHub Sponsors. This way, you're directly empowering us to fulfill our cause of improving developer experience and type-safety in the TypeScript community's day-to-day coding practices!
+If you or the company you work at has found value in using one or more of our packages, please consider supporting us through GitHub Sponsors. This way, you're directly empowering us to fulfill our cause of improving developer experience and type-safety in the TypeScript community's day-to-day coding practices!
 

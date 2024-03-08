@@ -5,6 +5,7 @@
 [![License](https://img.shields.io/npm/l/@quintal/monads?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/LICENSE)
 [![Bundle size](https://img.shields.io/bundlephobia/minzip/@quintal/monads?style=flat-square)](https://bundlephobia.com/package/@quintal/monads)
 [![Dependencies](https://img.shields.io/librariesio/release/npm/@quintal/monads?style=flat-square)](https://libraries.io/npm/%40quintal%2Fmonads/)
+[![Code coverage](https://img.shields.io/codecov/c/github/quintalwebsolutions/quintal-oss?style=flat-square&token=3ORY9UP6H7&flag=monads&logo=codecov)](https://codecov.io/gh/quintalwebsolutions/quintal-oss)
 [![Pull requests welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CONTRIBUTING.md)
 
 A collection of monads (Result, Option) for TypeScript, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/).

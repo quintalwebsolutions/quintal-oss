@@ -1,6 +1,26 @@
 {
   "name": "@quintal/config",
   "version": "0.2.0",
+  "license": "MIT",
+  "description": "The solution to the infamous [Node.JS Config Hell Problem](https://deno.com/blog/node-config-hell)",
+  "keywords": [
+    "config",
+    "hell",
+    "typescript",
+    "dotfiles"
+  ],
+  "author": {
+    "name": "William Ford",
+    "email": "william@quintalwebsolutions.com",
+    "url": "https://quintalwebsolutions.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quintalwebsolutions/quintal-oss.git",
+    "directory": "packages/config"
+  },
+  "homepage": "https://github.com/quintalwebsolutions/quintal-oss/tree/main/packages/config#readme",
+  "bugs": "https://github.com/quintalwebsolutions/quintal-oss/labels/%40quintal%2Fconfig",
   "files": [
     "tsconfig/**",
     "nextjs.js",

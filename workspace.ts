@@ -4,7 +4,7 @@ export const packages: Packages = {
   config: {
     title: 'Config',
     description:
-      'the solution to the infamous [Node.JS Config Hell Problem](https://deno.com/blog/node-config-hell).',
+      'The solution to the infamous [Node.JS Config Hell Problem](https://deno.com/blog/node-config-hell)',
     keywords: ['config', 'hell', 'typescript', 'dotfiles'],
   },
   environment: {

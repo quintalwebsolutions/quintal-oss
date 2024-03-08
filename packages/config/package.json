@@ -21,25 +21,13 @@
   },
   "homepage": "https://github.com/quintalwebsolutions/quintal-oss/tree/main/packages/config#readme",
   "bugs": "https://github.com/quintalwebsolutions/quintal-oss/labels/%40quintal%2Fconfig",
-  "main": "./.dist/index.cjs",
-  "module": "./.dist/index.mjs",
-  "types": "./.dist/index.d.ts",
   "files": [
-    ".dist"
+    "tsconfig/**",
+    "nextjs.js",
+    "vite.mjs"
   ],
   "scripts": {
-    "build": "run-s build:*",
-    "build:clean": "shx rm -rf .dist",
-    "build:code": "vite build",
-    "clean": "shx rm -rf .config .coverage .coverage-ts .dist .docs .turbo node_modules",
-    "dev": "vitest --watch",
-    "lint": "pnpm lint:fix && pnpm lint:types",
-    "lint:check": "biome ci .",
-    "lint:fix": "biome check --apply .",
-    "lint:types": "tsc --noEmit",
-    "test": "run-s test:*",
-    "test:source": "vitest",
-    "test:types": "typescript-coverage-report --outputDir .coverage-ts --strict"
+    "clean": "shx rm -rf .config .coverage .coverage-ts .dist .docs .turbo node_modules"
   },
   "dependencies": {
     "@vitejs/plugin-react": "4.2.1",

@@ -85,15 +85,13 @@ async function makeRootReadme(rootDir: string): Promise<void> {
   const content = [
     '# Quintal Open Source Software',
     '',
-    `![Typescript](${shieldRoot}/badge/TypeScript-007ACC${shieldStyle}&logo=typescript&logoColor=white)`,
+    `![Top language](${shieldRoot}/github/languages/top/quintalwebsolutions/quintal-oss${shieldStyle}&logo=typescript&logoColor=FAF9F8&labelColor=3178C6&color=3178C6)`,
     `[![Build status](${shieldRoot}/github/actions/workflow/status/${repoName}/release.yml${shieldStyle})](${githubRoot}/actions/workflows/release.yml)`,
+    `[![Codacy grade](${shieldRoot}/codacy/grade/bb3b006255104e4da8b9a4a7793dcffe${shieldStyle}&logo=codacy)](https://app.codacy.com/gh/${repoName}dashboard)`,
     `[![Code coverage](${shieldRoot}/codecov/c/github/${repoName}${shieldStyle}&token=3ORY9UP6H7&logo=codecov)](https://codecov.io/gh/${repoName})`,
     `[![GitHub License](${shieldRoot}/github/license/${repoName}${shieldStyle})](${githubRoot}/blob/main/LICENSE)`,
-    `[![Pull requests welcome](${shieldRoot}/badge/PRs-welcome-brightgreen.svg${shieldStyle})](${githubRoot}/blob/main/CONTRIBUTING.md)`,
     `[![Contributor Covenant](${shieldRoot}/badge/Contributor%20Covenant-2.1-4baaaa.svg${shieldStyle})](${githubRoot}/blob/main/CODE_OF_CONDUCT.md)`,
-    // TODO code quality metrics
-    // [![LGTM Code quality grade: Typescript](https://img.shields.io/lgtm/grade/javascript/g/saphewilliam/saphe-packages.svg?logo=lgtm&logoWidth=18&style=flat-square)](https://lgtm.com/projects/g/saphewilliam/saphe-packages/context:javascript)
-    // [![Total LGTM alerts](https://img.shields.io/lgtm/alerts/g/saphewilliam/saphe-packages.svg?logo=lgtm&logoWidth=18&style=flat-square)](https://lgtm.com/projects/g/saphewilliam/saphe-packages/alerts/)
+    `[![Pull requests welcome](${shieldRoot}/badge/PRs-welcome-brightgreen.svg${shieldStyle})](${githubRoot}/blob/main/CONTRIBUTING.md)`,
     '',
     'A package ecosystem dedicated to improving developer experience and type-safety in your next TypeScript project.',
     '',
@@ -112,7 +110,7 @@ async function makeRootReadme(rootDir: string): Promise<void> {
     '',
     '## Support us',
     '',
-    "If you, or the company you work at, has found value in using one or more of our packages, please consider supporting us through GitHub Sponsors. This way, you're directly empowering us to fulfill our cause of improving developer experience and type-safety in the TypeScript community's day-to-day coding practices!",
+    "If you or the company you work at has found value in using one or more of our packages, please consider supporting us through GitHub Sponsors. This way, you're directly empowering us to fulfill our cause of improving developer experience and type-safety in the TypeScript community's day-to-day coding practices!",
     '',
   ];
 
@@ -259,7 +257,12 @@ async function makePackageJson(packageDir: string, name: string, p: Package): Pr
 }
 
 async function makePackage(packageDir: string, name: string, p: Package): Promise<void> {
-  await createDirIfNotExists(packageDir);
+  const dirExists = await createDirIfNotExists(packageDir);
+
+  await makePackageJson(packageDir, name, p);
+  await makePackageReadme(packageDir, name, p);
+
+  if (dirExists) return;
 
   const srcDir = path.join(packageDir, 'src');
   const srcExists = await createDirIfNotExists(srcDir);
@@ -277,9 +280,6 @@ async function makePackage(packageDir: string, name: string, p: Package): Promis
       "import { describe, expect, it } from 'vitest';\nimport { add } from '../src';\n\ndescribe('add', () => {\n  it('adds integers', () => {\n    expect(add(1, 2)).toBe(3);\n  });\n});\n",
     );
   }
-
-  await makePackageJson(packageDir, name, p);
-  await makePackageReadme(packageDir, name, p);
 }
 
 async function main(): Promise<void> {

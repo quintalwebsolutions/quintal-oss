@@ -1,11 +1,12 @@
 # Quintal Open Source Software
 
-![Typescript](https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white)
+![Top language](https://img.shields.io/github/languages/top/quintalwebsolutions/quintal-oss?style=flat-square&logo=typescript&logoColor=FAF9F8&labelColor=3178C6&color=3178C6)
 [![Build status](https://img.shields.io/github/actions/workflow/status/quintalwebsolutions/quintal-oss/release.yml?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/actions/workflows/release.yml)
+[![Codacy grade](https://img.shields.io/codacy/grade/bb3b006255104e4da8b9a4a7793dcffe?style=flat-square&logo=codacy)](https://app.codacy.com/gh/quintalwebsolutions/quintal-ossdashboard)
 [![Code coverage](https://img.shields.io/codecov/c/github/quintalwebsolutions/quintal-oss?style=flat-square&token=3ORY9UP6H7&logo=codecov)](https://codecov.io/gh/quintalwebsolutions/quintal-oss)
-[![GitHub License](https://img.shields.io/github/license/quintalwebsolutions/quintal-oss)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/LICENSE)
-[![Pull requests welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CONTRIBUTING.md)
+[![GitHub License](https://img.shields.io/github/license/quintalwebsolutions/quintal-oss?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CODE_OF_CONDUCT.md)
+[![Pull requests welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CONTRIBUTING.md)
 
 A package ecosystem dedicated to improving developer experience and type-safety in your next TypeScript project.
 

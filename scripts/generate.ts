@@ -17,6 +17,11 @@ export type Package = {
 
 export type Packages = Record<string, Package>;
 
+const repoName = 'quintalwebsolutions/quintal-oss';
+const githubRoot = `https://github.com/${repoName}`;
+const shieldRoot = 'https://img.shields.io';
+const shieldStyle = '?style=flat-square';
+
 async function createDirIfNotExists(dir: string): Promise<boolean> {
   try {
     await fs.promises.access(dir, fs.constants.F_OK);
@@ -77,20 +82,15 @@ async function makeCoverageYml(rootDir: string): Promise<void> {
 async function makeRootReadme(rootDir: string): Promise<void> {
   const filePath = path.join(rootDir, 'README.md');
 
-  const repoName = 'quintalwebsolutions/quintal-oss';
-  const githubRoot = `https://github.com/${repoName}`;
-  const shieldsRoot = 'https://img.shields.io';
-  const style = '?style=flat-square';
-
   const content = [
     '# Quintal Open Source Software',
     '',
-    `![Typescript](${shieldsRoot}/badge/TypeScript-007ACC${style}&logo=typescript&logoColor=white)`,
-    `[![Build status](${shieldsRoot}/github/actions/workflow/status/${repoName}/release.yml${style})](${githubRoot}/actions/workflows/release.yml)`,
-    `[![Code coverage](${shieldsRoot}/codecov/c/github/${repoName}${style}&token=3ORY9UP6H7&logo=codecov)](https://codecov.io/gh/${repoName})`,
-    `[![GitHub License](${shieldsRoot}/github/license/${repoName})](${githubRoot}/blob/main/LICENSE)`,
-    `[![Pull requests welcome](${shieldsRoot}/badge/PRs-welcome-brightgreen.svg${style})](${githubRoot}/blob/main/CONTRIBUTING.md)`,
-    `[![Contributor Covenant](${shieldsRoot}/badge/Contributor%20Covenant-2.1-4baaaa.svg${style})](${githubRoot}/blob/main/CODE_OF_CONDUCT.md)`,
+    `![Typescript](${shieldRoot}/badge/TypeScript-007ACC${shieldStyle}&logo=typescript&logoColor=white)`,
+    `[![Build status](${shieldRoot}/github/actions/workflow/status/${repoName}/release.yml${shieldStyle})](${githubRoot}/actions/workflows/release.yml)`,
+    `[![Code coverage](${shieldRoot}/codecov/c/github/${repoName}${shieldStyle}&token=3ORY9UP6H7&logo=codecov)](https://codecov.io/gh/${repoName})`,
+    `[![GitHub License](${shieldRoot}/github/license/${repoName}${shieldStyle})](${githubRoot}/blob/main/LICENSE)`,
+    `[![Pull requests welcome](${shieldRoot}/badge/PRs-welcome-brightgreen.svg${shieldStyle})](${githubRoot}/blob/main/CONTRIBUTING.md)`,
+    `[![Contributor Covenant](${shieldRoot}/badge/Contributor%20Covenant-2.1-4baaaa.svg${shieldStyle})](${githubRoot}/blob/main/CODE_OF_CONDUCT.md)`,
     // TODO code quality metrics
     // [![LGTM Code quality grade: Typescript](https://img.shields.io/lgtm/grade/javascript/g/saphewilliam/saphe-packages.svg?logo=lgtm&logoWidth=18&style=flat-square)](https://lgtm.com/projects/g/saphewilliam/saphe-packages/context:javascript)
     // [![Total LGTM alerts](https://img.shields.io/lgtm/alerts/g/saphewilliam/saphe-packages.svg?logo=lgtm&logoWidth=18&style=flat-square)](https://lgtm.com/projects/g/saphewilliam/saphe-packages/alerts/)
@@ -128,10 +128,6 @@ async function makePackageReadme(packageDir: string, name: string, p: Package): 
 
   const packageName = `@quintal/${name}`;
   const uriPackageName = encodeURIComponent(packageName);
-  const repoName = 'quintalwebsolutions/quintal-oss';
-  const githubRoot = `https://github.com/${repoName}`;
-  const shieldsRoot = 'https://img.shields.io';
-  const style = '?style=flat-square';
 
   const makeListSection = <T>(
     arr: T[] | undefined,
@@ -145,13 +141,13 @@ async function makePackageReadme(packageDir: string, name: string, p: Package): 
     '',
 
     // Badges
-    `[![NPM version](${shieldsRoot}/npm/v/${packageName}${style})](https://npmjs.com/${packageName})`,
-    `[![NPM downloads](${shieldsRoot}/npm/dt/${packageName}${style})](https://npmjs.com/${packageName})`,
-    `[![License](${shieldsRoot}/npm/l/${packageName}${style})](${githubRoot}/blob/main/LICENSE)`,
-    `[![Bundle size](${shieldsRoot}/bundlephobia/minzip/${packageName}${style})](https://bundlephobia.com/package/${packageName})`,
-    `[![Dependencies](${shieldsRoot}/librariesio/release/npm/${packageName}${style})](https://libraries.io/npm/${uriPackageName}/)`,
-    `[![Code coverage](${shieldsRoot}/codecov/c/github/${repoName}${style}&token=3ORY9UP6H7&flag=${name}&logo=codecov)](https://codecov.io/gh/${repoName})`,
-    `[![Pull requests welcome](${shieldsRoot}/badge/PRs-welcome-brightgreen.svg${style})](${githubRoot}/blob/main/CONTRIBUTING.md)`,
+    `[![NPM version](${shieldRoot}/npm/v/${packageName}${shieldStyle})](https://npmjs.com/${packageName})`,
+    `[![NPM downloads](${shieldRoot}/npm/dt/${packageName}${shieldStyle})](https://npmjs.com/${packageName})`,
+    `[![License](${shieldRoot}/npm/l/${packageName}${shieldStyle})](${githubRoot}/blob/main/LICENSE)`,
+    `[![Bundle size](${shieldRoot}/bundlephobia/minzip/${packageName}${shieldStyle})](https://bundlephobia.com/package/${packageName})`,
+    `[![Dependencies](${shieldRoot}/librariesio/release/npm/${packageName}${shieldStyle})](https://libraries.io/npm/${uriPackageName}/)`,
+    `[![Code coverage](${shieldRoot}/codecov/c/github/${repoName}${shieldStyle}&token=3ORY9UP6H7&flag=${name}&logo=codecov)](https://codecov.io/gh/${repoName})`,
+    `[![Pull requests welcome](${shieldRoot}/badge/PRs-welcome-brightgreen.svg${shieldStyle})](${githubRoot}/blob/main/CONTRIBUTING.md)`,
     '',
 
     // Description

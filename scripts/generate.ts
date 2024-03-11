@@ -101,7 +101,7 @@ async function makeRootReadme(rootDir: string): Promise<void> {
     '-|-|-',
     ...Object.entries(packages).map(
       ([n, p]) =>
-        `\`@quintal/${n}\`|[![npm version](https://img.shields.io/npm/v/@quintal/${n}.svg?style=flat-square)](https://www.npmjs.com/package/@quintal/${n})|${p.description}`,
+        `[\`@quintal/${n}\`](${githubRoot}/tree/main/packages/${n})|[![npm version](https://img.shields.io/npm/v/@quintal/${n}.svg?style=flat-square)](https://www.npmjs.com/package/@quintal/${n})|${p.description}`,
     ),
     '',
     '## Contributing to the project',

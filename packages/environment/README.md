@@ -1,4 +1,4 @@
-# Environment
+# Quintal Environment
 
 [![NPM version](https://img.shields.io/npm/v/@quintal/environment?style=flat-square)](https://npmjs.com/@quintal/environment)
 [![NPM downloads](https://img.shields.io/npm/dt/@quintal/environment?style=flat-square)](https://npmjs.com/@quintal/environment)

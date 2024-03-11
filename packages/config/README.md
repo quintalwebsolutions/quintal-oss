@@ -1,4 +1,4 @@
-# Config
+# Quintal Config
 
 [![NPM version](https://img.shields.io/npm/v/@quintal/config?style=flat-square)](https://npmjs.com/@quintal/config)
 [![NPM downloads](https://img.shields.io/npm/dt/@quintal/config?style=flat-square)](https://npmjs.com/@quintal/config)

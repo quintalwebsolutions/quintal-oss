@@ -1,4 +1,4 @@
-# Monads
+# Quintal Monads
 
 [![NPM version](https://img.shields.io/npm/v/@quintal/monads?style=flat-square)](https://npmjs.com/@quintal/monads)
 [![NPM downloads](https://img.shields.io/npm/dt/@quintal/monads?style=flat-square)](https://npmjs.com/@quintal/monads)

@@ -2,13 +2,13 @@ import type { Packages } from './scripts';
 
 export const packages: Packages = {
   config: {
-    title: 'Config',
+    title: 'Quintal Config',
     description:
       'The solution to the infamous [Node.JS Config Hell Problem](https://deno.com/blog/node-config-hell)',
     keywords: ['config', 'hell', 'typescript', 'dotfiles'],
   },
   environment: {
-    title: 'Environment',
+    title: 'Quintal Environment',
     description: 'Framework-agnostic environment variable validation for TypeScript',
     keywords: ['environment', 'validation', 'typescript', 'zod'],
   },
@@ -19,7 +19,7 @@ export const packages: Packages = {
     keywords: ['react', 'form', 'hook', 'validation', 'headless', 'typescript'],
   },
   monads: {
-    title: 'Monads',
+    title: 'Quintal Monads',
     description:
       'A collection of monads (Result, Option) for TypeScript, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/).',
     keywords: ['monads', 'monad', 'result', 'option', 'error', 'null'],

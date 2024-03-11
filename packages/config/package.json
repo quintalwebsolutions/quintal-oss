@@ -27,9 +27,10 @@
     "vite.mjs"
   ],
   "scripts": {
-    "clean": "shx rm -rf .config .coverage .coverage-ts .dist .docs .turbo node_modules"
+    "clean": "shx rm -rf .coverage .coverage-ts .dist .turbo node_modules"
   },
   "dependencies": {
+    "@codecov/vite-plugin": "0.0.1-beta.4",
     "@vitejs/plugin-react": "4.2.1",
     "next": "14.1.1",
     "react": "18.2.0",

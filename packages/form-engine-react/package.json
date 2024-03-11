@@ -33,7 +33,7 @@
     "build": "run-s build:*",
     "build:clean": "shx rm -rf .dist",
     "build:code": "vite build",
-    "clean": "shx rm -rf .config .coverage .coverage-ts .dist .docs .turbo node_modules",
+    "clean": "shx rm -rf .coverage .coverage-ts .dist .turbo node_modules",
     "dev": "vitest --watch",
     "lint": "pnpm lint:fix && pnpm lint:types",
     "lint:check": "biome ci .",

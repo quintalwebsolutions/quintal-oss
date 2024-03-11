@@ -57,6 +57,7 @@ yarn add @quintal/monads
 # or
 npm install @quintal/monads
 ```
+
 <!-- END AUTO-GENERATED: Add custom documentation after this comment -->
 
 ## Result

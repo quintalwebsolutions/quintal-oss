@@ -3,6 +3,6 @@
   "compilerOptions": {
     "rootDir": "."
   },
-  "include": ["**/*.ts", "vite.config.mjs"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": [".coverage", ".coverage-ts", ".dist", ".turbo", "node_modules"]
 }

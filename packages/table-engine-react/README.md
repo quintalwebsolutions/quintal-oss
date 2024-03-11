@@ -27,4 +27,5 @@ yarn add @quintal/table-engine-react
 # or
 npm install @quintal/table-engine-react
 ```
+
 <!-- END AUTO-GENERATED: Add custom documentation after this comment -->

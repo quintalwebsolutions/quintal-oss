@@ -1,4 +1,5 @@
 import { resolve } from 'node:path';
+import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
@@ -33,5 +34,13 @@ export default defineConfig({
     },
     environment: 'happy-dom',
   },
-  plugins: [react(), dts({ rollupTypes: true })],
+  plugins: [
+    react(),
+    dts({ rollupTypes: true }),
+    codecovVitePlugin({
+      enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+      bundleName: 'quintal',
+      uploadToken: process.env.CODECOV_TOKEN,
+    }),
+  ],
 });

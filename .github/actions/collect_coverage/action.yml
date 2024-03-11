@@ -14,7 +14,6 @@ runs:
         file: ./packages/config/.coverage/coverage-final.json
         flags: config
         token: ${{ inputs.token }}
-
     - name: Upload @quintal/environment coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
@@ -22,7 +21,6 @@ runs:
         file: ./packages/environment/.coverage/coverage-final.json
         flags: environment
         token: ${{ inputs.token }}
-
     - name: Upload @quintal/form-engine-react coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
@@ -30,7 +28,6 @@ runs:
         file: ./packages/form-engine-react/.coverage/coverage-final.json
         flags: form-engine-react
         token: ${{ inputs.token }}
-
     - name: Upload @quintal/monads coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
@@ -38,7 +35,6 @@ runs:
         file: ./packages/monads/.coverage/coverage-final.json
         flags: monads
         token: ${{ inputs.token }}
-
     - name: Upload @quintal/table-engine-react coverage to Codecov
       uses: codecov/codecov-action@v4
       with:

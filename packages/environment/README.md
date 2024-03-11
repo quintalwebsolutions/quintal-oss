@@ -28,6 +28,7 @@ yarn add @quintal/environment
 # or
 npm install @quintal/environment
 ```
+
 <!-- END AUTO-GENERATED: Add custom documentation after this comment -->
 
 ## Kitchen Sink Example

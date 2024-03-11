@@ -29,6 +29,7 @@ yarn add @quintal/config
 # or
 npm install @quintal/config
 ```
+
 <!-- END AUTO-GENERATED: Add custom documentation after this comment -->
 
 ## Plan

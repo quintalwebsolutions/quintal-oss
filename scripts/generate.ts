@@ -43,13 +43,15 @@ async function writeFile(filePathSegments: string[], content: string[]): Promise
 async function makeLabelerYml(rootDir: string): Promise<void> {
   await writeFile(
     [rootDir, '.github', 'labeler.yml'],
-    Object.keys(packages).map((packageName) =>
-      [
-        `"@quintal/${packageName}":`,
-        '  - changed-files:',
-        `    - any-glob-to-any-file: packages/${packageName}/*`,
-      ].join('\n'),
-    ),
+    Object.keys(packages)
+      .map((packageName) =>
+        [
+          `"@quintal/${packageName}":`,
+          '  - changed-files:',
+          `    - any-glob-to-any-file: packages/${packageName}/*`,
+        ].join('\n'),
+      )
+      .concat(['']),
   );
 }
 
@@ -66,21 +68,23 @@ async function makeCoverageYml(rootDir: string): Promise<void> {
       'runs:',
       '  using: composite',
       '  steps:',
-    ].concat(
-      Object.keys(packages).map((packageName) =>
-        [
-          `- name: Upload @quintal/${packageName} coverage to Codecov`,
-          '  uses: codecov/codecov-action@v4',
-          '  with:',
-          '    fail_ci_if_error: true',
-          `    file: ./packages/${packageName}/.coverage/coverage-final.json`,
-          `    flags: ${packageName}`,
-          '    token: ${{ inputs.token }}',
-        ]
-          .map((line) => ' '.repeat(4) + line)
-          .join('\n'),
-      ),
-    ),
+    ]
+      .concat(
+        Object.keys(packages).map((packageName) =>
+          [
+            `- name: Upload @quintal/${packageName} coverage to Codecov`,
+            '  uses: codecov/codecov-action@v4',
+            '  with:',
+            '    fail_ci_if_error: true',
+            `    file: ./packages/${packageName}/.coverage/coverage-final.json`,
+            `    flags: ${packageName}`,
+            '    token: ${{ inputs.token }}',
+          ]
+            .map((line) => ' '.repeat(4) + line)
+            .join('\n'),
+        ),
+      )
+      .concat(['']),
   );
 }
 
@@ -284,7 +288,7 @@ async function makePackageTsConfig(packageDir: string): Promise<void> {
       '  "compilerOptions": {',
       '    "rootDir": "."',
       '  },',
-      '  "include": ["**/*.ts"],',
+      '  "include": ["**/*.ts", "**/*.tsx"],',
       `  "exclude": [${ignoreDirs.map((d) => `"${d}"`).join(', ')}]`,
       '}',
       '',

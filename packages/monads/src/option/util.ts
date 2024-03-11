@@ -1,4 +1,4 @@
-import { Option } from './option';
+import type { Option } from './option';
 
 export type OptionMatch<T, U> = {
   some: (value: T) => U;

@@ -4,22 +4,25 @@
     "include": ["*"],
     "ignore": [".coverage", ".coverage-ts", ".docs", ".dist"]
   },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "recommended": true
-    }
+  "organizeImports": {
+    "enabled": true
   },
   "formatter": {
     "enabled": true,
     "formatWithErrors": false,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineEnding": "lf",
-    "lineWidth": 100
+    "lineWidth": 100,
+    "lineEnding": "lf"
   },
-  "organizeImports": {
-    "enabled": true
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "all": true,
+      "style": {
+        "useBlockStatements": "off"
+      }
+    }
   },
   "javascript": {
     "parser": {
@@ -35,8 +38,8 @@
       "arrowParentheses": "always",
       "indentStyle": "space",
       "indentWidth": 2,
-      "lineEnding": "lf",
       "lineWidth": 100,
+      "lineEnding": "lf",
       "bracketSameLine": false,
       "bracketSpacing": true
     }

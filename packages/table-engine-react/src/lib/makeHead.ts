@@ -4,15 +4,15 @@ import type {
   Head,
   HeadCell,
   HeadRow,
-  TableBase,
-  StateFromPlugins,
-  OriginalHeadRow,
-  OriginalHeadCell,
   OriginalHead,
+  OriginalHeadCell,
+  OriginalHeadRow,
   PluginArray,
-  Row,
   Plugins,
+  Row,
   SetStateFromPlugins,
+  StateFromPlugins,
+  TableBase,
 } from '../types';
 import { applyPlugins, getEntries } from './util';
 

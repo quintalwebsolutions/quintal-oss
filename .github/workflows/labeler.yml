@@ -3,9 +3,6 @@ name: Pull Request Labeler
 on:
   - pull_request_target
 
-env:
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
 jobs:
   labeler:
     runs-on: ubuntu-latest
@@ -15,7 +12,7 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      - uses: actions/labeler@v4
+      - uses: actions/labeler@v5
         with:
           sync-labels: true
           repo-token: ${{ secrets.GITHUB_TOKEN }}

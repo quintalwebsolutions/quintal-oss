@@ -1,9 +1,9 @@
-import type { ComponentProps } from 'react';
+import type { ComponentProps, JSX } from 'react';
 
 type MaybeDomEvent = (e?: { preventDefault: () => void }) => void;
 
 type FormComponentProps<
-  TNativeKey extends keyof React.JSX.IntrinsicElements,
+  TNativeKey extends keyof JSX.IntrinsicElements,
   TNativeProps extends ComponentProps<TNativeKey>,
   TRawProps,
 > = {

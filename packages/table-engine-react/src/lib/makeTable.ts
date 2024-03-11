@@ -1,13 +1,13 @@
 import type {
-  Table,
   Columns,
   Data,
-  StateFromPlugins,
-  PluginArray,
-  Row,
   PersistentStateFromPlugins,
-  SetStateFromPlugins,
+  PluginArray,
   Plugins,
+  Row,
+  SetStateFromPlugins,
+  StateFromPlugins,
+  Table,
 } from '../types';
 import { makeBody } from './makeBody';
 import { makeHead } from './makeHead';
@@ -24,27 +24,12 @@ export function makeTable<TRow extends Row, TPlugins extends Plugins>(
   let initialState = { ...persistentState };
   for (const plugin of plugins)
     if (plugin.initializeState)
-      initialState = plugin.initializeState(
-        initialState,
-      ) as PersistentStateFromPlugins<TPlugins>;
+      initialState = plugin.initializeState(initialState) as PersistentStateFromPlugins<TPlugins>;
   const state = initialState as StateFromPlugins<TPlugins>;
 
-  const { head, originalHead } = makeHead(
-    id,
-    plugins,
-    state,
-    setState,
-    columns,
-  );
+  const { head, originalHead } = makeHead(id, plugins, state, setState, columns);
 
-  const { body, originalBody } = makeBody(
-    id,
-    plugins,
-    state,
-    setState,
-    columns,
-    data,
-  );
+  const { body, originalBody } = makeBody(id, plugins, state, setState, columns, data);
 
   const table = applyPlugins<TRow, TPlugins>(
     plugins,

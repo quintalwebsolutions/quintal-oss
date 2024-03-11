@@ -1,8 +1,4 @@
-import type {
-  ColumnMapInputFromPlugins,
-  ColumnInputFromPlugins,
-  Plugins,
-} from './plugins';
+import type { ColumnInputFromPlugins, ColumnMapInputFromPlugins, Plugins } from './plugins';
 import type { Row } from './util';
 
 /** User input object for a single column configuration */

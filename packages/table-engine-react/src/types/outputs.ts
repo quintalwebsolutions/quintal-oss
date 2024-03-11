@@ -20,17 +20,13 @@ export type BodyCellBase<TRow extends Row, TValue> = Id & {
   row: TRow;
 } & BodyValue<TValue>;
 
-export type BodyCell<
-  TRow extends Row,
-  TPlugins extends Plugins,
-  TValue,
-> = BodyCellBase<TRow, TValue> & BodyCellOutputFromPlugins<TPlugins>;
-
-export type OriginalBodyCell<TRow extends Row, TValue> = BodyCell<
+export type BodyCell<TRow extends Row, TPlugins extends Plugins, TValue> = BodyCellBase<
   TRow,
-  Plugins,
   TValue
->;
+> &
+  BodyCellOutputFromPlugins<TPlugins>;
+
+export type OriginalBodyCell<TRow extends Row, TValue> = BodyCell<TRow, Plugins, TValue>;
 
 // BodyRow
 export type BodyValues<TRow extends Row> = {
@@ -42,10 +38,7 @@ export type BodyRowBase<TRow extends Row, TPlugins extends Plugins> = Id & {
   cells: BodyCell<TRow, TPlugins, unknown>[];
 };
 
-export type BodyRow<TRow extends Row, TPlugins extends Plugins> = BodyRowBase<
-  TRow,
-  TPlugins
-> &
+export type BodyRow<TRow extends Row, TPlugins extends Plugins> = BodyRowBase<TRow, TPlugins> &
   BodyRowOutputFromPlugins<TPlugins>;
 
 export type OriginalBodyRow<TRow extends Row> = BodyRow<TRow, Plugins>;
@@ -55,10 +48,7 @@ export type BodyBase<TRow extends Row, TPlugins extends Plugins> = Id & {
   rows: BodyRow<TRow, TPlugins>[];
 };
 
-export type Body<TRow extends Row, TPlugins extends Plugins> = BodyBase<
-  TRow,
-  TPlugins
-> &
+export type Body<TRow extends Row, TPlugins extends Plugins> = BodyBase<TRow, TPlugins> &
   BodyOutputFromPlugins<TPlugins>;
 
 export type OriginalBody<TRow extends Row> = Body<TRow, Plugins>;
@@ -69,8 +59,7 @@ export type HeadCellBase = Id & {
   label: string;
 };
 
-export type HeadCell<TPlugins extends Plugins> = HeadCellBase &
-  HeadCellOutputFromPlugins<TPlugins>;
+export type HeadCell<TPlugins extends Plugins> = HeadCellBase & HeadCellOutputFromPlugins<TPlugins>;
 
 export type OriginalHeadCell = HeadCell<Plugins>;
 
@@ -89,8 +78,7 @@ export type HeadBase<TPlugins extends Plugins> = Id & {
   rows: HeadRow<TPlugins>[];
 };
 
-export type Head<TPlugins extends Plugins> = HeadBase<TPlugins> &
-  HeadOutputFromPlugins<TPlugins>;
+export type Head<TPlugins extends Plugins> = HeadBase<TPlugins> & HeadOutputFromPlugins<TPlugins>;
 
 export type OriginalHead = Head<Plugins>;
 
@@ -102,10 +90,7 @@ export type TableBase<TRow extends Row, TPlugins extends Plugins> = Id & {
   originalBody: OriginalBody<TRow>;
 };
 
-export type Table<TRow extends Row, TPlugins extends Plugins> = TableBase<
-  TRow,
-  TPlugins
-> &
+export type Table<TRow extends Row, TPlugins extends Plugins> = TableBase<TRow, TPlugins> &
   TableOutputFromPlugins<TPlugins>;
 
 // TODO Props helpers

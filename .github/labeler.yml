@@ -1,8 +1,19 @@
 "@quintal/config":
-  - packages/config/*
+  - changed-files:
+    - any-glob-to-any-file: packages/config/*
 
-"@quintal/result":
-  - packages/result/*
+"@quintal/environment":
+  - changed-files:
+    - any-glob-to-any-file: packages/environment/*
 
-"@quintal/table-engine":
-  - packages/table-engine/*
+"@quintal/form-engine-react":
+  - changed-files:
+    - any-glob-to-any-file: packages/form-engine-react/*
+
+"@quintal/monads":
+  - changed-files:
+    - any-glob-to-any-file: packages/monads/*
+
+"@quintal/table-engine-react":
+  - changed-files:
+    - any-glob-to-any-file: packages/table-engine-react/*

@@ -18,9 +18,7 @@ export default defineConfig({
       formats,
       fileName: (format) => fileName[format],
     },
-    rollupOptions: {
-      external: ['@quintal/result', '@quintal/option'],
-    },
+    outDir: '.dist',
   },
   test: {
     // TODO
@@ -31,6 +29,7 @@ export default defineConfig({
       provider: 'v8',
       include: ['src/**/*.ts'],
       reportsDirectory: '.coverage',
+      reporter: ['json'],
     },
     environment: 'happy-dom',
   },

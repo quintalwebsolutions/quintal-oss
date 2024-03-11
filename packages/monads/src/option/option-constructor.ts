@@ -1,10 +1,10 @@
 /* c8 ignore start */
 // TODO remove ignore comment when this issue is resolved: https://github.com/vitest-dev/vitest/issues/3605
 
-import { Err, Ok } from '../result';
-import { MaybePromise, Ternary } from '../util';
-import { None, Some } from './option';
-import { AnyOption, OptionMatch } from './util';
+import type { Err, Ok } from '../result';
+import type { MaybePromise, Ternary } from '../util';
+import type { None, Some } from './option';
+import type { AnyOption, OptionMatch } from './util';
 
 // TODO ASYNC variant to share docs?
 type Variant = 'SOME' | 'NONE';

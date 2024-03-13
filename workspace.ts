@@ -35,7 +35,7 @@ export const workspace: Workspace = {
     {
       name: 'bug',
       color: '#d73a4a',
-      description: "Something isn't working as expected",
+      description: 'Something is not working as expected',
     },
     {
       name: 'feature',

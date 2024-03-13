@@ -1,3 +1,8 @@
+<!--
+THIS FILE IS (PARTIALLY) AUTO-GENERATED USING `pnpm generate`.
+TO EDIT THE CONTENT, PLEASE MODIFY `/workspace.ts` OR `/scripts/generate.ts`
+-->
+
 # Quintal React Form Engine
 
 [![NPM version](https://img.shields.io/npm/v/@quintal/form-engine-react?style=flat-square)](https://npmjs.com/@quintal/form-engine-react)

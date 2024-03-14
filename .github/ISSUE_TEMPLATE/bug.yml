@@ -17,7 +17,7 @@ body:
     id: reproduction
     attributes:
       label: Reproduction
-      description: Please provide a [minimal reproduction](https://stackoverflow.com/help/minimal-reproducible-example) of the problem you ran into, either as a code snippet or some form of code sandbox. If other steps are required to reproduce the faulty behaviour, please describe them here aswell.
+      description: Please provide a [minimal reproduction](https://stackoverflow.com/help/minimal-reproducible-example) of the problem you ran into, either as a code snippet or some form of code sandbox. If other steps are required for reproduction, please describe them here aswell.
     validations:
       required: true
   - type: textarea

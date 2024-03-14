@@ -1,5 +1,5 @@
 name: "📚 Documentation"
-description: Suggest improvements or corrections in documentation
+description: "Suggest improvements or corrections in documentation"
 labels: "documentation"
 body:
   - type: markdown
@@ -32,7 +32,7 @@ body:
     id: reproduction
     attributes:
       label: Reproduction
-      description: If you have a reproduction, you may provide it here, either as a code snippet or some form of code sandbox. If other steps are required to reproduce the faulty behaviour, please describe them here aswell.
+      description: If you have a reproduction, you may provide it here, either as a code snippet or some form of code sandbox. If other steps are required for reproduction, please describe them here aswell.
       placeholder: Reproduction (optional)
   - type: checkboxes
     id: checkboxes

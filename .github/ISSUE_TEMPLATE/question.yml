@@ -1,0 +1,25 @@
+name: "❓ Question"
+description: "Some information is requested"
+labels: "question"
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for your interest in the project, we are more than happy to assist if you have a question!
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+  - type: checkboxes
+    id: checkboxes
+    attributes:
+      label: Validations
+      description: Before submitting the issue, please make sure you do the following
+      options:
+        - label: Follow our [Code of Conduct](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CODE_OF_CONDUCT.md)
+          required: true
+        - label: Read the [Contributing Guidelines](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CONTRIBUTING.md).
+          required: true
+        - label: Check that there isn't [already an issue](https://github.com/quintalwebsolutions/quintal-oss/issues) that asks the same question to avoid creating a duplicate.
+          required: true
+        - label: Add labels with the names of the affected package(s) to this issue
+          required: true

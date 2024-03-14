@@ -1,5 +1,5 @@
 name: "❓ Question"
-description: "Some information is requested"
+description: "Ask a question"
 labels: "question"
 body:
   - type: markdown

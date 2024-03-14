@@ -1,5 +1,5 @@
 name: "🚀 Feature request"
-description: "Suggestion for new functionality"
+description: "Request some new functionality"
 labels: "feature"
 body:
   - type: markdown

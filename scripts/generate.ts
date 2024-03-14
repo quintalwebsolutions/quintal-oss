@@ -2,7 +2,15 @@
 import fs from 'node:fs';
 // biome-ignore lint/nursery/noNodejsModules: this script is not run client-side
 import path from 'node:path';
-import { packages } from '../workspace';
+import { workspace } from '../workspace';
+
+export type Label = {
+  name: string;
+  color: `#${string}`;
+  description: string;
+};
+
+export type Labels = Label[];
 
 export type Package = {
   title: string;
@@ -16,6 +24,11 @@ export type Package = {
 };
 
 export type Packages = Record<string, Package>;
+
+export type Workspace = {
+  labels: Labels;
+  packages: Packages;
+};
 
 const repoName = 'quintalwebsolutions/quintal-oss';
 const githubRoot = `https://github.com/${repoName}`;
@@ -36,22 +49,69 @@ async function createDirIfNotExists(dir: string): Promise<boolean> {
   }
 }
 
+function getComment(filePath: string): string[] {
+  const ext = path.extname(filePath);
+  const comment = [
+    'THIS FILE IS (PARTIALLY) AUTO-GENERATED USING `pnpm generate`.',
+    'TO EDIT THE CONTENT, PLEASE MODIFY `/workspace.ts` OR `/scripts/generate.ts`',
+  ];
+
+  switch (ext) {
+    case '.md':
+      return ['<!--', ...comment, '-->', ''];
+    case '.mjs':
+      return ['/**', ...comment.map((c) => ` * ${c}`), ' */', ''];
+    case '.yml': {
+      const length = Math.max(...comment.map((c) => c.length));
+      const border = '#'.repeat(4 + length);
+      return [border, ...comment.map((c) => `# ${c.padEnd(length)} #`), border, ''];
+    }
+    case '.json':
+      return []; // Comments are not allowed in JSON
+    default:
+      throw new Error(`File extension ${ext} not recognised`);
+  }
+}
+
 async function writeFile(filePathSegments: string[], content: string[]): Promise<void> {
-  await fs.promises.writeFile(path.join(...filePathSegments), content.join('\n'));
+  const filePath = path.join(...filePathSegments);
+  const comment = getComment(filePath);
+
+  await fs.promises.writeFile(filePath, comment.concat(content).join('\n'));
 }
 
 async function makeLabelerYml(rootDir: string): Promise<void> {
   await writeFile(
     [rootDir, '.github', 'labeler.yml'],
-    Object.keys(packages)
-      .map((packageName) =>
+    Object.keys(workspace.packages).map((packageName) =>
+      [
+        `"@quintal/${packageName}":`,
+        '  - changed-files:',
+        `    - any-glob-to-any-file: packages/${packageName}/*`,
+        '',
+      ].join('\n'),
+    ),
+  );
+}
+
+async function makeLabelsYml(rootDir: string): Promise<void> {
+  await writeFile(
+    [rootDir, '.github', 'labels.yml'],
+    Object.keys(workspace.packages)
+      .map((n) => ({
+        name: `@quintal/${n}`,
+        color: '#FBCA04',
+        description: `Issues or pull requests related to the @quintal/${n} package`,
+      }))
+      .concat(workspace.labels)
+      .map((label) =>
         [
-          `"@quintal/${packageName}":`,
-          '  - changed-files:',
-          `    - any-glob-to-any-file: packages/${packageName}/*`,
+          `- name: '${label.name}'`,
+          `  color: '${label.color}'`,
+          `  description: '${label.description}'`,
+          '',
         ].join('\n'),
-      )
-      .concat(['']),
+      ),
   );
 }
 
@@ -70,7 +130,7 @@ async function makeCoverageYml(rootDir: string): Promise<void> {
       '  steps:',
     ]
       .concat(
-        Object.keys(packages).map((packageName) =>
+        Object.keys(workspace.packages).map((packageName) =>
           [
             `- name: Upload @quintal/${packageName} coverage to Codecov`,
             '  uses: codecov/codecov-action@v4',
@@ -108,7 +168,7 @@ async function makeRootReadme(rootDir: string): Promise<void> {
       '',
       'name|version|description',
       '-|-|-',
-      ...Object.entries(packages).map(
+      ...Object.entries(workspace.packages).map(
         ([n, p]) =>
           `[\`@quintal/${n}\`](${githubRoot}/tree/main/packages/${n})|[![npm version](${shieldRoot}/npm/v/@quintal/${n}.svg${shieldStyle})](https://www.npmjs.com/package/@quintal/${n})|${p.description}`,
       ),
@@ -119,7 +179,7 @@ async function makeRootReadme(rootDir: string): Promise<void> {
       '',
       '## Support us',
       '',
-      "If you or the company you work at has found value in using one or more of our packages, please consider supporting us through GitHub Sponsors. This way, you're directly empowering us to fulfill our cause of improving developer experience and type-safety in the TypeScript community's day-to-day coding practices!",
+      "If you or the company you work at has found value in using one or more of our packages, please consider [supporting us through GitHub Sponsors](https://github.com/sponsors/quintalwebsolutions). This way, you're directly empowering us to fulfill our cause of improving developer experience and type-safety in the TypeScript community's day-to-day coding practices!",
       '',
     ],
   );
@@ -340,8 +400,9 @@ async function main(): Promise<void> {
   await Promise.all([
     makeRootReadme(rootDir),
     makeLabelerYml(rootDir),
+    makeLabelsYml(rootDir),
     makeCoverageYml(rootDir),
-    ...Object.entries(packages).map(([name, p]) =>
+    ...Object.entries(workspace.packages).map(([name, p]) =>
       makePackage(path.join(rootDir, 'packages', name), name, p),
     ),
   ]);

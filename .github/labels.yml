@@ -1,0 +1,72 @@
+################################################################################
+# THIS FILE IS (PARTIALLY) AUTO-GENERATED USING `pnpm generate`.               #
+# TO EDIT THE CONTENT, PLEASE MODIFY `/workspace.ts` OR `/scripts/generate.ts` #
+################################################################################
+
+- name: '@quintal/config'
+  color: '#FBCA04'
+  description: 'Issues or pull requests related to the @quintal/config package'
+
+- name: '@quintal/environment'
+  color: '#FBCA04'
+  description: 'Issues or pull requests related to the @quintal/environment package'
+
+- name: '@quintal/form-engine-react'
+  color: '#FBCA04'
+  description: 'Issues or pull requests related to the @quintal/form-engine-react package'
+
+- name: '@quintal/monads'
+  color: '#FBCA04'
+  description: 'Issues or pull requests related to the @quintal/monads package'
+
+- name: '@quintal/table-engine-react'
+  color: '#FBCA04'
+  description: 'Issues or pull requests related to the @quintal/table-engine-react package'
+
+- name: 'good first issue'
+  color: '#7057ff'
+  description: 'Thanks for submitting your first issue or pull request'
+
+- name: 'high priority'
+  color: '#e50000'
+  description: 'High priority issue requiring immediate attention'
+
+- name: 'help wanted'
+  color: '#E99600'
+  description: 'Seeking contributions to address this issue'
+
+- name: 'wont fix'
+  color: '#e6e6e6'
+  description: 'This issue or request will not be addressed'
+
+- name: 'duplicate'
+  color: '#cfd3d7'
+  description: 'This issue or pull request already exists'
+
+- name: 'in review'
+  color: '#FFFF00'
+  description: 'Currently being reviewed'
+
+- name: 'bug'
+  color: '#d73a4a'
+  description: 'Something is not working as expected'
+
+- name: 'feature'
+  color: '#0E8A16'
+  description: 'Suggestion for new functionality'
+
+- name: 'fix'
+  color: '#0075ca'
+  description: 'A corrective action for a reported bug'
+
+- name: 'question'
+  color: '#d876e3'
+  description: 'Some information is requested'
+
+- name: 'documentation'
+  color: '#FAD8C7'
+  description: 'Improvements or corrections in documentation'
+
+- name: 'chore'
+  color: '#517FAD'
+  description: 'Code changes that neither fix bugs nor add features'

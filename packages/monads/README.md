@@ -1,3 +1,8 @@
+<!--
+THIS FILE IS (PARTIALLY) AUTO-GENERATED USING `pnpm generate`.
+TO EDIT THE CONTENT, PLEASE MODIFY `/workspace.ts` OR `/scripts/generate.ts`
+-->
+
 # Quintal Monads
 
 [![NPM version](https://img.shields.io/npm/v/@quintal/monads?style=flat-square)](https://npmjs.com/@quintal/monads)

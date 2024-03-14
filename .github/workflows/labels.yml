@@ -1,7 +1,10 @@
 name: Labels
+
 on:
-  - workflow_dispatch
-  - push
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 permissions:
   issues: write
@@ -10,11 +13,13 @@ jobs:
   labels:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
         with:
           sparse-checkout: .github/labels.yml
 
-      - uses: EndBug/label-sync@v2
+      - name: Sync labels
+        uses: EndBug/label-sync@v2
         with:
           config-file: .github/labels.yml
           delete-other-labels: true

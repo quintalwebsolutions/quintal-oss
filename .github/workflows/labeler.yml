@@ -1,18 +1,25 @@
 name: Pull Request Labeler
 
 on:
-  - pull_request_target
+  pull_request_target:
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   labeler:
+    name: Labeler
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
+    timeout-minutes: 5
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      - uses: actions/labeler@v5
+        with:
+          sparse-checkout: .github/labeler.yml
+
+      - name: Run labeler
+        uses: actions/labeler@v5
         with:
           sync-labels: true
           repo-token: ${{ secrets.GITHUB_TOKEN }}

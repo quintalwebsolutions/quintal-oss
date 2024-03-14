@@ -1,8 +1,11 @@
 name: Check
 
 on:
-  - workflow_dispatch
-  - push
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
 
 env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -11,6 +14,7 @@ jobs:
   check:
     name: Check
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -24,7 +28,7 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Collect coverage
+      - name: Collect test coverage
         uses: "./.github/actions/collect_coverage"
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

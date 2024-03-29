@@ -13,15 +13,15 @@ TO EDIT THE CONTENT, PLEASE MODIFY `/workspace.ts` OR `/scripts/generate.ts`
 [![Code coverage](https://img.shields.io/codecov/c/github/quintalwebsolutions/quintal-oss?style=flat-square&token=3ORY9UP6H7&flag=config&logo=codecov)](https://codecov.io/gh/quintalwebsolutions/quintal-oss)
 [![Pull requests welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CONTRIBUTING.md)
 
-The solution to the infamous [Node.JS Config Hell Problem](https://deno.com/blog/node-config-hell)
+Type-safe configuration file management with sensible defaults for your favourite tools.
 
 You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/docs/@quintal/config)
 
 ## Table of Contents
 
 - [Getting Started](#getting-started)
-- [Plan](#plan)
-- [Example](#example)
+- [Rationale](#rationale)
+- [Examples](#examples)
 
 ## Getting Started
 
@@ -37,25 +37,19 @@ npm install @quintal/config
 
 <!-- END AUTO-GENERATED: Add custom documentation after this comment -->
 
-## Plan
+## Rationale
 
-The plan for this package is to be the solution to the infamous
-[Node.JS Config Hell Problem](https://deno.com/blog/node-config-hell). This
-package will be a CLI tool that auto-generates configuration files in a
-`.config` directory at the root of your repository, based on a config.ts file in
-your project root.
+This package poses as a solution to the infamous [Node.JS Config Hell Problem](https://deno.com/blog/node-config-hell). It is a CLI tool that generates configuration files based on a TypeScript declaration. If possible, it puts the generated output in a `.config` directory in order to clean up your root directory. Besides that, we included a bunch of recommended configurations for often-used tools. You will never have to worry about configuration again.
 
-## Example
+## Examples
 
-You can define all your config in the `config.ts` file at the root of your
-project.
+You can define all your config in a `config.ts` file at the root of your project.
 
 ```ts
 // config.ts
 
 import { defineConfig } from '@quintal/config';
-import { prettierRecommendedConfig } from '@quintal/config-prettier';
-import { eslintRecommendedConfig } from '@quintal/config-eslint';
+import { biomeRecommendedConfig } from '@quintal/config-biome';
 import {
   typescriptConfig,
   typescriptRecommendedConfig,
@@ -64,8 +58,7 @@ import {
 export default defineConfig({
   outputDir: '.config',
   configs: [
-    prettierRecommendedConfig,
-    eslintRecommendedConfig,
+    biomeRecommendedConfig,
     typescriptConfig({
       ...typescriptRecommendedConfig,
       noPropertyAccessFromIndexSignature: false,

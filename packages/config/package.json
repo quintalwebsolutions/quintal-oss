@@ -2,8 +2,10 @@
   "name": "@quintal/config",
   "version": "0.2.0",
   "license": "MIT",
-  "description": "The solution to the infamous [Node.JS Config Hell Problem](https://deno.com/blog/node-config-hell)",
+  "description": "Type-safe configuration file management with sensible defaults for your favourite tools.",
   "keywords": [
+    "configuration",
+    "cli",
     "config",
     "hell",
     "typescript",
@@ -21,20 +23,45 @@
   },
   "homepage": "https://github.com/quintalwebsolutions/quintal-oss/tree/main/packages/config#readme",
   "bugs": "https://github.com/quintalwebsolutions/quintal-oss/labels/%40quintal%2Fconfig",
+  "main": "./.dist/index.cjs",
+  "module": "./.dist/index.mjs",
+  "types": "./.dist/index.d.ts",
+  "bin": {
+    "quintal-config": "./.dist/index.cjs"
+  },
   "files": [
-    "tsconfig/**",
-    "nextjs.js",
-    "vite.mjs"
+    ".dist"
   ],
   "scripts": {
-    "clean": "shx rm -rf .coverage .coverage-ts .dist .turbo node_modules"
+    "build": "run-s build:*",
+    "build:clean": "shx rm -rf .dist",
+    "build:code": "vite build && shx chmod +x .dist/index.cjs",
+    "clean": "shx rm -rf .coverage .coverage-ts .dist .turbo node_modules",
+    "dev": "vitest --watch",
+    "lint": "pnpm lint:fix && pnpm lint:types",
+    "lint:check": "biome ci .",
+    "lint:fix": "biome check --apply .",
+    "lint:types": "tsc --noEmit",
+    "test": "run-s test:*",
+    "test:source": "vitest",
+    "test:types": "typescript-coverage-report --outputDir .coverage-ts --strict"
   },
   "dependencies": {
+    "chalk": "<5",
+    "commander": "12.0.0",
+    "esbuild": "0.20.2",
+    "execa": "8.0.1"
+  },
+  "devDependencies": {
     "@codecov/vite-plugin": "0.0.1-beta.4",
+    "@commander-js/extra-typings": "12.0.1",
+    "@types/node": "20.11.24",
     "@vitejs/plugin-react": "4.2.1",
-    "next": "14.1.1",
-    "react": "18.2.0",
+    "@vitest/coverage-v8": "1.3.1",
+    "typescript": "5.3.3",
     "vite": "5.1.4",
-    "vite-plugin-dts": "3.7.3"
+    "vite-plugin-dts": "3.7.3",
+    "vite-plugin-externalize-deps": "0.8.0",
+    "vitest": "1.3.1"
   }
 }

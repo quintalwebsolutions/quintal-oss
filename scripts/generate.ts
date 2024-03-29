@@ -16,6 +16,7 @@ export type Package = {
   title: string;
   description: string;
   keywords: string[];
+  cliName?: string;
   // TODO https://docs.npmjs.com/cli/v10/configuring-npm/package-json#peerdependenciesmeta
   // peerDependencies?: {name: string, version: string, isOptional?: boolean}[];
   features?: { icon: string; text: string }[];
@@ -309,11 +310,12 @@ async function makePackageJson(packageDir: string, name: string, p: Package): Pr
     main: './.dist/index.cjs',
     module: './.dist/index.mjs',
     types: './.dist/index.d.ts',
+    bin: p.cliName ? { [p.cliName]: './.dist/index.cjs' } : undefined,
     files: ['.dist'],
     scripts: {
       build: 'run-s build:*',
       'build:clean': 'shx rm -rf .dist',
-      'build:code': 'vite build',
+      'build:code': `vite build${p.cliName ? ' && shx chmod +x .dist/index.cjs' : ''}`,
       clean: `shx rm -rf ${ignoreDirs.join(' ')}`,
       dev: 'vitest --watch',
       lint: 'pnpm lint:fix && pnpm lint:types',

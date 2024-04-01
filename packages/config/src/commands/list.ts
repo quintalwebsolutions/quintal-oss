@@ -1,22 +1,39 @@
 import chalk from 'chalk';
-import { getConfig, logger } from '../lib';
+import { getDependencies, logger } from '../lib';
+
+function writeName(dependency: Awaited<ReturnType<typeof getDependencies>>[number]): string {
+  if (!dependency.current) return `[none] ${dependency.name}`;
+  return `[${dependency.current.type}] ${dependency.name}@${dependency.current.version}`;
+}
 
 export async function list(): Promise<void> {
   logger.debug('Start command `list`');
 
-  const config = await getConfig();
+  const dependencies = await getDependencies();
 
-  if (!config || config.configs.length === 0) {
-    logger.warn('No configurations found');
-    return;
-  }
+  const dash = chalk.dim('-');
 
-  // TODO group by dev and prod deps, not config name, group shared dependencies and check semver compatibility
-  // TODO report if the deps have been installed and the version requirements suffice
-  for (const c of config.configs) {
-    logger.info(`Config "${c.name}" has dependencies:`);
-    for (const d of c.dependencies) {
-      logger.write(`${chalk.dim('-')} ${chalk.cyan(`[${d.type}]`)} ${d.name}@${d.version}`);
+  for (const d of dependencies) {
+    switch (d.status.type) {
+      case 'satisfied':
+        logger.write(`${dash} ${chalk.greenBright(writeName(d))} is satisfied`);
+        break;
+      case 'unsatisfied':
+        logger.write(
+          `${dash} ${chalk.yellowBright(writeName(d))} is unsatisfied, wanted: ${
+            d.status.wanted.type
+          }@${d.status.wanted.version}`,
+        );
+        break;
+      case 'conflicting':
+        logger.write(
+          `${dash} ${chalk.redBright(writeName(d))} has conflicting version ranges ${
+            d.status.a.version
+          } (from config: '${d.status.a.configName}') and ${d.status.b.version} (from config: '${
+            d.status.b.configName
+          }')`,
+        );
+        break;
     }
   }
 

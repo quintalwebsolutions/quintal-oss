@@ -1,4 +1,3 @@
-// biome-ignore lint/nursery/noNodejsModules: vite config is run in a Node.js context
 import path from 'node:path';
 import { codecovVitePlugin } from '@codecov/vite-plugin';
 import { defineConfig } from 'vite';

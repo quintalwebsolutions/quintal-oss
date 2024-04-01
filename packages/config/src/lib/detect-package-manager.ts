@@ -1,6 +1,4 @@
-// biome-ignore lint/nursery/noNodejsModules: This script is run in a NodeJS context
 import fs from 'node:fs/promises';
-// biome-ignore lint/nursery/noNodejsModules: This script is run in a NodeJS context
 import path from 'node:path';
 import { logger } from './logger';
 

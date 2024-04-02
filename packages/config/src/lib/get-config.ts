@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { $ } from 'execa';
 import type { ConfigOptions } from './define-config';
 import { logger } from './logger';
 
@@ -17,12 +18,12 @@ export async function getConfig(): Promise<ConfigOptions<object> | null> {
   // TODO this assumes that the command was run in the same directory as the package.json
   // TODO allow the location of the config file to be specified through CLI options
   const configFilePath = path.join(process.cwd(), 'config.ts');
-  const outputFilePath = path.join(process.cwd(), `config-${new Date().toISOString()}.js`);
+  const id = new Date().toISOString().replace(/[-:.TZ]/gm, '');
+  const outputFilePath = path.join(process.cwd(), `config-${id}.js`);
 
   // TODO check if there even is a config.ts file before transpiling
 
   logger.debug(`Transpiling config file at ${configFilePath}`);
-  const { $ } = await import('execa');
   const output =
     await $`esbuild ${configFilePath} --bundle --platform=node --target=node20 --outfile=${outputFilePath}`;
 
@@ -32,7 +33,7 @@ export async function getConfig(): Promise<ConfigOptions<object> | null> {
   }
 
   logger.debug(`Loading transpiled config file at ${outputFilePath}`);
-  const configModule = await import(`file://${outputFilePath}`);
+  const configModule = await import(outputFilePath);
 
   logger.debug('Deleting transpiled config file');
   await fs.unlink(outputFilePath);

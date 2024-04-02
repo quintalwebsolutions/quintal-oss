@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { program } from '@commander-js/extra-typings';
+import { program } from 'commander';
+import esMain from 'es-main';
 import { description, version } from '../package.json';
 import { generate, install, list } from './commands';
 
@@ -32,7 +33,9 @@ async function main(): Promise<void> {
   await program.parseAsync(process.argv);
 }
 
-if (require.main === module)
+const meta = import.meta.url ? import.meta : ({ url: 'file:///' } as ImportMeta);
+
+if (esMain(meta))
   main()
     .then()
     .catch((error) => {

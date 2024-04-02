@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { $ } from 'execa';
 import { logger } from './logger';
 
 type PackageManagerName = 'npm' | 'yarn' | 'pnpm' | 'bun';
@@ -16,7 +17,6 @@ async function pathExists(p: string) {
 }
 
 async function isInstalled(packageManagerName: PackageManagerName): Promise<boolean> {
-  const { $ } = await import('execa');
   try {
     const output = await $`${packageManagerName} --version`;
     return /^\d+.\d+.\d+$/.test(output.stdout);

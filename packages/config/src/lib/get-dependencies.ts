@@ -1,11 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import semver from 'semver';
-import type { ConfigObject } from './config';
+import type { ConfigObject, DependencyType } from './config';
 import { getConfig } from './get-config';
 import { logger } from './logger';
-
-type DependencyType = 'dev' | 'prod';
 
 type ConfigDependency = { configName: string; version: string; type: DependencyType };
 
@@ -13,7 +11,7 @@ type HeadlessDependency = Pick<ConfigDependency, 'version' | 'type'>;
 
 type PackageJsonDependencies = Record<string, HeadlessDependency>;
 
-type Dependency = {
+export type DependencyStatus = {
   name: string;
   current: HeadlessDependency | null;
   wanted: ConfigDependency[];
@@ -23,7 +21,7 @@ type Dependency = {
     | { type: 'conflicting'; a: ConfigDependency; b: ConfigDependency };
 };
 
-type MappedDependency = Pick<Dependency, 'current' | 'wanted'>;
+type MappedDependency = Pick<DependencyStatus, 'current' | 'wanted'>;
 
 type DependencyMap = Record<string, MappedDependency>;
 
@@ -79,8 +77,8 @@ function findFirstConflictingSemver(
   return null;
 }
 
-function evaluateDependency(name: string, dep: MappedDependency): Dependency {
-  const dependency: Dependency = { ...dep, name, status: { type: 'satisfied' } };
+function evaluateDependency(name: string, dep: MappedDependency): DependencyStatus {
+  const dependency: DependencyStatus = { ...dep, name, status: { type: 'satisfied' } };
 
   // Check all configs if the dependency version ranges are compatible with each other
   const conflicting = findFirstConflictingSemver(dependency.wanted);
@@ -94,7 +92,7 @@ function evaluateDependency(name: string, dep: MappedDependency): Dependency {
   }
 
   // Check for installed version if its version is compatible with the wanted version
-  // TODO more sophisticated way to find wanted version
+  // TODO better way to find wanted version?
   const wantedVersion = dependency.wanted.map((d) => d.version).join(' || ');
   const wantedType = dependency.wanted.reduce(
     (prev, curr) => ([prev, curr.type].includes('prod') ? 'prod' : 'dev'),
@@ -124,16 +122,16 @@ function evaluateDependency(name: string, dep: MappedDependency): Dependency {
   return dependency;
 }
 
-function evaluateDependencies(dependencyMap: DependencyMap): Dependency[] {
+function evaluateDependencies(dependencyMap: DependencyMap): DependencyStatus[] {
   return Object.entries(dependencyMap)
     .reduce((prev, [name, dependency]) => {
       prev.push(evaluateDependency(name, dependency));
       return prev;
-    }, [] as Dependency[])
+    }, [] as DependencyStatus[])
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export async function getDependencies(): Promise<Dependency[]> {
+export async function getDependencies(): Promise<DependencyStatus[]> {
   logger.debug('Scanning dependencies');
 
   const config = await getConfig();

@@ -1,4 +1,10 @@
-export type Dependency = { type: 'dev' | 'prod'; name: string; version: string };
+export type DependencyType = 'dev' | 'prod';
+
+export type Dependency = {
+  type: DependencyType;
+  name: string;
+  version: string;
+};
 
 export type Dependencies = Dependency[];
 

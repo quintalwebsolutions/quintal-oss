@@ -1,12 +1,12 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { $ } from 'execa';
-import type { ConfigOptions } from './define-config';
 import { logger } from './logger';
+import type { RootConfig } from './root-config';
 
-let cachedConfig: ConfigOptions<object> | null = null;
+let cachedConfig: RootConfig<object> | null = null;
 
-export async function getConfig(): Promise<ConfigOptions<object> | null> {
+export async function getConfig(): Promise<RootConfig<object> | null> {
   logger.debug('Loading config file');
 
   if (cachedConfig) {
@@ -24,6 +24,8 @@ export async function getConfig(): Promise<ConfigOptions<object> | null> {
   // TODO check if there even is a config.ts file before transpiling
 
   logger.debug(`Transpiling config file at ${configFilePath}`);
+
+  // TODO run tsc to type-check config file
   const output =
     await $`esbuild ${configFilePath} --bundle --platform=node --target=node20 --outfile=${outputFilePath}`;
 
@@ -41,7 +43,7 @@ export async function getConfig(): Promise<ConfigOptions<object> | null> {
   // TODO validate config file shape (+ no duplicate configs)
 
   cachedConfig = configModule.default.default;
-  logger.debug('Config file loaded and cached');
+  logger.info(`Loaded config file from ${configFilePath}`);
 
   return cachedConfig;
 }

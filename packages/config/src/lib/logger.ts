@@ -14,14 +14,17 @@ export class Logger {
     return levels.slice(0, levels.indexOf(level) + 1).includes(this.level);
   }
 
-  debug(message: string): void {
+  private log(message: string): void {
     // biome-ignore lint/suspicious/noConsoleLog: we allow console.log in this setting
-    if (this.shouldLog('debug')) console.log(chalk.dim(message));
+    console.log(message);
+  }
+
+  debug(message: string): void {
+    if (this.shouldLog('debug')) this.log(chalk.dim(message));
   }
 
   info(message: string): void {
-    // biome-ignore lint/suspicious/noConsoleLog: we allow console.log in this setting
-    if (this.shouldLog('info')) console.log(chalk.cyan(message));
+    if (this.shouldLog('info')) this.log(chalk.cyan(message));
   }
 
   warn(message: string): void {
@@ -32,24 +35,15 @@ export class Logger {
     if (this.shouldLog('error')) console.error(chalk.bold.red(message));
   }
 
+  fatal(message: string): void {
+    this.error(message);
+    process.exit(1);
+  }
+
   write(message: string): void {
-    // biome-ignore lint/suspicious/noConsoleLog: we allow console.log in this setting
-    console.log(message);
+    this.log(message);
   }
 }
 
 // TODO init with appropriate level
 export const logger = new Logger('debug');
-
-// const die = (errorOrMessage, instructions) => {
-//   if (errorOrMessage instanceof Error) {
-//     error(errorOrMessage.message);
-//     info(errorOrMessage.stack);
-//   } else {
-//     error(errorOrMessage);
-//     if (instructions) {
-//       info(instructions);
-//     }
-//   }
-//   process.exit(1);
-// };

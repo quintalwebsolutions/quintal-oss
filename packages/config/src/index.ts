@@ -4,9 +4,17 @@ import { program } from 'commander';
 import esMain from 'es-main';
 import { description, version } from '../package.json';
 import { generate, install, list } from './commands';
+import { logger } from './lib';
 
 export * from './lib';
 export * from './configs';
+
+async function command(name: string, action: () => Promise<void>): Promise<void> {
+  logger.info(`quintal-config v${version}`);
+  logger.debug(`Start command '${name}'`);
+  await action();
+  logger.debug(`End command '${name}'`);
+}
 
 program
   .name('quintal-config')
@@ -17,17 +25,17 @@ program
 program
   .command('install')
   .description('install packages required to use the specified configuration')
-  .action(() => install());
+  .action(() => command('install', install));
 
 program
   .command('generate')
   .description('generate configuration files')
-  .action(() => generate());
+  .action(() => command('generate', generate));
 
 program
   .command('list')
   .description('list the configurations and which dependencies are associated with them')
-  .action(() => list());
+  .action(() => command('list', list));
 
 async function main(): Promise<void> {
   await program.parseAsync(process.argv);

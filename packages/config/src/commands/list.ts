@@ -7,8 +7,6 @@ function writeName(dependency: Awaited<ReturnType<typeof getDependencies>>[numbe
 }
 
 export async function list(): Promise<void> {
-  logger.debug('Start command `list`');
-
   const dependencies = await getDependencies();
 
   const dash = chalk.dim('-');
@@ -20,7 +18,7 @@ export async function list(): Promise<void> {
         break;
       case 'unsatisfied':
         logger.write(
-          `${dash} ${chalk.yellowBright(writeName(d))} is unsatisfied, wanted: ${
+          `${dash} ${chalk.yellowBright(writeName(d))} is not satisfied, wanted: ${
             d.status.wanted.type
           }@${d.status.wanted.version}`,
         );
@@ -36,6 +34,4 @@ export async function list(): Promise<void> {
         break;
     }
   }
-
-  logger.debug('End command `list`');
 }

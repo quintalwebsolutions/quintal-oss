@@ -1,6 +1,6 @@
-import { defineConfig, typescriptConfig, typescriptNextjsPreset } from './src';
+import { defineRootConfig, typescriptConfig, typescriptNextjsPreset } from './src';
 
-export default defineConfig({
+export default defineRootConfig({
   configs: [
     typescriptConfig(typescriptNextjsPreset),
     {

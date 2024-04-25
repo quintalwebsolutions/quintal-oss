@@ -3,9 +3,9 @@ import path from 'node:path';
 import { $ } from 'execa';
 import { logger } from './logger';
 
-type PackageManagerName = 'npm' | 'yarn' | 'pnpm' | 'bun';
+export type PackageManagerName = 'npm' | 'yarn' | 'pnpm' | 'bun';
 
-type PackageManager = { lockFile: string; name: PackageManagerName };
+type PackageManager = { name: PackageManagerName; lockFile: string };
 
 async function pathExists(p: string) {
   try {
@@ -16,7 +16,7 @@ async function pathExists(p: string) {
   }
 }
 
-async function isInstalled(packageManagerName: PackageManagerName): Promise<boolean> {
+async function packageManagerIsInstalled(packageManagerName: PackageManagerName): Promise<boolean> {
   try {
     const output = await $`${packageManagerName} --version`;
     return /^\d+.\d+.\d+$/.test(output.stdout);
@@ -50,7 +50,7 @@ async function scanPackageManager(): Promise<PackageManagerName | null> {
   }
 
   logger.debug('No lockfile found, trying global installations');
-  return await getByPredicate((pm) => isInstalled(pm.name));
+  return await getByPredicate((pm) => packageManagerIsInstalled(pm.name));
 }
 
 export async function detectPackageManager() {

@@ -325,4 +325,15 @@ export type ResultConstructor<T, V extends Variant> = {
    * }); // 'Some error handling'
    */
   match: <U>(m: ResultMatch<Value<T, V>, Error<T, V>, U>) => U;
+  /**
+   * Serialize the result into an object literal that can be passed over the network
+   *
+   * @example
+   * ok('value').serialize() // { isOk: true, isErr: false, value: 'value' }
+   * err('error').serialize() // { isOk: false, isErr: true, error: 'error' }
+   */
+  serialize: () => {
+    isOk: Eval<V, true, false>;
+    isErr: Eval<V, false, true>;
+  } & Eval<V, { value: Value<T, V> }, { error: Error<T, V> }>;
 };

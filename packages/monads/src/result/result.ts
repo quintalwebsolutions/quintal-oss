@@ -132,6 +132,14 @@ export class Ok<T> implements ResultConstructor<T, 'OK'> {
   match<U>(m: ResultMatch<T, never, U>): U {
     return m.ok(this.value);
   }
+
+  serialize(): { isOk: true; isErr: false; value: T } {
+    return {
+      isOk: this.isOk,
+      isErr: this.isErr,
+      value: this.value,
+    };
+  }
 }
 
 export class Err<E> implements ResultConstructor<E, 'ERR'> {
@@ -248,6 +256,14 @@ export class Err<E> implements ResultConstructor<E, 'ERR'> {
 
   match<U>(m: ResultMatch<never, E, U>): U {
     return m.err(this.error);
+  }
+
+  serialize(): { isOk: false; isErr: true; error: E } {
+    return {
+      isOk: this.isOk,
+      isErr: this.isErr,
+      error: this.error,
+    };
   }
 }
 

@@ -1,14 +1,14 @@
 export { type AnyResult, isAnyResult } from './util';
 export {
   type Result,
-  type Ok,
-  type Err,
+  Ok,
+  Err,
   result,
   ok,
   err,
 } from './result';
 export {
-  type AsyncResult,
+  AsyncResult,
   type AsyncOk,
   type AsyncErr,
   asyncResult,

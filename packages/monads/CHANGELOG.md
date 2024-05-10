@@ -1,5 +1,11 @@
 # @quintal/monads
 
+## 0.2.0
+
+### Minor Changes
+
+- 963217e: Add serialize function for passing a result over the network
+
 ## 0.1.0
 
 ### Minor Changes

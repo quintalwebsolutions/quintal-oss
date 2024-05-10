@@ -258,7 +258,7 @@ export class Err<E> implements ResultConstructor<E, 'ERR'> {
     return m.err(this.error);
   }
 
-  serialize(): { isOk: false; isErr: true } & { error: E } {
+  serialize(): { isOk: false; isErr: true; error: E } {
     return {
       isOk: this.isOk,
       isErr: this.isErr,

@@ -151,6 +151,23 @@ export class AsyncResult<R extends AnyResult> {
   match<U>(m: ResultMatch<Value<R>, Error<R>, U>): Promise<U> {
     return this.then((res) => res.match(m));
   }
+
+  serialize(): Promise<
+    IsOk<
+      R,
+      { isOk: true; isErr: false; value: Value<R> },
+      { isOk: false; isErr: true; error: Error<R> }
+    >
+  > {
+    return this.then(
+      (res) =>
+        res.serialize() as IsOk<
+          R,
+          { isOk: true; isErr: false; value: Value<R> },
+          { isOk: false; isErr: true; error: Error<R> }
+        >,
+    );
+  }
 }
 
 export type AsyncOk<T> = AsyncResult<Ok<T>>;

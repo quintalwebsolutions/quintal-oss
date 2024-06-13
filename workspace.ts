@@ -67,8 +67,9 @@ export const workspace: Workspace = {
     config: {
       title: 'Quintal Config',
       description:
-        'The solution to the infamous [Node.JS Config Hell Problem](https://deno.com/blog/node-config-hell)',
-      keywords: ['config', 'hell', 'typescript', 'dotfiles'],
+        'Type-safe configuration file management with sensible defaults for your favourite tools.',
+      keywords: ['configuration', 'cli', 'config', 'hell', 'typescript', 'dotfiles'],
+      cliName: 'quintal-config',
     },
     environment: {
       title: 'Quintal Environment',

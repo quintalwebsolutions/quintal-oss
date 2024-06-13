@@ -21,6 +21,9 @@
       "all": true,
       "style": {
         "useBlockStatements": "off"
+      },
+      "nursery": {
+        "noNodejsModules": "off"
       }
     }
   },

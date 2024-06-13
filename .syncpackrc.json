@@ -33,6 +33,7 @@
     "main",
     "module",
     "types",
+    "bin",
     "files",
     "scripts",
     "engines",

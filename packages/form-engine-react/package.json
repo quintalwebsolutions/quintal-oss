@@ -3,14 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "description": "A headless, declarative, lightweight form engine for React apps with first-class TypeScript support.",
-  "keywords": [
-    "react",
-    "form",
-    "hook",
-    "validation",
-    "headless",
-    "typescript"
-  ],
+  "keywords": ["react", "form", "hook", "validation", "headless", "typescript"],
   "author": {
     "name": "William Ford",
     "email": "william@quintalwebsolutions.com",
@@ -26,9 +19,7 @@
   "main": "./.dist/index.cjs",
   "module": "./.dist/index.mjs",
   "types": "./.dist/index.d.ts",
-  "files": [
-    ".dist"
-  ],
+  "files": [".dist"],
   "scripts": {
     "build": "run-s build:*",
     "build:clean": "shx rm -rf .dist",
@@ -45,6 +36,9 @@
   },
   "peerDependencies": {
     "react": "^18.2.0"
+  },
+  "dependencies": {
+    "@quintal/use-async-reducer": "workspace:*"
   },
   "devDependencies": {
     "@quintal/config": "workspace:*",

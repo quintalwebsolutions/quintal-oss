@@ -3,13 +3,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "description": "A headless, declarative, lightweight, type-safe table engine for React apps.",
-  "keywords": [
-    "react",
-    "table",
-    "hook",
-    "headless",
-    "typescript"
-  ],
+  "keywords": ["react", "table", "hook", "headless", "typescript"],
   "author": {
     "name": "William Ford",
     "email": "william@quintalwebsolutions.com",
@@ -25,9 +19,7 @@
   "main": "./.dist/index.cjs",
   "module": "./.dist/index.mjs",
   "types": "./.dist/index.d.ts",
-  "files": [
-    ".dist"
-  ],
+  "files": [".dist"],
   "scripts": {
     "build": "run-s build:*",
     "build:clean": "shx rm -rf .dist",

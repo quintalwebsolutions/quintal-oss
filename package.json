@@ -5,7 +5,7 @@
     "clean": "turbo run clean && shx rm -rf .turbo node_modules",
     "dev": "turbo run dev",
     "generate": "ts-node ./scripts/generate.ts",
-    "lint": "turbo run lint",
+    "lint": "pnpm sync && turbo run lint",
     "lint:check": "syncpack lint && turbo run lint:check",
     "sync": "syncpack fix-mismatches && syncpack format",
     "test": "turbo run test"

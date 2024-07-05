@@ -19,6 +19,12 @@ export type Value<TInternal, TValueArgs extends ValueArgs = Record<never, unknow
   __empty__: 'empty' extends keyof TValueArgs ? TValueArgs['empty'] : null;
 };
 
+export type AnyValue = {
+  __internal__: unknown;
+  __serialized__: unknown;
+  __empty__: unknown;
+};
+
 type ValueFlag = 'serialized' | 'optional';
 export type UnwrapValue<T, TValueFlag extends ValueFlag = never> = T extends Value<
   infer TValue,

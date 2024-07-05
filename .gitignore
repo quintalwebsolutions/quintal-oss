@@ -5,8 +5,8 @@ node_modules
 .coverage
 .coverage-ts
 
-# Build output
-dist
+# Generated output
+.dist
 
 # Logs
 *.log*

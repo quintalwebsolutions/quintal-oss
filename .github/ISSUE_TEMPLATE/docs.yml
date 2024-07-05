@@ -1,0 +1,50 @@
+name: "📚 Documentation"
+description: "Suggest improvements or corrections in documentation"
+labels: "documentation"
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to fill out this issue!
+  - type: checkboxes
+    id: documentation-is
+    attributes:
+      label: Documentation is
+      options:
+        - label: Missing
+        - label: Outdated
+        - label: Confusing
+        - label: Not sure?
+  - type: textarea
+    id: description
+    attributes:
+      label: Explain in detail
+      description: A clear and concise description of the issue. If you intend to submit a PR, tell us in the description. Thanks!
+      placeholder: The description of ... is not clear. I thought it meant ... but ...
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Your suggested changes
+    validations:
+      required: true
+  - type: input
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: If you have a reproduction, you may provide it here, either as a code snippet or some form of code sandbox. If other steps are required for reproduction, please describe them here aswell.
+      placeholder: Reproduction (optional)
+  - type: checkboxes
+    id: checkboxes
+    attributes:
+      label: Validations
+      description: Before submitting the issue, please make sure you do the following
+      options:
+        - label: Follow our [Code of Conduct](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CODE_OF_CONDUCT.md).
+          required: true
+        - label: Read the [Contributing Guidelines](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CONTRIBUTING.md).
+          required: true
+        - label: Check that there isn't [already an issue](https://github.com/quintalwebsolutions/quintal-oss/issues) that reports the same problem to avoid creating a duplicate.
+          required: true
+        - label: Add labels with the names of the affected package(s) to this issue.
+          required: true

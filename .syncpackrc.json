@@ -4,22 +4,32 @@
   "dependencyTypes": ["dev", "prod"],
   "filter": ".",
   "indent": "  ",
-  "semverGroups": [],
+  "semverGroups": [
+    {
+      "range": "",
+      "dependencies": ["**"],
+      "packages": ["**"]
+    }
+  ],
   "semverRange": "",
   "sortAz": [
     "contributors",
+    "peerDependencies",
     "dependencies",
     "devDependencies",
-    "keywords",
-    "peerDependencies",
     "resolutions",
     "scripts"
   ],
   "sortFirst": [
     "name",
-    "description",
     "version",
+    "license",
+    "description",
+    "keywords",
     "author",
+    "repository",
+    "homepage",
+    "bugs",
     "main",
     "module",
     "types",

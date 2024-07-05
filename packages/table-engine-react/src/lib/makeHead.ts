@@ -4,15 +4,16 @@ import type {
   Head,
   HeadCell,
   HeadRow,
-  TableBase,
-  StateFromPlugins,
-  OriginalHeadRow,
-  OriginalHeadCell,
   OriginalHead,
+  OriginalHeadCell,
+  OriginalHeadRow,
   PluginArray,
-  Row,
   Plugins,
- SetStateFromPlugins } from '../types';
+  Row,
+  SetStateFromPlugins,
+  StateFromPlugins,
+  TableBase,
+} from '../types';
 import { applyPlugins, getEntries } from './util';
 
 export function makeHead<TRow extends Row, TPlugins extends Plugins>(

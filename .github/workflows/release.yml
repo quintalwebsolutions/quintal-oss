@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -12,6 +13,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -27,11 +29,13 @@ jobs:
 
       - name: Collect test coverage
         uses: "./.github/actions/collect_coverage"
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Build
         run: pnpm build
 
-      - name: Create Release Pull Request or Publish to npm
+      - name: Create release pull request or publish to npm
         id: changesets
         uses: changesets/action@v1
         with:

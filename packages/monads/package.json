@@ -1,0 +1,56 @@
+{
+  "name": "@quintal/monads",
+  "version": "0.2.0",
+  "license": "MIT",
+  "description": "A collection of monads (Result, Option) for TypeScript, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/).",
+  "keywords": [
+    "monads",
+    "monad",
+    "result",
+    "option",
+    "error",
+    "null"
+  ],
+  "author": {
+    "name": "William Ford",
+    "email": "william@quintalwebsolutions.com",
+    "url": "https://quintalwebsolutions.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quintalwebsolutions/quintal-oss.git",
+    "directory": "packages/monads"
+  },
+  "homepage": "https://github.com/quintalwebsolutions/quintal-oss/tree/main/packages/monads#readme",
+  "bugs": "https://github.com/quintalwebsolutions/quintal-oss/labels/%40quintal%2Fmonads",
+  "main": "./.dist/index.cjs",
+  "module": "./.dist/index.mjs",
+  "types": "./.dist/index.d.ts",
+  "files": [
+    ".dist"
+  ],
+  "scripts": {
+    "build": "run-s build:*",
+    "build:clean": "shx rm -rf .dist",
+    "build:code": "vite build",
+    "clean": "shx rm -rf .coverage .coverage-ts .dist .turbo node_modules",
+    "dev": "vitest --watch",
+    "lint": "pnpm lint:fix && pnpm lint:types",
+    "lint:check": "biome ci .",
+    "lint:fix": "biome check --apply .",
+    "lint:types": "tsc --noEmit",
+    "test": "run-s test:*",
+    "test:source": "vitest",
+    "test:types": "typescript-coverage-report --outputDir .coverage-ts --strict"
+  },
+  "devDependencies": {
+    "@quintal/config": "workspace:*",
+    "@types/node": "20.11.24",
+    "@vitest/coverage-v8": "1.3.1",
+    "happy-dom": "13.6.2",
+    "typescript": "5.3.3",
+    "typescript-coverage-report": "1.0.0",
+    "vite": "5.1.4",
+    "vitest": "1.3.1"
+  }
+}

@@ -1,4 +1,4 @@
-import type { PluginObject, TransformFn, Plugins, Row } from '../types';
+import type { PluginObject, Plugins, Row, TransformFn } from '../types';
 
 export function serializeValue<TRow extends Row>(
   value: TRow[keyof TRow],
@@ -6,27 +6,19 @@ export function serializeValue<TRow extends Row>(
   serializeFunction?: (value: TRow[keyof TRow], row: TRow) => string,
 ): string {
   if (serializeFunction) return serializeFunction(value, row);
-  if (typeof value === 'object')
-    return value === null ? '' : JSON.stringify(value);
+  if (typeof value === 'object') return value === null ? '' : JSON.stringify(value);
   if (typeof value === 'undefined') return '';
   return String(value);
 }
 
-export function getEntries<TObj extends object, K extends keyof TObj>(
-  obj: TObj,
-): [K, TObj[K]][] {
+export function getEntries<TObj extends object, K extends keyof TObj>(obj: TObj): [K, TObj[K]][] {
   // TODO look into this typing
   // @ts-expect-error This should pass by definition.
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- Typing is hard
   return Object.entries(obj);
 }
 
 type TransformKeys<T> = keyof {
-  [K in keyof T as K extends string
-    ? K extends `transform${string}`
-      ? K
-      : never
-    : never]: T[K];
+  [K in keyof T as K extends string ? (K extends `transform${string}` ? K : never) : never]: T[K];
 };
 
 export function applyPlugins<
@@ -36,11 +28,7 @@ export function applyPlugins<
   TKey extends TransformKeys<TObject> = TransformKeys<TObject>,
   // @ts-expect-error idk why this errors lol it works in practice
   TFn extends TransformFn<TPlugins> = NonNullable<TObject[TKey]>,
->(
-  plugins: TObject[],
-  pluginFnName: TKey,
-  ...args: Parameters<TFn>
-): ReturnType<TFn> {
+>(plugins: TObject[], pluginFnName: TKey, ...args: Parameters<TFn>): ReturnType<TFn> {
   const [obj, state, setState, meta] = args;
   let result: unknown;
   // TODO deep clone?

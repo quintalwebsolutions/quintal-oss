@@ -1,9 +1,4 @@
-import type {
-  ComponentProps,
-  FormEventHandler,
-  JSXElementConstructor,
-  ReactNode,
-} from 'react';
+import type { ComponentProps, JSX } from 'react';
 
 type ToggleAutoComplete = 'off' | 'on';
 
@@ -15,6 +10,13 @@ type NameAutoComplete =
   | 'family-name'
   | 'honorific-suffix'
   | 'nickname';
+type FormComponentProps<
+  TNativeKey extends keyof JSX.IntrinsicElements,
+  TNativeProps extends ComponentProps<TNativeKey>,
+  TRawProps,
+> = {
+  register: TNativeProps;
+} & TRawProps;
 
 type AuthenticationAutoComplete =
   | 'email'
@@ -69,13 +71,7 @@ type PhoneAutoComplete =
   | 'tel-local'
   | 'tel-extension';
 
-type MiscAutoComplete =
-  | 'language'
-  | 'sex'
-  | 'impp'
-  | 'url'
-  | 'photo'
-  | 'webauthn';
+type MiscAutoComplete = 'language' | 'sex' | 'impp' | 'url' | 'photo' | 'webauthn';
 
 // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete
 export type AutoComplete =

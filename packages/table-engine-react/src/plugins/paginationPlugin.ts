@@ -1,10 +1,4 @@
-import type {
-  DefinePluginArgs,
-  GlobalInputFromPlugins,
-  Plugin,
-  PluginObject,
-  Row,
-} from '../types';
+import type { DefinePluginArgs, GlobalInputFromPlugins, Plugin, PluginObject, Row } from '../types';
 
 const defaultInitialPageSize = 10;
 
@@ -51,9 +45,7 @@ export type PaginationPluginArgs<TRow extends Row> = DefinePluginArgs<
   }
 >;
 
-export type PaginationPlugin<TRow extends Row> = Plugin<
-  PaginationPluginArgs<TRow>
->;
+export type PaginationPlugin<TRow extends Row> = Plugin<PaginationPluginArgs<TRow>>;
 
 export function paginationPlugin<TRow extends Row>(
   options: GlobalInputFromPlugins<PaginationPluginArgs<TRow>>,
@@ -61,25 +53,19 @@ export function paginationPlugin<TRow extends Row>(
   return {
     initializeState: (persistentState) => ({
       page: persistentState.page ?? 0,
-      pageSize:
-        persistentState.pageSize ??
-        options.initialPageSize ??
-        defaultInitialPageSize,
+      pageSize: persistentState.pageSize ?? options.initialPageSize ?? defaultInitialPageSize,
     }),
     transformTable: (table, state, setState) => {
       const { page, pageSize } = state;
       const dataLength = table.originalBody.rows.length;
-      const pageAmount =
-        dataLength === 0 ? 1 : Math.ceil(dataLength / pageSize);
+      const pageAmount = dataLength === 0 ? 1 : Math.ceil(dataLength / pageSize);
 
       const setPage = (newPage: number): void => {
         if (newPage < 0 || newPage >= pageAmount)
           throw new Error(
-            `Cannot set page to ${newPage}, should be in between 0 and ${
-              pageAmount - 1
-            }`,
+            `Cannot set page to ${newPage}, should be in between 0 and ${pageAmount - 1}`,
           );
-        else setState({ page: newPage, pageSize });
+        setState({ page: newPage, pageSize });
       };
 
       const setPageSize = (newPageSize: number): void => {

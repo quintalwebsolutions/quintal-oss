@@ -1,9 +1,10 @@
-/** @type {import('next').NextConfig} */
-module.exports = {
+// @ts-check
+
+/**
+ * @type {import('next').NextConfig}
+ */
+const nextConfig = {
   reactStrictMode: true,
-  eslint: {
-    dirs: ['src'],
-  },
   images: {
     remotePatterns: [
       {
@@ -16,7 +17,6 @@ module.exports = {
       },
     ],
   },
-  experimental: {
-    typedRoutes: true,
-  },
 };
+
+module.exports = nextConfig;

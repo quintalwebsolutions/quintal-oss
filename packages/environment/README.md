@@ -43,7 +43,6 @@ export const environment = createEnvironment({
   values: {
     environment: {
       value: process.env.NEXT_PUBLIC_ENVIRONMENT,
-      description: 'Self-provided environment indicator',
       schema: z
         .enum(['DEVELOPMENT', 'PREVIEW', 'PRODUCTION'])
         .default('DEVELOPMENT'),

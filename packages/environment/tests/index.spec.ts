@@ -16,8 +16,9 @@ describe('environment', () => {
             schema: z.coerce.number().int().default(4000),
             isServerOnly: true,
           },
+          simpleStringValue: process.env.SIMPLE_STRING_VALUE,
           isFeatureEnabled: {
-            value: process.env.NEXT_PUBLIC_IS_FEATURE_ENABLED,
+            value: process.env.IS_FEATURE_ENABLED,
             schema: z.enum(['true', 'false']).transform((s) => s === 'true'),
           },
           baseUrl: {
@@ -47,6 +48,7 @@ describe('environment', () => {
       expectTypeOf(environment).toEqualTypeOf<{
         environment: 'DEVELOPMENT' | 'PREVIEW' | 'PRODUCTION';
         port: number;
+        simpleStringValue: string;
         isFeatureEnabled: boolean;
         baseUrl: {
           self: string;
@@ -125,7 +127,7 @@ describe('environment', () => {
   it('parses (nested) environment variables to be in the correct datatype', () => {
     const environment = createEnvironment({
       values: {
-        string: { value: 'hello world', schema: z.string() },
+        string: 'hello world',
         number: { value: '42', schema: z.coerce.number().int() },
         boolean: {
           value: 'true',

@@ -11,36 +11,40 @@ const fileName = {
 
 const formats = Object.keys(fileName);
 
-export default defineConfig({
-  build: {
-    lib: {
-      entry: resolve(process.cwd(), 'src', 'index.ts'),
-      name: '@quintal/result',
-      formats,
-      fileName: (format) => fileName[format],
+export default function getViteConfig(bundleName) {
+  return defineConfig({
+    build: {
+      lib: {
+        entry: resolve(process.cwd(), 'src', 'index.ts'),
+        name: bundleName,
+        formats,
+        fileName: (format) => fileName[format],
+      },
+      outDir: '.dist',
     },
-    outDir: '.dist',
-  },
-  test: {
-    // TODO
-    // benchmark
-    watch: false,
-    coverage: {
-      enabled: true,
-      provider: 'v8',
-      include: ['src/**/*.ts'],
-      reportsDirectory: '.coverage',
-      reporter: ['json', 'text'],
+    test: {
+      // TODO
+      // benchmark
+      watch: false,
+      reporters: process.env.CI ? ['junit'] : ['default'],
+      outputFile: 'junit.xml',
+      coverage: {
+        enabled: true,
+        provider: 'v8',
+        include: ['src/**/*.ts'],
+        reportsDirectory: '.coverage',
+        reporter: ['json', 'text'],
+      },
+      environment: 'happy-dom',
     },
-    environment: 'happy-dom',
-  },
-  plugins: [
-    react(),
-    dts({ rollupTypes: true }),
-    codecovVitePlugin({
-      enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
-      bundleName: 'quintal',
-      uploadToken: process.env.CODECOV_TOKEN,
-    }),
-  ],
-});
+    plugins: [
+      react(),
+      dts({ rollupTypes: true }),
+      codecovVitePlugin({
+        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        bundleName,
+        uploadToken: process.env.CODECOV_TOKEN,
+      }),
+    ],
+  });
+}

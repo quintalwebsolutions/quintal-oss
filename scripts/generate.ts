@@ -1,6 +1,4 @@
-// biome-ignore lint/nursery/noNodejsModules: this script is not run client-side
 import fs from 'node:fs';
-// biome-ignore lint/nursery/noNodejsModules: this script is not run client-side
 import path from 'node:path';
 import { workspace } from '../workspace';
 
@@ -115,11 +113,12 @@ async function makeLabelsYml(rootDir: string): Promise<void> {
   );
 }
 
-async function makeCoverageYml(rootDir: string): Promise<void> {
+async function makeCollectTestAnalyticsYml(rootDir: string): Promise<void> {
   await writeFile(
-    [rootDir, '.github', 'actions', 'collect_coverage', 'action.yml'],
+    [rootDir, '.github', 'actions', 'collect_test_analytics', 'action.yml'],
     [
-      'name: Collect coverage from all packages',
+      'name: Collect Test Analytics',
+      'description: Collect test analytics from all packages and upload to Codecov',
       '',
       'inputs:',
       '  token:',
@@ -133,10 +132,18 @@ async function makeCoverageYml(rootDir: string): Promise<void> {
         Object.keys(workspace.packages).map((packageName) =>
           [
             `- name: Upload @quintal/${packageName} coverage to Codecov`,
+            '  if: ${{ !cancelled() }}',
             '  uses: codecov/codecov-action@v4',
             '  with:',
             '    fail_ci_if_error: true',
             `    file: ./packages/${packageName}/.coverage/coverage-final.json`,
+            `    flags: ${packageName}`,
+            '    token: ${{ inputs.token }}',
+            `- name: Upload @quintal/${packageName} analytics to Codecov`,
+            '  if: ${{ !cancelled() }}',
+            '  uses: codecov/test-results-action@v1',
+            '  with:',
+            '    fail_ci_if_error: true',
             `    flags: ${packageName}`,
             '    token: ${{ inputs.token }}',
           ]
@@ -332,10 +339,15 @@ async function makePackageJson(packageDir: string, name: string, p: Package): Pr
   await writeFile([filePath], [`${JSON.stringify(content, null, 2)}\n`]);
 }
 
-async function makePackageViteConfig(packageDir: string): Promise<void> {
+async function makePackageViteConfig(packageName: string, packageDir: string): Promise<void> {
   await writeFile(
     [packageDir, 'vite.config.mjs'],
-    ["import recommended from '@quintal/config/vite';", '', 'export default recommended;', ''],
+    [
+      "import getRecommended from '@quintal/config/vite';",
+      '',
+      `export default getRecommended(\'${packageName}\');`,
+      '',
+    ],
   );
 }
 
@@ -361,7 +373,7 @@ async function makePackage(packageDir: string, name: string, p: Package): Promis
 
   await makePackageJson(packageDir, name, p);
   await makePackageReadme(packageDir, name, p);
-  await makePackageViteConfig(packageDir);
+  await makePackageViteConfig(`@quintal/${name}`, packageDir);
   await makePackageTsConfig(packageDir);
 
   if (dirExists) return;
@@ -401,7 +413,7 @@ async function main(): Promise<void> {
     makeRootReadme(rootDir),
     makeLabelerYml(rootDir),
     makeLabelsYml(rootDir),
-    makeCoverageYml(rootDir),
+    makeCollectTestAnalyticsYml(rootDir),
     ...Object.entries(workspace.packages).map(([name, p]) =>
       makePackage(path.join(rootDir, 'packages', name), name, p),
     ),

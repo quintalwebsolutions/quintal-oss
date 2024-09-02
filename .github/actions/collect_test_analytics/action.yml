@@ -3,49 +3,88 @@
 # TO EDIT THE CONTENT, PLEASE MODIFY `/workspace.ts` OR `/scripts/generate.ts` #
 ################################################################################
 
-name: Collect Coverage
-description: Collect coverage from all packages and upload to Codecov
+name: Collect Test Analytics
+description: Collect test analytics from all packages and upload to Codecov
 
 inputs:
   token:
     required: true
-    description: 'Codecov token'
 
 runs:
   using: composite
   steps:
     - name: Upload @quintal/config coverage to Codecov
+      if: ${{ !cancelled() }}
       uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: true
         file: ./packages/config/.coverage/coverage-final.json
         flags: config
         token: ${{ inputs.token }}
+    - name: Upload @quintal/config analytics to Codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        fail_ci_if_error: true
+        flags: config
+        token: ${{ inputs.token }}
     - name: Upload @quintal/environment coverage to Codecov
+      if: ${{ !cancelled() }}
       uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: true
         file: ./packages/environment/.coverage/coverage-final.json
         flags: environment
         token: ${{ inputs.token }}
+    - name: Upload @quintal/environment analytics to Codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        fail_ci_if_error: true
+        flags: environment
+        token: ${{ inputs.token }}
     - name: Upload @quintal/form-engine-react coverage to Codecov
+      if: ${{ !cancelled() }}
       uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: true
         file: ./packages/form-engine-react/.coverage/coverage-final.json
         flags: form-engine-react
         token: ${{ inputs.token }}
+    - name: Upload @quintal/form-engine-react analytics to Codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        fail_ci_if_error: true
+        flags: form-engine-react
+        token: ${{ inputs.token }}
     - name: Upload @quintal/monads coverage to Codecov
+      if: ${{ !cancelled() }}
       uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: true
         file: ./packages/monads/.coverage/coverage-final.json
         flags: monads
         token: ${{ inputs.token }}
+    - name: Upload @quintal/monads analytics to Codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        fail_ci_if_error: true
+        flags: monads
+        token: ${{ inputs.token }}
     - name: Upload @quintal/table-engine-react coverage to Codecov
+      if: ${{ !cancelled() }}
       uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: true
         file: ./packages/table-engine-react/.coverage/coverage-final.json
+        flags: table-engine-react
+        token: ${{ inputs.token }}
+    - name: Upload @quintal/table-engine-react analytics to Codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        fail_ci_if_error: true
         flags: table-engine-react
         token: ${{ inputs.token }}

@@ -3,7 +3,12 @@
   "version": "0.2.0",
   "license": "MIT",
   "description": "Framework-agnostic environment variable validation for TypeScript",
-  "keywords": ["environment", "validation", "typescript", "zod"],
+  "keywords": [
+    "environment",
+    "validation",
+    "typescript",
+    "zod"
+  ],
   "author": {
     "name": "William Ford",
     "email": "william@quintalwebsolutions.com",
@@ -19,7 +24,9 @@
   "main": "./.dist/index.cjs",
   "module": "./.dist/index.mjs",
   "types": "./.dist/index.d.ts",
-  "files": [".dist"],
+  "files": [
+    ".dist"
+  ],
   "scripts": {
     "build": "run-s build:*",
     "build:clean": "shx rm -rf .dist",

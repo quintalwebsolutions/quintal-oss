@@ -22,6 +22,9 @@
       "all": true,
       "style": {
         "useBlockStatements": "off"
+      },
+      "correctness": {
+        "noNodejsModules": "off"
       }
     }
   },

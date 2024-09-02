@@ -1,6 +1,7 @@
 name: "🚀 Feature request"
 description: "Request some new functionality"
-labels: "feature"
+labels: 
+  - "feature"
 body:
   - type: markdown
     attributes:

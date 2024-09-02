@@ -1,17 +1,12 @@
 {
-  "$schema": "https://unpkg.com/syncpack@11.2.1/dist/schema.json",
-  "customTypes": {},
-  "dependencyTypes": ["dev", "prod"],
-  "filter": ".",
-  "indent": "  ",
+  "$schema": "https://unpkg.com/syncpack@13.0.0/dist/schema.json",
+  "dependencyTypes": ["dev", "prod", "peer"],
   "semverGroups": [
     {
-      "range": "",
-      "dependencies": ["**"],
-      "packages": ["**"]
+      "label": "use exact version numbers for dependencies",
+      "range": ""
     }
   ],
-  "semverRange": "",
   "sortAz": [
     "contributors",
     "peerDependencies",
@@ -40,14 +35,5 @@
     "peerDependencies",
     "dependencies",
     "devDependencies"
-  ],
-  "source": ["package.json", "packages/*/package.json"],
-  "versionGroups": [
-    {
-      "label": "Internal",
-      "packages": ["**"],
-      "dependencies": ["@quintal/*"],
-      "pinVersion": "workspace:*"
-    }
   ]
 }

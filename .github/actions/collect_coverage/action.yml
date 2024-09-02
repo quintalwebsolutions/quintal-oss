@@ -3,11 +3,13 @@
 # TO EDIT THE CONTENT, PLEASE MODIFY `/workspace.ts` OR `/scripts/generate.ts` #
 ################################################################################
 
-name: Collect coverage from all packages
+name: Collect Coverage
+description: Collect coverage from all packages and upload to Codecov
 
 inputs:
   token:
     required: true
+    description: 'Codecov token'
 
 runs:
   using: composite

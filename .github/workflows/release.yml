@@ -21,19 +21,13 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
-      - name: Lint
-        run: pnpm lint:check
-
-      - name: Test
-        run: pnpm test
+      - name: Check
+        run: pnpm turbo run lint:check lint:types test build
 
       - name: Collect test coverage
         uses: "./.github/actions/collect_coverage"
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Build
-        run: pnpm build
 
       - name: Create release pull request or publish to npm
         id: changesets

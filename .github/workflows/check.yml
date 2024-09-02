@@ -22,11 +22,8 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
-      - name: Lint
-        run: pnpm lint:check
-
-      - name: Test
-        run: pnpm test
+      - name: Check
+        run: pnpm turbo run lint:check lint:types test
 
       - name: Collect test coverage
         uses: "./.github/actions/collect_coverage"

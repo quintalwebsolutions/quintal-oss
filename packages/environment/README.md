@@ -94,11 +94,6 @@ type EnvValue = {
    */
   value: string | undefined;
   /**
-   * A description of the contents of the environment variable.
-   * @defaultValue undefined
-   */
-  description?: string;
-  /**
    * Zod schema that validates the value of the environment variable.
    * @defaultValue z.string()
    */

@@ -43,6 +43,7 @@ export const environment = createEnvironment({
   values: {
     environment: {
       value: process.env.NEXT_PUBLIC_ENVIRONMENT,
+      description: 'Self-provided environment indicator',
       schema: z
         .enum(['DEVELOPMENT', 'PREVIEW', 'PRODUCTION'])
         .default('DEVELOPMENT'),
@@ -52,6 +53,7 @@ export const environment = createEnvironment({
       schema: z.coerce.number().int().default(4000),
       isServerOnly: true,
     },
+    simpleStringValue: process.env.SIMPLE_STRING_VALUE,
     isFeatureEnabled: {
       value: process.env.IS_FEATURE_ENABLED,
       schema: z.enum(['true', 'false']).transform((s) => s === 'true'),
@@ -84,7 +86,7 @@ export const environment = createEnvironment({
 Every environment variable is defined as an object with the following properties
 
 ```ts
-type EnvVariableDefinition = {
+type EnvValue = {
   /**
    * The value
    * @example process.env.NODE_ENV
@@ -93,12 +95,17 @@ type EnvVariableDefinition = {
    */
   value: string | undefined;
   /**
+   * A description of the contents of the environment variable.
+   * @defaultValue undefined
+   */
+  description?: string;
+  /**
    * Zod schema that validates the value of the environment variable.
    * @defaultValue z.string()
    */
   schema?: ZodType;
   /**
-   * Only make environment variable available to server usages.
+   * Only make environment variable available for server-side usage.
    * @defaultValue false
    */
   isServerOnly?: boolean;

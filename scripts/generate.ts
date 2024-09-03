@@ -205,10 +205,10 @@ async function makePackageReadme(packageDir: string, name: string, p: Package): 
   const packageName = `@quintal/${name}`;
   const uriPackageName = encodeURIComponent(packageName);
 
-  const makeListSection = <T>(
-    arr: T[] | undefined,
+  const makeListSection = <TItem>(
+    arr: TItem[] | undefined,
     title: string,
-    makeItem: (item: T, index: number) => string,
+    makeItem: (item: TItem, index: number) => string,
   ) => (arr && arr.length > 0 ? [`## ${title}`, '', ...arr.map(makeItem), ''] : []);
 
   await writeFile(

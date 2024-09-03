@@ -1,6 +1,13 @@
 import type { MaybePromise } from '../util';
-import { type Err, type Ok, type Result, err, ok } from './result';
-import type { AnyResult, ResultMatch } from './util';
+import { type Err, type Ok, type Result, err, ok, resultFromSerialized } from './result';
+import type {
+  AnyResult,
+  AnySerializedResult,
+  ResultFromSerialized,
+  ResultMatch,
+  SerializedErr,
+  SerializedOk,
+} from './util';
 
 type Value<TResult extends AnyResult> = ReturnType<TResult['unwrap']>;
 type Error<TResult extends AnyResult> = ReturnType<TResult['unwrapErr']>;
@@ -113,43 +120,47 @@ export class AsyncResult<TResult extends AnyResult> {
     return new AsyncResult(this.then((res) => res.flatten()));
   }
 
-  map<TNextValue>(
-    fn: (value: Value<TResult>) => TNextValue,
-  ): AsyncResult<IsOk<TResult, Ok<Awaited<TNextValue>>, Err<Error<TResult>>>> {
+  map<TMappedValue>(
+    fn: (value: Value<TResult>) => TMappedValue,
+  ): AsyncResult<IsOk<TResult, Ok<Awaited<TMappedValue>>, Err<Error<TResult>>>> {
     return new AsyncResult(
       this.then(
-        (res) => res.map(fn) as IsOk<TResult, Ok<Awaited<TNextValue>>, Err<Error<TResult>>>,
+        (res) => res.map(fn) as IsOk<TResult, Ok<Awaited<TMappedValue>>, Err<Error<TResult>>>,
       ),
     );
   }
 
-  mapErr<TNextError>(
-    fn: (error: Error<TResult>) => TNextError,
-  ): AsyncResult<IsOk<TResult, Ok<Value<TResult>>, Err<Awaited<TNextError>>>> {
+  mapErr<TMappedError>(
+    fn: (error: Error<TResult>) => TMappedError,
+  ): AsyncResult<IsOk<TResult, Ok<Value<TResult>>, Err<Awaited<TMappedError>>>> {
     return new AsyncResult(
       this.then(
-        (res) => res.mapErr(fn) as IsOk<TResult, Ok<Value<TResult>>, Err<Awaited<TNextError>>>,
+        (res) => res.mapErr(fn) as IsOk<TResult, Ok<Value<TResult>>, Err<Awaited<TMappedError>>>,
       ),
     );
   }
 
-  mapOr<TDefaultValue, TNextValue>(
+  mapOr<TDefaultValue, TMappedValue>(
     defaultValue: TDefaultValue,
-    fn: (value: Value<TResult>) => TNextValue,
-  ): Promise<IsOk<TResult, Awaited<TNextValue>, Awaited<TDefaultValue>>> {
+    fn: (value: Value<TResult>) => TMappedValue,
+  ): Promise<IsOk<TResult, Awaited<TMappedValue>, Awaited<TDefaultValue>>> {
     return this.then(
       (res) =>
-        res.mapOr(defaultValue, fn) as IsOk<TResult, Awaited<TNextValue>, Awaited<TDefaultValue>>,
+        res.mapOr(defaultValue, fn) as IsOk<TResult, Awaited<TMappedValue>, Awaited<TDefaultValue>>,
     );
   }
 
-  mapOrElse<TDefaultValue, TNextValue>(
+  mapOrElse<TDefaultValue, TMappedValue>(
     defaultFn: (error: Error<TResult>) => TDefaultValue,
-    fn: (value: Value<TResult>) => TNextValue,
-  ): Promise<IsOk<TResult, Awaited<TNextValue>, Awaited<TDefaultValue>>> {
+    fn: (value: Value<TResult>) => TMappedValue,
+  ): Promise<IsOk<TResult, Awaited<TMappedValue>, Awaited<TDefaultValue>>> {
     return this.then(
       (res) =>
-        res.mapOrElse(defaultFn, fn) as IsOk<TResult, Awaited<TNextValue>, Awaited<TDefaultValue>>,
+        res.mapOrElse(defaultFn, fn) as IsOk<
+          TResult,
+          Awaited<TMappedValue>,
+          Awaited<TDefaultValue>
+        >,
     );
   }
 
@@ -181,19 +192,13 @@ export class AsyncResult<TResult extends AnyResult> {
     return this.then((res) => res.match(m));
   }
 
-  serialize(): Promise<
-    IsOk<
-      TResult,
-      { isOk: true; isErr: false; value: Value<TResult> },
-      { isOk: false; isErr: true; error: Error<TResult> }
-    >
-  > {
+  serialize(): Promise<IsOk<TResult, SerializedOk<Value<TResult>>, SerializedErr<Error<TResult>>>> {
     return this.then(
       (res) =>
         res.serialize() as IsOk<
           TResult,
-          { isOk: true; isErr: false; value: Value<TResult> },
-          { isOk: false; isErr: true; error: Error<TResult> }
+          SerializedOk<Value<TResult>>,
+          SerializedErr<Error<TResult>>
         >,
     );
   }
@@ -210,7 +215,13 @@ export function asyncErr<TError>(error: TError): AsyncErr<TError> {
   return new AsyncResult(Promise.resolve(err(error)));
 }
 
-export function asyncResult<TValue>(
+export function asyncResultFromSerialized<TSerializedResult extends AnySerializedResult>(
+  serializedResult: Promise<TSerializedResult>,
+): AsyncResult<ResultFromSerialized<TSerializedResult>> {
+  return new AsyncResult(serializedResult.then((value) => resultFromSerialized(value)));
+}
+
+export function asyncResultFromThrowable<TValue>(
   fn: () => Promise<TValue>,
 ): AsyncResult<Result<TValue, unknown>> {
   return new AsyncResult(

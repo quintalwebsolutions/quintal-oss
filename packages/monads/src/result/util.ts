@@ -7,6 +7,28 @@ export type ResultMatch<TValue, TError, TOutput> = {
   err: (error: TError) => TOutput;
 };
 
+export type SerializedOk<TValue> = {
+  type: 'ok';
+  value: TValue;
+};
+
+export type SerializedErr<TError> = {
+  type: 'err';
+  error: TError;
+};
+
+export type SerializedResult<TValue, TError> = SerializedOk<TValue> | SerializedErr<TError>;
+
+// biome-ignore lint/suspicious/noExplicitAny: This type exists solely for generic parameters to extend
+export type AnySerializedResult = SerializedResult<any, any>;
+
+export type ResultFromSerialized<TSerializedResult extends AnySerializedResult> =
+  TSerializedResult extends SerializedOk<infer TValue>
+    ? Ok<TValue>
+    : TSerializedResult extends SerializedErr<infer TError>
+      ? Err<TError>
+      : never;
+
 // biome-ignore lint/suspicious/noExplicitAny: This type exists solely for generic parameters to extend
 export type AnyResult = Result<any, any> | AsyncResult<any>;
 

@@ -204,13 +204,19 @@ async function makePackageReadme(packageDir: string, name: string, p: Package): 
   );
 
   const packageName = `@quintal/${name}`;
-  const uriPackageName = encodeURIComponent(packageName);
 
   const makeListSection = <TItem>(
     arr: TItem[] | undefined,
     title: string,
+    description: string | null,
     makeItem: (item: TItem, index: number) => string,
-  ) => (arr && arr.length > 0 ? [`## ${title}`, '', ...arr.map(makeItem), ''] : []);
+  ) =>
+    arr && arr.length > 0
+      ? [`## ${title}`, '']
+          .concat(description ? [description, ''] : [])
+          .concat(arr.map(makeItem))
+          .concat([''])
+      : [];
 
   await writeFile(
     [filePath],
@@ -224,7 +230,6 @@ async function makePackageReadme(packageDir: string, name: string, p: Package): 
       `[![NPM downloads](${shieldRoot}/npm/dt/${packageName}${shieldStyle})](https://npmjs.com/${packageName})`,
       `[![License](${shieldRoot}/npm/l/${packageName}${shieldStyle})](${githubRoot}/blob/main/LICENSE)`,
       `[![Bundle size](${shieldRoot}/bundlephobia/minzip/${packageName}${shieldStyle})](https://bundlephobia.com/package/${packageName})`,
-      `[![Dependencies](${shieldRoot}/librariesio/release/npm/${packageName}${shieldStyle})](https://libraries.io/npm/${uriPackageName}/)`,
       `[![Code coverage](${shieldRoot}/codecov/c/github/${repoName}${shieldStyle}&token=3ORY9UP6H7&flag=${name}&logo=codecov)](https://codecov.io/gh/${repoName})`,
       `[![Pull requests welcome](${shieldRoot}/badge/PRs-welcome-brightgreen.svg${shieldStyle})](${githubRoot}/blob/main/CONTRIBUTING.md)`,
       '',
@@ -237,17 +242,15 @@ async function makePackageReadme(packageDir: string, name: string, p: Package): 
       ...makeListSection(
         p.features,
         'Features',
+        null,
         ({ icon, text }, i) => `- ${icon} ${text}${i + 1 === p.features?.length ? '.' : ','}`,
       ),
-
-      // Tsdocs
-      `You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/docs/${packageName})`,
-      '',
 
       // Roadmap
       ...makeListSection(
         p.roadmap,
         'Roadmap',
+        'The following features are planned for future releases:',
         ({ level: l, checked: c, text: t }) =>
           `${' '.repeat((l ?? 0) * 2)}- [${c ? 'x' : ' '}] ${t}`,
       ),
@@ -283,6 +286,7 @@ async function makePackageReadme(packageDir: string, name: string, p: Package): 
       ...makeListSection(
         p.examples,
         'Examples',
+        'Check out these examples to get started quickly:',
         (example) => `- [${example.title}](${example.href})`,
       ),
 

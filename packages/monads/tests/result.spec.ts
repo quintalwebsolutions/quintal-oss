@@ -2,19 +2,26 @@ import { type Mock, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import {
   type AnyOption,
   type AnyResult,
+  type AsyncErr,
+  type AsyncOk,
   type AsyncResult,
   type Err,
+  type None,
   type Ok,
+  type Option,
   type Result,
+  type Some,
   asyncErr,
   asyncOk,
-  asyncResult,
+  asyncResultFromSerialized,
+  asyncResultFromThrowable,
   err,
+  none,
   ok,
-  result,
+  resultFromSerialized,
+  resultFromTrowable,
+  some,
 } from '../src';
-import { type None, type Option, type Some, none, some } from '../src';
-import type { AsyncErr, AsyncOk } from '../src';
 import type { And, Equal, MaybePromise, Ternary } from './util';
 
 function expectU<TResult extends AnyResult>(result: TResult) {
@@ -78,10 +85,10 @@ const asyncOkRes2 = asyncOk('v2') as AsyncResult<Result<'v2', 'e2'>>;
 const asyncErrRes1 = asyncErr('e1') as AsyncResult<Result<'v1', 'e1'>>;
 const asyncErrRes2 = asyncErr('e2') as AsyncResult<Result<'v2', 'e2'>>;
 
-const okResVal = result(returns);
-const errResVal = result(throws);
-const asyncOkResVal = asyncResult(returnsAsync);
-const asyncErrResVal = asyncResult(throwsAsync);
+const okResVal = resultFromTrowable(returns);
+const errResVal = resultFromTrowable(throws);
+const asyncOkResVal = asyncResultFromThrowable(returnsAsync);
+const asyncErrResVal = asyncResultFromThrowable(throwsAsync);
 
 type ResVal = typeof okResVal;
 type AsyncResVal = typeof asyncOkResVal;
@@ -1161,40 +1168,55 @@ describe('Result', () => {
     expect(mockFn).toHaveBeenCalledTimes(8);
   });
 
-  it('Serializes into a type-safe object literal', () => {
+  it('Serializes into a type-safe object literal', async () => {
+    type ResSer = { type: 'ok'; value: 'v1' } | { type: 'err'; error: 'e1' };
+
     const okSer = okVal.serialize();
-    expectTypeOf(okSer).toEqualTypeOf<{ isOk: true; isErr: false; value: 'value' }>();
-    expect(okSer).toEqual({ isOk: true, isErr: false, value: 'value' });
+    expectTypeOf(okSer).toEqualTypeOf<{ type: 'ok'; value: 'value' }>();
+    expect(okSer).toEqual({ type: 'ok', value: 'value' });
+    const okSerPar = resultFromSerialized(okSer);
+    expectU(okSerPar).toBe<'value', never>(true, 'value');
 
     const errSer = errVal.serialize();
-    expectTypeOf(errSer).toEqualTypeOf<{ isOk: false; isErr: true; error: 'error' }>();
-    expect(errSer).toEqual({ isOk: false, isErr: true, error: 'error' });
+    expectTypeOf(errSer).toEqualTypeOf<{ type: 'err'; error: 'error' }>();
+    expect(errSer).toEqual({ type: 'err', error: 'error' });
+    const errSerPar = resultFromSerialized(errSer);
+    expectU(errSerPar).toBe<never, 'error'>(false, 'error');
 
     const asyncOkSer = asyncOkVal.serialize();
-    expectTypeOf(asyncOkSer).toEqualTypeOf<P<{ isOk: true; isErr: false; value: 'value' }>>();
-    expect(asyncOkSer).resolves.toEqual({ isOk: true, isErr: false, value: 'value' });
+    expectTypeOf(asyncOkSer).toEqualTypeOf<P<{ type: 'ok'; value: 'value' }>>();
+    expect(asyncOkSer).resolves.toEqual({ type: 'ok', value: 'value' });
+    const asyncOkSerPar = await asyncResultFromSerialized(asyncOkSer);
+    expectU(asyncOkSerPar).toBe<'value', never>(true, 'value');
 
     const asyncErrSer = asyncErrVal.serialize();
-    expectTypeOf(asyncErrSer).toEqualTypeOf<P<{ isOk: false; isErr: true; error: 'error' }>>();
-    expect(asyncErrSer).resolves.toEqual({ isOk: false, isErr: true, error: 'error' });
+    expectTypeOf(asyncErrSer).toEqualTypeOf<P<{ type: 'err'; error: 'error' }>>();
+    expect(asyncErrSer).resolves.toEqual({ type: 'err', error: 'error' });
+    const asyncErrSerPar = await asyncResultFromSerialized(asyncErrSer);
+    expectU(asyncErrSerPar).toBe<never, 'error'>(false, 'error');
 
-    type ResSer =
-      | { isOk: true; isErr: false; value: 'v1' }
-      | { isOk: false; isErr: true; error: 'e1' };
     const okResSer = okRes1.serialize();
     expectTypeOf(okResSer).toEqualTypeOf<ResSer>();
-    expect(okResSer).toEqual({ isOk: true, isErr: false, value: 'v1' });
+    expect(okResSer).toEqual({ type: 'ok', value: 'v1' });
+    const okResSerPar = resultFromSerialized(okResSer);
+    expectU(okResSerPar).toBe<'v1', 'e1'>(true, 'v1');
 
     const errResSer = errRes1.serialize();
     expectTypeOf(errResSer).toEqualTypeOf<ResSer>();
-    expect(errResSer).toEqual({ isOk: false, isErr: true, error: 'e1' });
+    expect(errResSer).toEqual({ type: 'err', error: 'e1' });
+    const errResSerPar = resultFromSerialized(errResSer);
+    expectU(errResSerPar).toBe<'v1', 'e1'>(false, 'e1');
 
     const asyncOkResSer = asyncOkRes1.serialize();
     expectTypeOf(asyncOkResSer).toEqualTypeOf<P<ResSer>>();
-    expect(asyncOkResSer).resolves.toEqual({ isOk: true, isErr: false, value: 'v1' });
+    expect(asyncOkResSer).resolves.toEqual({ type: 'ok', value: 'v1' });
+    const asyncOkResSerPar = await asyncResultFromSerialized(asyncOkResSer);
+    expectU(asyncOkResSerPar).toBe<'v1', 'e1'>(true, 'v1');
 
     const asyncErrResSer = asyncErrRes1.serialize();
     expectTypeOf(asyncErrResSer).toEqualTypeOf<P<ResSer>>();
-    expect(asyncErrResSer).resolves.toEqual({ isOk: false, isErr: true, error: 'e1' });
+    expect(asyncErrResSer).resolves.toEqual({ type: 'err', error: 'e1' });
+    const asyncErrResSerPar = await asyncResultFromSerialized(asyncErrResSer);
+    expectU(asyncErrResSerPar).toBe<'v1', 'e1'>(false, 'e1');
   });
 });

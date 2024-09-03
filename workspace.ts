@@ -72,8 +72,21 @@ export const workspace: Workspace = {
     },
     environment: {
       title: 'Quintal Environment',
-      description: 'Framework-agnostic environment variable validation for TypeScript',
+      description:
+        'Framework-agnostic environment variable validation for TypeScript powered by Zod',
       keywords: ['environment', 'validation', 'typescript', 'zod'],
+      features: [
+        { icon: '🔍', text: 'Use Zod to validate and transform environment variables' },
+        { icon: '🔒', text: 'Secure environment variables by marking them as server-only' },
+        { icon: '📦', text: 'Nest environment variables into groups' },
+        { icon: '✅', text: 'CommonJS and ES Modules support' },
+        { icon: '⚖️', text: 'Super lightweight (only ~10kb gzipped)' },
+        { icon: '🧪', text: '100% test coverage' },
+        { icon: '🛡️', text: 'Enjoy full type-safety in every step of the process' },
+      ],
+      examples: [
+        { title: 'Kitchen sink', href: 'https://codesandbox.io/p/sandbox/x2slnv?file=%2Findex.ts' },
+      ],
     },
     'form-engine-react': {
       title: 'Quintal React Form Engine',
@@ -87,7 +100,8 @@ export const workspace: Workspace = {
         'A collection of monads (Result, Option) for TypeScript, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/).',
       keywords: ['monads', 'monad', 'result', 'option', 'error', 'null'],
       features: [
-        { icon: '🦀', text: 'Implements all relevant methods from Rust' },
+        { icon: '🛡️', text: 'Easy type-safe error- and empty-value handling' },
+        { icon: '🦀', text: 'Implements all relevant utility methods from Rust' },
         { icon: '✅', text: 'CommonJS and ES Modules support' },
         { icon: '📖', text: 'Extensive documentation' },
         { icon: '⚖️', text: 'Super lightweight (only ~1kb gzipped)' },
@@ -95,10 +109,10 @@ export const workspace: Workspace = {
         { icon: '🧪', text: '100% test coverage' },
       ],
       roadmap: [
+        { checked: true, text: 'Serialize and deserialize monads for API usage' },
         {
-          text: "Figure out a way to emulate [Rust's question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-)",
+          text: "Find a nice way to emulate [Rust's question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-)",
         },
-        { text: 'Serialize and deserialize monads for API usage' },
         {
           text: "Write docs on [Rust's must-use property](https://doc.rust-lang.org/std/result/#results-must-be-used)",
         },

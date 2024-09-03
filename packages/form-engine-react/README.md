@@ -9,13 +9,10 @@ TO EDIT THE CONTENT, PLEASE MODIFY `/workspace.ts` OR `/scripts/generate.ts`
 [![NPM downloads](https://img.shields.io/npm/dt/@quintal/form-engine-react?style=flat-square)](https://npmjs.com/@quintal/form-engine-react)
 [![License](https://img.shields.io/npm/l/@quintal/form-engine-react?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/LICENSE)
 [![Bundle size](https://img.shields.io/bundlephobia/minzip/@quintal/form-engine-react?style=flat-square)](https://bundlephobia.com/package/@quintal/form-engine-react)
-[![Dependencies](https://img.shields.io/librariesio/release/npm/@quintal/form-engine-react?style=flat-square)](https://libraries.io/npm/%40quintal%2Fform-engine-react/)
 [![Code coverage](https://img.shields.io/codecov/c/github/quintalwebsolutions/quintal-oss?style=flat-square&token=3ORY9UP6H7&flag=form-engine-react&logo=codecov)](https://codecov.io/gh/quintalwebsolutions/quintal-oss)
 [![Pull requests welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CONTRIBUTING.md)
 
 A headless, declarative, lightweight form engine for React apps with first-class TypeScript support.
-
-You can explore [the exposed functions and types on ts-docs](https://tsdocs.dev/docs/@quintal/form-engine-react)
 
 ## Table of Contents
 

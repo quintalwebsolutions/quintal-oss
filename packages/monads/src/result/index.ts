@@ -3,15 +3,18 @@ export {
   type Result,
   Ok,
   Err,
-  result,
+  resultFromSerialized,
+  resultFromTrowable,
   ok,
   err,
 } from './result';
+
 export {
   AsyncResult,
   type AsyncOk,
   type AsyncErr,
-  asyncResult,
+  asyncResultFromThrowable,
+  asyncResultFromSerialized,
   asyncOk,
   asyncErr,
 } from './async-result';

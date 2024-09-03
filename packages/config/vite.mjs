@@ -26,7 +26,7 @@ export default function getViteConfig(bundleName) {
       // TODO
       // benchmark
       watch: false,
-      reporters: process.env.CI ? ['junit'] : ['default'],
+      reporters: process.env.CI ? ['default', 'junit'] : ['default'],
       outputFile: 'junit.xml',
       coverage: {
         enabled: true,

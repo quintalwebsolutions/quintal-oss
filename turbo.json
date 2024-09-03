@@ -5,7 +5,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["src/**"],
-      "outputs": ["dist/**"]
+      "outputs": [".dist/**"]
     },
     "clean": {
       "cache": false
@@ -30,7 +30,8 @@
     },
     "test": {
       "inputs": ["src/**", "tests/**"],
-      "outputs": [".coverage/**"]
+      "env": ["CI"],
+      "outputs": [".coverage/**", ".coverage-ts/**", "junit.xml"]
     }
   }
 }

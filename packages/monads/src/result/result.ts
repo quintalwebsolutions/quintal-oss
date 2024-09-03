@@ -5,14 +5,14 @@ import { type AsyncErr, type AsyncOk, AsyncResult } from './async-result';
 import type { ResultConstructor } from './result-constructor';
 import { type AnyResult, type ResultMatch, isAnyResult } from './util';
 
-export class Ok<T> implements ResultConstructor<T, 'OK'> {
-  protected _value: T;
+export class Ok<TValue> implements ResultConstructor<TValue, 'OK'> {
+  protected _value: TValue;
 
-  constructor(value: T) {
+  constructor(value: TValue) {
     this._value = value;
   }
 
-  get value(): T {
+  get value(): TValue {
     return this._value;
   }
 
@@ -24,24 +24,24 @@ export class Ok<T> implements ResultConstructor<T, 'OK'> {
     return false;
   }
 
-  isOkAnd<P extends MaybePromise<boolean>>(fn: (value: T) => P): P {
+  isOkAnd<TPredicate extends MaybePromise<boolean>>(fn: (value: TValue) => TPredicate): TPredicate {
     return fn(this.value);
   }
 
-  isErrAnd<P extends MaybePromise<boolean>>(_fn: (error: never) => P): false {
+  isErrAnd<TPredicate extends MaybePromise<boolean>>(_fn: (error: never) => TPredicate): false {
     return false;
   }
 
-  inspect(fn: (value: T) => void): Ok<T> {
+  inspect(fn: (value: TValue) => void): Ok<TValue> {
     fn(this.value);
     return this;
   }
 
-  inspectErr(_fn: (error: never) => void): Ok<T> {
+  inspectErr(_fn: (error: never) => void): Ok<TValue> {
     return this;
   }
 
-  expect(_message: string): T {
+  expect(_message: string): TValue {
     return this.value;
   }
 
@@ -49,7 +49,7 @@ export class Ok<T> implements ResultConstructor<T, 'OK'> {
     throw new Error(message);
   }
 
-  unwrap(): T {
+  unwrap(): TValue {
     return this.value;
   }
 
@@ -57,15 +57,15 @@ export class Ok<T> implements ResultConstructor<T, 'OK'> {
     throw new Error(`Attempted to unwrapErr an 'ok' value: ${this.value}`);
   }
 
-  unwrapOr<U>(_defaultValue: U): T {
+  unwrapOr<TDefaultValue>(_defaultValue: TDefaultValue): TValue {
     return this.value;
   }
 
-  unwrapOrElse<U>(_fn: (error: never) => U): T {
+  unwrapOrElse<TDefaultValue>(_fn: (error: never) => TDefaultValue): TValue {
     return this.value;
   }
 
-  ok(): Some<T> {
+  ok(): Some<TValue> {
     return some(this.value);
   }
 
@@ -73,9 +73,13 @@ export class Ok<T> implements ResultConstructor<T, 'OK'> {
     return none;
   }
 
-  transpose(): T extends None ? T : Some<Ok<T extends Some<infer TSome> ? TSome : T>> {
+  transpose(): TValue extends None
+    ? TValue
+    : Some<Ok<TValue extends Some<infer TSome> ? TSome : TValue>> {
     // TODO achieve without cast?
-    type Cast = T extends None ? T : Some<Ok<T extends Some<infer TSome> ? TSome : T>>;
+    type Cast = TValue extends None
+      ? TValue
+      : Some<Ok<TValue extends Some<infer TSome> ? TSome : TValue>>;
 
     const v = this.value;
     const isOption = isAnyOption(v);
@@ -83,57 +87,65 @@ export class Ok<T> implements ResultConstructor<T, 'OK'> {
     return some(ok(isOption && v.isSome ? v.unwrap() : v)) as Cast;
   }
 
-  flatten(): T extends AnyResult ? T : Ok<T> {
+  flatten(): TValue extends AnyResult ? TValue : Ok<TValue> {
     // TODO achieve without cast?
-    type Cast = T extends AnyResult ? T : Ok<T>;
+    type Cast = TValue extends AnyResult ? TValue : Ok<TValue>;
 
     const v = this.value;
     if (isAnyResult(v)) return v as Cast;
     return ok(v) as Cast;
   }
 
-  map<U>(fn: (value: T) => U): U extends Promise<infer TValue> ? AsyncOk<TValue> : Ok<U> {
+  map<TNextValue>(
+    fn: (value: TValue) => TNextValue,
+  ): TNextValue extends Promise<infer TValue> ? AsyncOk<TValue> : Ok<TNextValue> {
     // TODO achieve without cast?
-    type Cast = U extends Promise<infer TValue> ? AsyncOk<TValue> : Ok<U>;
+    type Cast = TNextValue extends Promise<infer TValue> ? AsyncOk<TValue> : Ok<TNextValue>;
 
     const mappedValue = fn(this.value);
     if (mappedValue instanceof Promise) return new AsyncResult(mappedValue.then(ok)) as Cast;
     return ok(mappedValue) as Cast;
   }
 
-  mapErr<F>(_fn: (error: never) => F): Ok<T> {
+  mapErr<TNextError>(_fn: (error: never) => TNextError): Ok<TValue> {
     return this;
   }
 
-  mapOr<D, U>(_defaultValue: D, fn: (value: T) => U): U {
+  mapOr<TDefaultValue, TNextValue>(
+    _defaultValue: TDefaultValue,
+    fn: (value: TValue) => TNextValue,
+  ): TNextValue {
     return fn(this.value);
   }
 
-  mapOrElse<D, U>(_defaultFn: (error: never) => D, fn: (value: T) => U): U {
+  mapOrElse<TDefaultValue, TNextValue>(
+    _defaultFn: (error: never) => TDefaultValue,
+    fn: (value: TValue) => TNextValue,
+  ): TNextValue {
     return fn(this.value);
   }
 
-  and<R extends AnyResult>(resB: R): R {
+  and<TResultB extends AnyResult>(resB: TResultB): TResultB {
     return resB;
   }
 
-  or<R extends AnyResult>(_resB: R): Ok<T> {
+  or<TResultB extends AnyResult>(_resB: TResultB): Ok<TValue> {
     return this;
   }
 
-  andThen<R extends AnyResult>(fn: (value: T) => R): R {
+  andThen<TResultB extends AnyResult>(fn: (value: TValue) => TResultB): TResultB {
     return fn(this.value);
   }
 
-  orElse<R extends AnyResult>(_fn: (error: never) => R): Ok<T> {
+  orElse<TResultB extends AnyResult>(_fn: (error: never) => TResultB): Ok<TValue> {
     return this;
   }
 
-  match<U>(m: ResultMatch<T, never, U>): U {
+  match<TOutput>(m: ResultMatch<TValue, never, TOutput>): TOutput {
     return m.ok(this.value);
   }
 
-  serialize(): { isOk: true; isErr: false; value: T } {
+  serialize(): { isOk: true; isErr: false; value: TValue } {
     return {
       isOk: this.isOk,
       isErr: this.isErr,
@@ -142,14 +154,14 @@ export class Ok<T> implements ResultConstructor<T, 'OK'> {
   }
 }
 
-export class Err<E> implements ResultConstructor<E, 'ERR'> {
-  protected _error: E;
+export class Err<TError> implements ResultConstructor<TError, 'ERR'> {
+  protected _error: TError;
 
-  constructor(error: E) {
+  constructor(error: TError) {
     this._error = error;
   }
 
-  get error(): E {
+  get error(): TError {
     return this._error;
   }
 
@@ -161,19 +173,21 @@ export class Err<E> implements ResultConstructor<E, 'ERR'> {
     return true;
   }
 
-  isOkAnd<P extends MaybePromise<boolean>>(_fn: (value: never) => P): false {
+  isOkAnd<TPredicate extends MaybePromise<boolean>>(_fn: (value: never) => TPredicate): false {
     return false;
   }
 
-  isErrAnd<P extends MaybePromise<boolean>>(fn: (error: E) => P): P {
+  isErrAnd<TPredicate extends MaybePromise<boolean>>(
+    fn: (error: TError) => TPredicate,
+  ): TPredicate {
     return fn(this.error);
   }
 
-  inspect(_fn: (value: never) => void): Err<E> {
+  inspect(_fn: (value: never) => void): Err<TError> {
     return this;
   }
 
-  inspectErr(fn: (error: E) => void): Err<E> {
+  inspectErr(fn: (error: TError) => void): Err<TError> {
     fn(this.error);
     return this;
   }
@@ -182,7 +196,7 @@ export class Err<E> implements ResultConstructor<E, 'ERR'> {
     throw new Error(message);
   }
 
-  expectErr(_message: string): E {
+  expectErr(_message: string): TError {
     return this.error;
   }
 
@@ -190,15 +204,15 @@ export class Err<E> implements ResultConstructor<E, 'ERR'> {
     throw new Error(`Attempted to unwrap an 'err' value: ${this.error}`);
   }
 
-  unwrapErr(): E {
+  unwrapErr(): TError {
     return this.error;
   }
 
-  unwrapOr<U>(defaultValue: U): U {
+  unwrapOr<TDefaultValue>(defaultValue: TDefaultValue): TDefaultValue {
     return defaultValue;
   }
 
-  unwrapOrElse<U>(fn: (error: E) => U): U {
+  unwrapOrElse<TDefaultValue>(fn: (error: TError) => TDefaultValue): TDefaultValue {
     return fn(this.error);
   }
 
@@ -206,59 +220,67 @@ export class Err<E> implements ResultConstructor<E, 'ERR'> {
     return none;
   }
 
-  err(): Some<E> {
+  err(): Some<TError> {
     return some(this.error);
   }
 
-  transpose(): Some<Err<E>> {
+  transpose(): Some<Err<TError>> {
     return some(this);
   }
 
-  flatten(): Err<E> {
+  flatten(): Err<TError> {
     return this;
   }
 
-  map<U>(_fn: (value: never) => U): Err<E> {
+  map<TNextValue>(_fn: (value: never) => TNextValue): Err<TError> {
     return this;
   }
 
-  mapErr<F>(fn: (error: E) => F): F extends Promise<infer TValue> ? AsyncErr<TValue> : Err<F> {
-    type Cast = F extends Promise<infer TValue> ? AsyncErr<TValue> : Err<F>;
+  mapErr<TNextError>(
+    fn: (error: TError) => TNextError,
+  ): TNextError extends Promise<infer TValue> ? AsyncErr<TValue> : Err<TNextError> {
+    type Cast = TNextError extends Promise<infer TValue> ? AsyncErr<TValue> : Err<TNextError>;
 
     const mappedError = fn(this.error);
     if (mappedError instanceof Promise) return new AsyncResult(mappedError.then(err)) as Cast;
     return err(mappedError) as Cast;
   }
 
-  mapOr<D, U>(defaultValue: D, _fn: (value: never) => U): D {
+  mapOr<TDefaultValue, TNextValue>(
+    defaultValue: TDefaultValue,
+    _fn: (value: never) => TNextValue,
+  ): TDefaultValue {
     return defaultValue;
   }
 
-  mapOrElse<D, U>(defaultFn: (error: E) => D, _fn: (value: never) => U): D {
+  mapOrElse<TDefaultValue, TNextValue>(
+    defaultFn: (error: TError) => TDefaultValue,
+    _fn: (value: never) => TNextValue,
+  ): TDefaultValue {
     return defaultFn(this.error);
   }
 
-  and<R extends AnyResult>(_resB: R): Err<E> {
+  and<TResultB extends AnyResult>(_resB: TResultB): Err<TError> {
     return this;
   }
 
-  or<R extends AnyResult>(resB: R): R {
+  or<TResultB extends AnyResult>(resB: TResultB): TResultB {
     return resB;
   }
 
-  andThen<R extends AnyResult>(_fn: (value: never) => R): Err<E> {
+  andThen<TResultB extends AnyResult>(_fn: (value: never) => TResultB): Err<TError> {
     return this;
   }
 
-  orElse<R extends AnyResult>(fn: (error: E) => R): R {
+  orElse<TResultB extends AnyResult>(fn: (error: TError) => TResultB): TResultB {
     return fn(this.error);
   }
 
-  match<U>(m: ResultMatch<never, E, U>): U {
+  match<TOutput>(m: ResultMatch<never, TError, TOutput>): TOutput {
     return m.err(this.error);
   }
 
-  serialize(): { isOk: false; isErr: true; error: E } {
+  serialize(): { isOk: false; isErr: true; error: TError } {
     return {
       isOk: this.isOk,
       isErr: this.isErr,
@@ -267,17 +289,17 @@ export class Err<E> implements ResultConstructor<E, 'ERR'> {
   }
 }
 
-export type Result<T, E> = Ok<T> | Err<E>;
+export type Result<TValue, TError> = Ok<TValue> | Err<TError>;
 
-export function ok<T>(value: T): Ok<T> {
+export function ok<TValue>(value: TValue): Ok<TValue> {
   return new Ok(value);
 }
 
-export function err<E>(error: E): Err<E> {
+export function err<TError>(error: TError): Err<TError> {
   return new Err(error);
 }
 
-export function result<T>(fn: () => T): Result<T, unknown> {
+export function result<TValue>(fn: () => TValue): Result<TValue, unknown> {
   try {
     const value = fn();
     return ok(value);

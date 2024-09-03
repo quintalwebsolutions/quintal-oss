@@ -1,21 +1,37 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "ui": "tui",
+  "tasks": {
     "build": {
-      "inputs": ["src/**"],
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "inputs": ["src/**"],
+      "outputs": [".dist/**"]
     },
-    "clean": {},
+    "clean": {
+      "cache": false
+    },
+    "//#clean": {
+      "cache": false
+    },
     "dev": {
       "cache": false,
       "persistent": true
     },
-    "lint": {},
-    "lint:check": {},
+    "lint": {
+      "dependsOn": ["build"]
+    },
+    "//#lint": {},
+    "lint:check": {
+      "dependsOn": ["build"]
+    },
+    "//#lint:check": {},
+    "lint:types": {
+      "dependsOn": ["build"]
+    },
     "test": {
-      "inputs": ["src/**", "test/**"],
-      "outputs": [".coverage/**"]
+      "inputs": ["src/**", "tests/**"],
+      "env": ["CI"],
+      "outputs": [".coverage/**", ".coverage-ts/**", "junit.xml"]
     }
   }
 }

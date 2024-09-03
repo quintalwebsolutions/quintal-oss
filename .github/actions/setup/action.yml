@@ -1,35 +1,25 @@
 name: Setup
+description: Setup pipeline environment
 
 runs:
   using: composite
   steps:
-    - name: Install Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 20.10.0
-
     - name: Install pnpm
-      uses: pnpm/action-setup@v3
+      uses: pnpm/action-setup@v4
       with:
-        version: 8
         run_install: false
 
-    - name: Get pnpm store directory
-      shell: bash
-      run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-    - name: Setup pnpm cache
-      uses: actions/cache@v3
+    - name: Install Node.js
+      uses: actions/setup-node@v4
       with:
-        path: ${{ env.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: ${{ runner.os }}-pnpm-store-
+        node-version: 20.17.0
+        cache: pnpm
 
     - name: Install dependencies
       shell: bash
       run: pnpm install --frozen-lockfile
 
     - name: Set up turborepo cache
-      uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      uses: rharkor/caching-for-turbo@v1.5
       with:
         cache-prefix: turbo_

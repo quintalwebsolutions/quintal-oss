@@ -2,62 +2,65 @@ import type { MaybePromise } from '../util';
 import { type Err, type Ok, type Result, err, ok } from './result';
 import type { AnyResult, ResultMatch } from './util';
 
-type Value<R extends AnyResult> = ReturnType<R['unwrap']>;
-type Error<R extends AnyResult> = ReturnType<R['unwrapErr']>;
-type IsOk<R extends AnyResult, TIsOk, TIsErr> = R extends Ok<unknown> ? TIsOk : TIsErr;
+type Value<TResult extends AnyResult> = ReturnType<TResult['unwrap']>;
+type Error<TResult extends AnyResult> = ReturnType<TResult['unwrapErr']>;
+type IsOk<TResult extends AnyResult, TIsOk, TIsErr> = TResult extends Ok<unknown> ? TIsOk : TIsErr;
 
 // TODO relate this to the resultconstructor to share documentation
-export class AsyncResult<R extends AnyResult> {
-  private _promise: Promise<R>;
+export class AsyncResult<TResult extends AnyResult> {
+  private _promise: Promise<TResult>;
 
-  constructor(promise: Promise<R>) {
+  constructor(promise: Promise<TResult>) {
     this._promise = promise;
   }
 
-  // TODO Cache promise result?
-  // biome-ignore lint/nursery/noThenProperty: We explicitly want to make this class thenable
-  then<TResult1 = R, TResult2 = never>(
-    onfulfilled?: (value: R) => TResult1 | PromiseLike<TResult1>,
+  // biome-ignore lint/suspicious/noThenProperty: We explicitly want to make this class thenable
+  then<TResult1 = TResult, TResult2 = never>(
+    onfulfilled?: (value: TResult) => TResult1 | PromiseLike<TResult1>,
     onrejected?: (reason: unknown) => TResult2 | PromiseLike<TResult2>,
   ): Promise<TResult1 | TResult2> {
     return this._promise.then(onfulfilled, onrejected);
   }
 
-  get isOk(): Promise<R['isOk']> {
+  get isOk(): Promise<TResult['isOk']> {
     return this.then((res) => res.isOk);
   }
 
-  get isErr(): Promise<R['isErr']> {
+  get isErr(): Promise<TResult['isErr']> {
     return this.then((res) => res.isErr);
   }
 
-  isOkAnd<P extends MaybePromise<boolean>>(
-    fn: (value: Value<R>) => P,
-  ): Promise<IsOk<R, Awaited<P>, false>> {
-    return this.then(async (res) => (await res.isOkAnd(fn)) as IsOk<R, Awaited<P>, false>);
+  isOkAnd<TPredicate extends MaybePromise<boolean>>(
+    fn: (value: Value<TResult>) => TPredicate,
+  ): Promise<IsOk<TResult, Awaited<TPredicate>, false>> {
+    return this.then(
+      async (res) => (await res.isOkAnd(fn)) as IsOk<TResult, Awaited<TPredicate>, false>,
+    );
   }
 
-  isErrAnd<P extends MaybePromise<boolean>>(
-    fn: (error: Error<R>) => P,
-  ): Promise<IsOk<R, false, Awaited<P>>> {
-    return this.then(async (res) => (await res.isErrAnd(fn)) as IsOk<R, false, Awaited<P>>);
+  isErrAnd<TPredicate extends MaybePromise<boolean>>(
+    fn: (error: Error<TResult>) => TPredicate,
+  ): Promise<IsOk<TResult, false, Awaited<TPredicate>>> {
+    return this.then(
+      async (res) => (await res.isErrAnd(fn)) as IsOk<TResult, false, Awaited<TPredicate>>,
+    );
   }
 
-  inspect(fn: (value: Value<R>) => void): typeof this {
+  inspect(fn: (value: Value<TResult>) => void): typeof this {
     this.then((res) => res.inspect(fn));
     return this;
   }
 
-  inspectErr(fn: (error: Error<R>) => void): typeof this {
+  inspectErr(fn: (error: Error<TResult>) => void): typeof this {
     this.then((res) => res.inspectErr(fn));
     return this;
   }
 
-  expect(message: string): Promise<ReturnType<R['expect']>> {
+  expect(message: string): Promise<ReturnType<TResult['expect']>> {
     return this.then((res) => res.expect(message));
   }
 
-  expectErr(message: string): Promise<ReturnType<R['expectErr']>> {
+  expectErr(message: string): Promise<ReturnType<TResult['expectErr']>> {
     return this.then((res) => res.expectErr(message));
   }
 
@@ -68,120 +71,148 @@ export class AsyncResult<R extends AnyResult> {
   //     ? Promise<never>
   //     : AsyncResult<Awaited<Value<R>>>
   //   : Promise<Awaited<Value<R>>> {
-  unwrap(): Promise<Awaited<Value<R>>> {
+  unwrap(): Promise<Awaited<Value<TResult>>> {
     return this.then((res) => res.unwrap());
   }
 
-  unwrapErr(): Promise<Awaited<Error<R>>> {
+  unwrapErr(): Promise<Awaited<Error<TResult>>> {
     return this.then((res) => res.unwrapErr());
   }
 
-  unwrapOr<U>(defaultValue: U): Promise<IsOk<R, Value<R>, Awaited<U>>> {
+  unwrapOr<TDefaultValue>(
+    defaultValue: TDefaultValue,
+  ): Promise<IsOk<TResult, Value<TResult>, Awaited<TDefaultValue>>> {
     return this.then((res) => res.unwrapOr(defaultValue));
   }
 
-  unwrapOrElse<U>(fn: (error: Error<R>) => U): Promise<IsOk<R, Value<R>, Awaited<U>>> {
+  unwrapOrElse<TDefaultValue>(
+    fn: (error: Error<TResult>) => TDefaultValue,
+  ): Promise<IsOk<TResult, Value<TResult>, Awaited<TDefaultValue>>> {
     return this.then((res) => res.unwrapOrElse(fn));
   }
 
-  ok(): Promise<ReturnType<R['ok']>> {
-    return this.then((res) => res.ok() as ReturnType<R['ok']>);
+  ok(): Promise<ReturnType<TResult['ok']>> {
+    return this.then((res) => res.ok() as ReturnType<TResult['ok']>);
   }
 
-  err(): Promise<ReturnType<R['err']>> {
-    return this.then((res) => res.err() as ReturnType<R['err']>);
+  err(): Promise<ReturnType<TResult['err']>> {
+    return this.then((res) => res.err() as ReturnType<TResult['err']>);
   }
 
-  transpose(): Promise<ReturnType<R['transpose']>> {
+  transpose(): Promise<ReturnType<TResult['transpose']>> {
     return this.then((res) => res.transpose());
   }
 
   flatten(): AsyncResult<
-    IsOk<R, Value<R> extends AnyResult ? Value<R> : Ok<Value<R>>, Err<Error<R>>>
+    IsOk<
+      TResult,
+      Value<TResult> extends AnyResult ? Value<TResult> : Ok<Value<TResult>>,
+      Err<Error<TResult>>
+    >
   > {
     return new AsyncResult(this.then((res) => res.flatten()));
   }
 
-  map<U>(fn: (value: Value<R>) => U): AsyncResult<IsOk<R, Ok<Awaited<U>>, Err<Error<R>>>> {
+  map<TNextValue>(
+    fn: (value: Value<TResult>) => TNextValue,
+  ): AsyncResult<IsOk<TResult, Ok<Awaited<TNextValue>>, Err<Error<TResult>>>> {
     return new AsyncResult(
-      this.then((res) => res.map(fn) as IsOk<R, Ok<Awaited<U>>, Err<Error<R>>>),
+      this.then(
+        (res) => res.map(fn) as IsOk<TResult, Ok<Awaited<TNextValue>>, Err<Error<TResult>>>,
+      ),
     );
   }
 
-  mapErr<F>(fn: (error: Error<R>) => F): AsyncResult<IsOk<R, Ok<Value<R>>, Err<Awaited<F>>>> {
+  mapErr<TNextError>(
+    fn: (error: Error<TResult>) => TNextError,
+  ): AsyncResult<IsOk<TResult, Ok<Value<TResult>>, Err<Awaited<TNextError>>>> {
     return new AsyncResult(
-      this.then((res) => res.mapErr(fn) as IsOk<R, Ok<Value<R>>, Err<Awaited<F>>>),
+      this.then(
+        (res) => res.mapErr(fn) as IsOk<TResult, Ok<Value<TResult>>, Err<Awaited<TNextError>>>,
+      ),
     );
   }
 
-  mapOr<D, U>(
-    defaultValue: D,
-    fn: (value: Value<R>) => U,
-  ): Promise<IsOk<R, Awaited<U>, Awaited<D>>> {
-    return this.then((res) => res.mapOr(defaultValue, fn) as IsOk<R, Awaited<U>, Awaited<D>>);
+  mapOr<TDefaultValue, TNextValue>(
+    defaultValue: TDefaultValue,
+    fn: (value: Value<TResult>) => TNextValue,
+  ): Promise<IsOk<TResult, Awaited<TNextValue>, Awaited<TDefaultValue>>> {
+    return this.then(
+      (res) =>
+        res.mapOr(defaultValue, fn) as IsOk<TResult, Awaited<TNextValue>, Awaited<TDefaultValue>>,
+    );
   }
 
-  mapOrElse<D, U>(
-    defaultFn: (error: Error<R>) => D,
-    fn: (value: Value<R>) => U,
-  ): Promise<IsOk<R, Awaited<U>, Awaited<D>>> {
-    return this.then((res) => res.mapOrElse(defaultFn, fn) as IsOk<R, Awaited<U>, Awaited<D>>);
+  mapOrElse<TDefaultValue, TNextValue>(
+    defaultFn: (error: Error<TResult>) => TDefaultValue,
+    fn: (value: Value<TResult>) => TNextValue,
+  ): Promise<IsOk<TResult, Awaited<TNextValue>, Awaited<TDefaultValue>>> {
+    return this.then(
+      (res) =>
+        res.mapOrElse(defaultFn, fn) as IsOk<TResult, Awaited<TNextValue>, Awaited<TDefaultValue>>,
+    );
   }
 
-  and<B extends AnyResult>(resB: B): AsyncResult<IsOk<R, Awaited<B>, Err<Error<R>>>> {
+  and<TResultB extends AnyResult>(
+    resB: TResultB,
+  ): AsyncResult<IsOk<TResult, Awaited<TResultB>, Err<Error<TResult>>>> {
     return new AsyncResult(this.then((res) => res.and(resB)));
   }
 
-  or<B extends AnyResult>(resB: B): AsyncResult<IsOk<R, Ok<Value<R>>, Awaited<B>>> {
+  or<TResultB extends AnyResult>(
+    resB: TResultB,
+  ): AsyncResult<IsOk<TResult, Ok<Value<TResult>>, Awaited<TResultB>>> {
     return new AsyncResult(this.then((res) => res.or(resB)));
   }
 
-  andThen<B extends AnyResult>(
-    fn: (value: Value<R>) => B,
-  ): AsyncResult<IsOk<R, Awaited<B>, Err<Error<R>>>> {
+  andThen<TResultB extends AnyResult>(
+    fn: (value: Value<TResult>) => TResultB,
+  ): AsyncResult<IsOk<TResult, Awaited<TResultB>, Err<Error<TResult>>>> {
     return new AsyncResult(this.then((res) => res.andThen(fn)));
   }
 
-  orElse<B extends AnyResult>(
-    fn: (error: Error<R>) => B,
-  ): AsyncResult<IsOk<R, Ok<Value<R>>, Awaited<B>>> {
+  orElse<TResultB extends AnyResult>(
+    fn: (error: Error<TResult>) => TResultB,
+  ): AsyncResult<IsOk<TResult, Ok<Value<TResult>>, Awaited<TResultB>>> {
     return new AsyncResult(this.then((res) => res.orElse(fn)));
   }
 
-  match<U>(m: ResultMatch<Value<R>, Error<R>, U>): Promise<U> {
+  match<TOutput>(m: ResultMatch<Value<TResult>, Error<TResult>, TOutput>): Promise<TOutput> {
     return this.then((res) => res.match(m));
   }
 
   serialize(): Promise<
     IsOk<
-      R,
-      { isOk: true; isErr: false; value: Value<R> },
-      { isOk: false; isErr: true; error: Error<R> }
+      TResult,
+      { isOk: true; isErr: false; value: Value<TResult> },
+      { isOk: false; isErr: true; error: Error<TResult> }
     >
   > {
     return this.then(
       (res) =>
         res.serialize() as IsOk<
-          R,
-          { isOk: true; isErr: false; value: Value<R> },
-          { isOk: false; isErr: true; error: Error<R> }
+          TResult,
+          { isOk: true; isErr: false; value: Value<TResult> },
+          { isOk: false; isErr: true; error: Error<TResult> }
         >,
     );
   }
 }
 
-export type AsyncOk<T> = AsyncResult<Ok<T>>;
-export type AsyncErr<E> = AsyncResult<Err<E>>;
+export type AsyncOk<TValue> = AsyncResult<Ok<TValue>>;
+export type AsyncErr<TError> = AsyncResult<Err<TError>>;
 
-export function asyncOk<T>(value: T): AsyncOk<T> {
+export function asyncOk<TValue>(value: TValue): AsyncOk<TValue> {
   return new AsyncResult(Promise.resolve(ok(value)));
 }
 
-export function asyncErr<E>(error: E): AsyncErr<E> {
+export function asyncErr<TError>(error: TError): AsyncErr<TError> {
   return new AsyncResult(Promise.resolve(err(error)));
 }
 
-export function asyncResult<T>(fn: () => Promise<T>): AsyncResult<Result<T, unknown>> {
+export function asyncResult<TValue>(
+  fn: () => Promise<TValue>,
+): AsyncResult<Result<TValue, unknown>> {
   return new AsyncResult(
     fn()
       .then((value) => ok(value))

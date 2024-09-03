@@ -1,52 +1,60 @@
 /* c8 ignore start */
-// TODO remove ignore comment when this issue is resolved: https://github.com/vitest-dev/vitest/issues/3605
 
 import type { Err, Ok } from '../result';
 import type { MaybePromise, Ternary } from '../util';
 import type { None, Some } from './option';
 import type { AnyOption, OptionMatch } from './util';
 
-// TODO ASYNC variant to share docs?
 type Variant = 'SOME' | 'NONE';
-type Eval<V extends Variant, TIsSome, TIsNone> = V extends 'SOME'
+type Eval<TVariant extends Variant, TIsSome, TIsNone> = TVariant extends 'SOME'
   ? TIsSome
-  : V extends 'NONE'
+  : TVariant extends 'NONE'
     ? TIsNone
     : never;
 
-type Value<T, V extends Variant> = V extends 'SOME' ? T : never;
+type Value<TValue, TVariant extends Variant> = TVariant extends 'SOME' ? TValue : never;
 
 // TODO docs
 /** A data structure that represents either the presence or the absence of a value */
-export type OptionConstructor<T, V extends Variant> = {
+export type OptionConstructor<TValue, TVariant extends Variant> = {
   // Querying
 
-  isSome: Eval<V, true, false>;
-  isNone: Eval<V, false, true>;
-  isSomeAnd: <P extends MaybePromise<boolean>>(fn: (value: Value<T, V>) => P) => Eval<V, P, false>;
-  inspect: (fn: (value: Value<T, V>) => void) => OptionConstructor<T, V>;
+  isSome: Eval<TVariant, true, false>;
+  isNone: Eval<TVariant, false, true>;
+  isSomeAnd: <TPredicate extends MaybePromise<boolean>>(
+    fn: (value: Value<TValue, TVariant>) => TPredicate,
+  ) => Eval<TVariant, TPredicate, false>;
+  inspect: (fn: (value: Value<TValue, TVariant>) => void) => OptionConstructor<TValue, TVariant>;
 
   // Extracting the contained value
 
-  expect: (message: string) => Value<T, V>;
-  unwrap: () => Value<T, V>;
-  unwrapOr: <U>(defaultValue: U) => Eval<V, T, U>;
-  unwrapOrElse: <U>(fn: () => U) => Eval<V, T, U>;
+  expect: (message: string) => Value<TValue, TVariant>;
+  unwrap: () => Value<TValue, TVariant>;
+  unwrapOr: <TDefaultValue>(defaultValue: TDefaultValue) => Eval<TVariant, TValue, TDefaultValue>;
+  unwrapOrElse: <TDefaultValue>(fn: () => TDefaultValue) => Eval<TVariant, TValue, TDefaultValue>;
 
   // Transforming the contained value
 
-  okOr: <E>(error: E) => Eval<V, Ok<T>, Err<E>>;
-  okOrElse: <E>(errorFn: () => E) => Eval<V, Ok<T>, Err<E>>;
+  okOr: <TError>(error: TError) => Eval<TVariant, Ok<TValue>, Err<TError>>;
+  okOrElse: <TError>(errorFn: () => TError) => Eval<TVariant, Ok<TValue>, Err<TError>>;
   // TODO
   // transpose: ;
   // flatten: ;
   // TODO allow promises => AsyncOption
-  map: <U>(fn: (value: Value<T, V>) => U) => Eval<V, Some<U>, None>;
-  mapOr: <D, U>(defaultValue: D, fn: (value: Value<T, V>) => U) => Eval<V, U, D>;
-  mapOrElse: <D, U>(defaultFn: () => D, fn: (value: Value<T, V>) => U) => Eval<V, U, D>;
-  filter: <P extends boolean>(
-    predicate: (value: Value<T, V>) => P,
-  ) => Eval<V, P extends true ? Some<T> : None, None>;
+  map: <TNextValue>(
+    fn: (value: Value<TValue, TVariant>) => TNextValue,
+  ) => Eval<TVariant, Some<TNextValue>, None>;
+  mapOr: <TDefaultValue, TNextValue>(
+    defaultValue: TDefaultValue,
+    fn: (value: Value<TValue, TVariant>) => TNextValue,
+  ) => Eval<TVariant, TNextValue, TDefaultValue>;
+  mapOrElse: <TDefaultValue, TNextValue>(
+    defaultFn: () => TDefaultValue,
+    fn: (value: Value<TValue, TVariant>) => TNextValue,
+  ) => Eval<TVariant, TNextValue, TDefaultValue>;
+  filter: <TPredicate extends boolean>(
+    predicate: (value: Value<TValue, TVariant>) => TPredicate,
+  ) => Eval<TVariant, TPredicate extends true ? Some<TValue> : None, None>;
   // TODO `O extends AnyOption`? These can all be more typesafe
   // zip: <U>(other: Option<U>) => Option<[T, U]>;
   // zipWith: <U, R>(other: Option<U>, fn: (optA: T, optB: U) => R) => Option<R>;
@@ -54,15 +62,23 @@ export type OptionConstructor<T, V extends Variant> = {
 
   // Boolean operators
 
-  and: <O extends AnyOption>(opt: O) => Eval<V, O, None>;
-  or: <O extends AnyOption>(opt: O) => Eval<V, Some<T>, O>;
-  xor: <O extends AnyOption>(
-    opt: O,
-  ) => Eval<V, Ternary<O['isSome'], None, Some<T>>, Ternary<O['isSome'], O, None>>;
-  andThen: <O extends AnyOption>(fn: (value: T) => O) => Eval<V, O, None>;
-  orElse: <O extends AnyOption>(fn: () => O) => Eval<V, Some<T>, O>;
+  and: <TOptionB extends AnyOption>(opt: TOptionB) => Eval<TVariant, TOptionB, None>;
+  or: <TOptionB extends AnyOption>(opt: TOptionB) => Eval<TVariant, Some<TValue>, TOptionB>;
+  xor: <TOptionB extends AnyOption>(
+    opt: TOptionB,
+  ) => Eval<
+    TVariant,
+    Ternary<TOptionB['isSome'], None, Some<TValue>>,
+    Ternary<TOptionB['isSome'], TOptionB, None>
+  >;
+  andThen: <TOptionB extends AnyOption>(
+    fn: (value: TValue) => TOptionB,
+  ) => Eval<TVariant, TOptionB, None>;
+  orElse: <TOptionB extends AnyOption>(
+    fn: () => TOptionB,
+  ) => Eval<TVariant, Some<TValue>, TOptionB>;
 
   // Rust syntax utilities
 
-  match: <U>(m: OptionMatch<Value<T, V>, U>) => U;
+  match: <TOutput>(m: OptionMatch<Value<TValue, TVariant>, TOutput>) => TOutput;
 };

@@ -3,6 +3,6 @@
  * TO EDIT THE CONTENT, PLEASE MODIFY `/workspace.ts` OR `/scripts/generate.ts`
  */
 
-import recommended from '@quintal/config/vite';
+import getRecommended from '@quintal/config/vite';
 
-export default recommended;
+export default getRecommended('@quintal/table-engine-react');

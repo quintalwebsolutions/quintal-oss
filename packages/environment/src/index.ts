@@ -23,14 +23,14 @@ type EnvValue = {
 
 type EnvValues = { [key: string]: EnvValue | EnvValues | string | undefined };
 
-type UnwrapEnvValue<T> = T extends string
+type UnwrapEnvValue<TValue> = TValue extends string
   ? string
-  : T extends EnvValue
-    ? T extends Required<Pick<EnvValue, 'schema'>>
-      ? ReturnType<T['schema']['parse']>
+  : TValue extends EnvValue
+    ? TValue extends Required<Pick<EnvValue, 'schema'>>
+      ? ReturnType<TValue['schema']['parse']>
       : string
-    : T extends Record<string, unknown>
-      ? { [TKey in keyof T]: UnwrapEnvValue<T[TKey]> }
+    : TValue extends Record<string, unknown>
+      ? { [TKey in keyof TValue]: UnwrapEnvValue<TValue[TKey]> }
       : never;
 
 type UnwrapEnvValues<TEnvValues extends EnvValues> = {

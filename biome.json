@@ -2,46 +2,77 @@
   "$schema": "node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
     "include": ["*"],
-    "ignore": [".coverage", ".coverage-ts", ".docs", ".dist"]
+    "ignore": [
+      "node_modules",
+      ".coverage",
+      ".coverage-ts",
+      ".dist",
+      ".turbo",
+      "package.json",
+      "vite.config.mjs"
+    ]
   },
   "organizeImports": {
     "enabled": true
   },
   "formatter": {
     "enabled": true,
+    "attributePosition": "auto",
     "formatWithErrors": false,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineWidth": 100,
-    "lineEnding": "lf"
+    "lineEnding": "lf",
+    "lineWidth": 100
   },
   "linter": {
     "enabled": true,
     "rules": {
       "all": true,
       "style": {
-        "useBlockStatements": "off"
+        "useBlockStatements": "off",
+        "useNamingConvention": {
+          "level": "warn",
+          "options": {
+            "strictCase": true,
+            "requireAscii": true,
+            "enumMemberCase": "CONSTANT_CASE",
+            "conventions": [
+              {
+                "selector": {
+                  "kind": "typeParameter"
+                },
+                "match": "T(.+)",
+                "formats": ["PascalCase"]
+              }
+            ]
+          }
+        }
+      },
+      "performance": {
+        "noBarrelFile": "off",
+        "noReExportAll": "off"
+      },
+      "correctness": {
+        "noNodejsModules": "off"
       }
     }
   },
   "javascript": {
-    "parser": {
-      "unsafeParameterDecoratorsEnabled": false
-    },
     "formatter": {
       "enabled": true,
-      "quoteStyle": "single",
-      "jsxQuoteStyle": "double",
-      "quoteProperties": "preserve",
-      "trailingComma": "all",
-      "semicolons": "always",
       "arrowParentheses": "always",
+      "attributePosition": "auto",
+      "bracketSameLine": false,
+      "bracketSpacing": true,
       "indentStyle": "space",
       "indentWidth": 2,
-      "lineWidth": 100,
+      "jsxQuoteStyle": "double",
       "lineEnding": "lf",
-      "bracketSameLine": false,
-      "bracketSpacing": true
+      "lineWidth": 100,
+      "quoteProperties": "preserve",
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "all"
     }
   },
   "json": {
@@ -54,7 +85,20 @@
       "indentStyle": "space",
       "indentWidth": 2,
       "lineEnding": "lf",
-      "lineWidth": 100
+      "lineWidth": 100,
+      "trailingCommas": "none"
     }
-  }
+  },
+  "overrides": [
+    {
+      "include": [],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    }
+  ]
 }

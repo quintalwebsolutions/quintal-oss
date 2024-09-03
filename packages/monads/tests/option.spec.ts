@@ -2,9 +2,10 @@ import { describe, expect, expectTypeOf, it } from 'vitest';
 import { type AnyOption, type Option, none, some } from '../src';
 import type { Equal } from './util';
 
-function expectOptionUnwrap<Option extends AnyOption>(_option: Option) {
+function expectOptionUnwrap<TOption extends AnyOption>(_option: TOption) {
   return {
-    toBe: <Unwrap>(_val: Equal<ReturnType<Option['unwrap']>, Unwrap>) => {},
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: test
+    toBe: <TUnwrap>(_val: Equal<ReturnType<TOption['unwrap']>, TUnwrap>) => {},
   };
 }
 

@@ -17,23 +17,21 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup
         uses: ./.github/actions/setup
 
-      - name: Lint
-        run: pnpm lint:check
+      - name: Check
+        run: pnpm turbo run lint:check lint:types test build
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Test
-        run: pnpm test
-
-      - name: Collect test coverage
-        uses: "./.github/actions/collect_coverage"
+      - name: Collect test analytics
+        uses: "./.github/actions/collect_test_analytics"
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Build
-        run: pnpm build
 
       - name: Create release pull request or publish to npm
         id: changesets

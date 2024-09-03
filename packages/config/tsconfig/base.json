@@ -27,7 +27,7 @@
     "declaration": true,
     "declarationMap": true,
     "downlevelIteration": true,
-    "importHelpers": true,
+    "importHelpers": false,
     "newLine": "lf",
     "noEmit": false,
     "outDir": "./dist",

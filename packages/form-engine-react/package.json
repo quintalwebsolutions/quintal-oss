@@ -1,6 +1,6 @@
 {
   "name": "@quintal/form-engine-react",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "description": "A headless, declarative, lightweight form engine for React apps with first-class TypeScript support.",
   "keywords": [

@@ -1,5 +1,15 @@
 # @quintal/environment
 
+## 1.0.0
+
+### Major Changes
+
+- 033fc08: First major release
+
+### Patch Changes
+
+- 782dc4c: Update all packages and pipelines
+
 ## 0.2.0
 
 ### Minor Changes

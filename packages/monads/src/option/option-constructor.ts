@@ -4,7 +4,7 @@ import type { None, Some } from './option';
 import type { AnyOption, OptionMatch } from './util';
 
 type Variant = 'SOME' | 'NONE';
-type Eval<TVariant extends Variant, TIsSome, TIsNone> = TVariant extends 'SOME'
+type EvaluateVariant<TVariant extends Variant, TIsSome, TIsNone> = TVariant extends 'SOME'
   ? TIsSome
   : TVariant extends 'NONE'
     ? TIsNone
@@ -17,42 +17,46 @@ type Value<TValue, TVariant extends Variant> = TVariant extends 'SOME' ? TValue 
 export type OptionConstructor<TValue, TVariant extends Variant> = {
   // Querying
 
-  isSome: Eval<TVariant, true, false>;
-  isNone: Eval<TVariant, false, true>;
+  isSome: EvaluateVariant<TVariant, true, false>;
+  isNone: EvaluateVariant<TVariant, false, true>;
   isSomeAnd: <TPredicate extends MaybePromise<boolean>>(
     fn: (value: Value<TValue, TVariant>) => TPredicate,
-  ) => Eval<TVariant, TPredicate, false>;
+  ) => EvaluateVariant<TVariant, TPredicate, false>;
   inspect: (fn: (value: Value<TValue, TVariant>) => void) => OptionConstructor<TValue, TVariant>;
 
   // Extracting the contained value
 
   expect: (message: string) => Value<TValue, TVariant>;
   unwrap: () => Value<TValue, TVariant>;
-  unwrapOr: <TDefaultValue>(defaultValue: TDefaultValue) => Eval<TVariant, TValue, TDefaultValue>;
-  unwrapOrElse: <TDefaultValue>(fn: () => TDefaultValue) => Eval<TVariant, TValue, TDefaultValue>;
+  unwrapOr: <TDefaultValue>(
+    defaultValue: TDefaultValue,
+  ) => EvaluateVariant<TVariant, TValue, TDefaultValue>;
+  unwrapOrElse: <TDefaultValue>(
+    fn: () => TDefaultValue,
+  ) => EvaluateVariant<TVariant, TValue, TDefaultValue>;
 
   // Transforming the contained value
 
-  okOr: <TError>(error: TError) => Eval<TVariant, Ok<TValue>, Err<TError>>;
-  okOrElse: <TError>(errorFn: () => TError) => Eval<TVariant, Ok<TValue>, Err<TError>>;
+  okOr: <TError>(error: TError) => EvaluateVariant<TVariant, Ok<TValue>, Err<TError>>;
+  okOrElse: <TError>(errorFn: () => TError) => EvaluateVariant<TVariant, Ok<TValue>, Err<TError>>;
   // TODO
   // transpose: ;
   // flatten: ;
   // TODO allow promises => AsyncOption
-  map: <TNextValue>(
-    fn: (value: Value<TValue, TVariant>) => TNextValue,
-  ) => Eval<TVariant, Some<TNextValue>, None>;
-  mapOr: <TDefaultValue, TNextValue>(
+  map: <TMappedValue>(
+    fn: (value: Value<TValue, TVariant>) => TMappedValue,
+  ) => EvaluateVariant<TVariant, Some<TMappedValue>, None>;
+  mapOr: <TDefaultValue, TMappedValue>(
     defaultValue: TDefaultValue,
-    fn: (value: Value<TValue, TVariant>) => TNextValue,
-  ) => Eval<TVariant, TNextValue, TDefaultValue>;
-  mapOrElse: <TDefaultValue, TNextValue>(
+    fn: (value: Value<TValue, TVariant>) => TMappedValue,
+  ) => EvaluateVariant<TVariant, TMappedValue, TDefaultValue>;
+  mapOrElse: <TDefaultValue, TMappedValue>(
     defaultFn: () => TDefaultValue,
-    fn: (value: Value<TValue, TVariant>) => TNextValue,
-  ) => Eval<TVariant, TNextValue, TDefaultValue>;
+    fn: (value: Value<TValue, TVariant>) => TMappedValue,
+  ) => EvaluateVariant<TVariant, TMappedValue, TDefaultValue>;
   filter: <TPredicate extends boolean>(
     predicate: (value: Value<TValue, TVariant>) => TPredicate,
-  ) => Eval<TVariant, TPredicate extends true ? Some<TValue> : None, None>;
+  ) => EvaluateVariant<TVariant, TPredicate extends true ? Some<TValue> : None, None>;
   // TODO `O extends AnyOption`? These can all be more typesafe
   // zip: <U>(other: Option<U>) => Option<[T, U]>;
   // zipWith: <U, R>(other: Option<U>, fn: (optA: T, optB: U) => R) => Option<R>;
@@ -60,21 +64,23 @@ export type OptionConstructor<TValue, TVariant extends Variant> = {
 
   // Boolean operators
 
-  and: <TOptionB extends AnyOption>(opt: TOptionB) => Eval<TVariant, TOptionB, None>;
-  or: <TOptionB extends AnyOption>(opt: TOptionB) => Eval<TVariant, Some<TValue>, TOptionB>;
+  and: <TOptionB extends AnyOption>(opt: TOptionB) => EvaluateVariant<TVariant, TOptionB, None>;
+  or: <TOptionB extends AnyOption>(
+    opt: TOptionB,
+  ) => EvaluateVariant<TVariant, Some<TValue>, TOptionB>;
   xor: <TOptionB extends AnyOption>(
     opt: TOptionB,
-  ) => Eval<
+  ) => EvaluateVariant<
     TVariant,
     Ternary<TOptionB['isSome'], None, Some<TValue>>,
     Ternary<TOptionB['isSome'], TOptionB, None>
   >;
   andThen: <TOptionB extends AnyOption>(
     fn: (value: TValue) => TOptionB,
-  ) => Eval<TVariant, TOptionB, None>;
+  ) => EvaluateVariant<TVariant, TOptionB, None>;
   orElse: <TOptionB extends AnyOption>(
     fn: () => TOptionB,
-  ) => Eval<TVariant, Some<TValue>, TOptionB>;
+  ) => EvaluateVariant<TVariant, Some<TValue>, TOptionB>;
 
   // Rust syntax utilities
 

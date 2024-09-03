@@ -57,21 +57,21 @@ export class Some<TValue> implements OptionConstructor<TValue, 'SOME'> {
     return ok(this.value);
   }
 
-  map<TNextValue>(fn: (value: TValue) => TNextValue): Some<TNextValue> {
+  map<TMappedValue>(fn: (value: TValue) => TMappedValue): Some<TMappedValue> {
     return some(fn(this.value));
   }
 
-  mapOr<TDefaultValue, TNextValue>(
+  mapOr<TDefaultValue, TMappedValue>(
     _defaultValue: TDefaultValue,
-    fn: (value: TValue) => TNextValue,
-  ): TNextValue {
+    fn: (value: TValue) => TMappedValue,
+  ): TMappedValue {
     return fn(this.value);
   }
 
-  mapOrElse<TDefaultValue, TNextValue>(
+  mapOrElse<TDefaultValue, TMappedValue>(
     _defaultFn: () => TDefaultValue,
-    fn: (value: TValue) => TNextValue,
-  ): TNextValue {
+    fn: (value: TValue) => TMappedValue,
+  ): TMappedValue {
     return fn(this.value);
   }
 
@@ -153,20 +153,20 @@ export class None implements OptionConstructor<never, 'NONE'> {
     return err(errorFn());
   }
 
-  map<TNextValue>(_fn: (value: never) => TNextValue): None {
+  map<TMappedValue>(_fn: (value: never) => TMappedValue): None {
     return this;
   }
 
-  mapOr<TDefaultValue, TNextValue>(
+  mapOr<TDefaultValue, TMappedValue>(
     defaultValue: TDefaultValue,
-    _fn: (value: never) => TNextValue,
+    _fn: (value: never) => TMappedValue,
   ): TDefaultValue {
     return defaultValue;
   }
 
-  mapOrElse<TDefaultValue, TNextValue>(
+  mapOrElse<TDefaultValue, TMappedValue>(
     defaultFn: () => TDefaultValue,
-    _fn: (value: never) => TNextValue,
+    _fn: (value: never) => TMappedValue,
   ): TDefaultValue {
     return defaultFn();
   }

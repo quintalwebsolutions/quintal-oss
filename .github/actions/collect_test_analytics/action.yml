@@ -8,8 +8,8 @@ description: Collect test analytics from all packages and upload to Codecov
 
 inputs:
   token:
-    description: 'Codecov token'
     required: true
+    description: 'Codecov token'
 
 runs:
   using: composite

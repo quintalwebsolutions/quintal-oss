@@ -3,6 +3,7 @@
   "name": "quintal-oss",
   "scripts": {
     "clean": "shx rm -rf .turbo node_modules",
+    "generate": "tsx ./scripts/generate.ts",
     "lint": "syncpack fix-mismatches && syncpack format && sherif --fix",
     "lint:check": "syncpack lint && sherif"
   },

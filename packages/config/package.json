@@ -3,7 +3,12 @@
   "version": "0.2.0",
   "license": "MIT",
   "description": "The solution to the infamous [Node.JS Config Hell Problem](https://deno.com/blog/node-config-hell)",
-  "keywords": ["config", "hell", "typescript", "dotfiles"],
+  "keywords": [
+    "config",
+    "hell",
+    "typescript",
+    "dotfiles"
+  ],
   "author": {
     "name": "William Ford",
     "email": "william@quintalwebsolutions.com",
@@ -16,7 +21,11 @@
   },
   "homepage": "https://github.com/quintalwebsolutions/quintal-oss/tree/main/packages/config#readme",
   "bugs": "https://github.com/quintalwebsolutions/quintal-oss/labels/%40quintal%2Fconfig",
-  "files": ["tsconfig/**", "nextjs.js", "vite.mjs"],
+  "files": [
+    "tsconfig/**",
+    "nextjs.js",
+    "vite.mjs"
+  ],
   "scripts": {
     "clean": "shx rm -rf .coverage .coverage-ts .dist .turbo node_modules"
   },

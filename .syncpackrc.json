@@ -3,19 +3,19 @@
   "dependencyTypes": ["dev", "prod", "peer"],
   "semverGroups": [
     {
-      "label": "use exact version numbers for dependencies",
-      "range": ""
+      "label": "Use exact version numbers for dependencies",
+      "range": "",
+      "dependencyTypes": ["prod", "dev"]
+    },
+    {
+      "label": "Use major version numbers for peer dependencies",
+      "range": "^",
+      "dependencyTypes": ["peer"]
     }
   ],
-  "sortAz": [
-    "contributors",
-    "peerDependencies",
-    "dependencies",
-    "devDependencies",
-    "resolutions",
-    "scripts"
-  ],
+  "sortAz": ["scripts", "peerDependencies", "dependencies", "devDependencies"],
   "sortFirst": [
+    "private",
     "name",
     "version",
     "license",

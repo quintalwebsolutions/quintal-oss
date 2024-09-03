@@ -5,7 +5,8 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["src/**"],
-      "outputs": [".dist/**"]
+      "outputs": [".dist/**"],
+      "env": ["CODECOV_TOKEN"]
     },
     "clean": {
       "cache": false

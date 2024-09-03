@@ -44,12 +44,12 @@ function throws(): 'value' {
   throw new Error('error');
 }
 
-// biome-ignore lint/nursery/useAwait: test
+// biome-ignore lint/suspicious/useAwait: test
 async function returnsAsync(): P<'value'> {
   return 'value';
 }
 
-// biome-ignore lint/nursery/useAwait: test
+// biome-ignore lint/suspicious/useAwait: test
 async function throwsAsync(): P<'value'> {
   throw new Error('error');
 }
@@ -263,7 +263,7 @@ describe('Result', () => {
               }),
             ),
             test(true, (mock) =>
-              // biome-ignore lint/nursery/useAwait: test
+              // biome-ignore lint/suspicious/useAwait: test
               result.inspect(async (v) => {
                 expect(v).toStrictEqual(value);
                 mock();
@@ -276,7 +276,7 @@ describe('Result', () => {
               }),
             ),
             test(false, (mock) =>
-              // biome-ignore lint/nursery/useAwait: test
+              // biome-ignore lint/suspicious/useAwait: test
               result.inspectErr(async (e) => {
                 expect(e).toStrictEqual(value);
                 mock();

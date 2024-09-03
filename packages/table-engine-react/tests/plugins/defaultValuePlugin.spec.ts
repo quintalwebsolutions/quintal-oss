@@ -1,9 +1,9 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import type {
-  DefaultValuePlugin,
-  P,
   Plugins as BasePlugins,
   Row as BaseRow,
+  DefaultValuePlugin,
+  P,
   Table,
 } from '../../src';
 import { defaultValuePlugin, makeTable } from '../../src';

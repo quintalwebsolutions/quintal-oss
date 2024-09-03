@@ -2,7 +2,7 @@
   "$schema": "node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
     "include": ["*"],
-    "ignore": ["node_modules", ".coverage", ".coverage-ts", ".dist", ".turbo"]
+    "ignore": ["node_modules", ".coverage", ".coverage-ts", ".dist", ".turbo", "package.json"]
   },
   "organizeImports": {
     "enabled": true
@@ -21,7 +21,28 @@
     "rules": {
       "all": true,
       "style": {
-        "useBlockStatements": "off"
+        "useBlockStatements": "off",
+        "useNamingConvention": {
+          "level": "warn",
+          "options": {
+            "strictCase": true,
+            "requireAscii": true,
+            "enumMemberCase": "CONSTANT_CASE",
+            "conventions": [
+              {
+                "selector": {
+                  "kind": "typeParameter"
+                },
+                "match": "T(.+)",
+                "formats": ["PascalCase"]
+              }
+            ]
+          }
+        }
+      },
+      "performance": {
+        "noBarrelFile": "off",
+        "noReExportAll": "off"
       },
       "correctness": {
         "noNodejsModules": "off"
@@ -29,9 +50,6 @@
     }
   },
   "javascript": {
-    "parser": {
-      "unsafeParameterDecoratorsEnabled": false
-    },
     "formatter": {
       "enabled": true,
       "arrowParentheses": "always",
@@ -62,5 +80,17 @@
       "lineWidth": 100,
       "trailingCommas": "none"
     }
-  }
+  },
+  "overrides": [
+    {
+      "include": [],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    }
+  ]
 }

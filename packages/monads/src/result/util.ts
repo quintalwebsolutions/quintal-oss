@@ -2,9 +2,9 @@ import { AsyncResult } from './async-result';
 import type { Result } from './result';
 import { Err, Ok } from './result';
 
-export type ResultMatch<T, E, U> = {
-  ok: (value: T) => U;
-  err: (error: E) => U;
+export type ResultMatch<TValue, TError, TOutput> = {
+  ok: (value: TValue) => TOutput;
+  err: (error: TError) => TOutput;
 };
 
 // biome-ignore lint/suspicious/noExplicitAny: This type exists solely for generic parameters to extend

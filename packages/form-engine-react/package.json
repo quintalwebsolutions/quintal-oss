@@ -3,7 +3,14 @@
   "version": "0.0.0",
   "license": "MIT",
   "description": "A headless, declarative, lightweight form engine for React apps with first-class TypeScript support.",
-  "keywords": ["react", "form", "hook", "validation", "headless", "typescript"],
+  "keywords": [
+    "react",
+    "form",
+    "hook",
+    "validation",
+    "headless",
+    "typescript"
+  ],
   "author": {
     "name": "William Ford",
     "email": "william@quintalwebsolutions.com",
@@ -19,7 +26,9 @@
   "main": "./.dist/index.cjs",
   "module": "./.dist/index.mjs",
   "types": "./.dist/index.d.ts",
-  "files": [".dist"],
+  "files": [
+    ".dist"
+  ],
   "scripts": {
     "build": "run-s build:*",
     "build:clean": "shx rm -rf .dist",
@@ -42,10 +51,10 @@
     "@testing-library/react": "16.0.1",
     "@types/react": "18.3.5",
     "@vitest/coverage-v8": "2.0.5",
-    "npm-run-all": "4.1.5",
-    "shx": "0.3.4",
     "happy-dom": "15.7.3",
+    "npm-run-all": "4.1.5",
     "react": "18.3.1",
+    "shx": "0.3.4",
     "vite": "5.4.2",
     "vitest": "2.0.5"
   }

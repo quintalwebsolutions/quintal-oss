@@ -128,36 +128,34 @@ async function makeCollectTestAnalyticsYml(rootDir: string): Promise<void> {
       'runs:',
       '  using: composite',
       '  steps:',
-    ]
-      .concat(
-        Object.keys(workspace.packages).map((packageName) =>
-          [
-            `- name: Upload @quintal/${packageName} coverage to Codecov`,
-            '  if: ${{ !cancelled() }}',
-            '  uses: codecov/codecov-action@v4',
-            '  with:',
-            '    fail_ci_if_error: true',
-            '    handle_no_reports_found: true',
-            '    disable_search: true',
-            `    file: ./packages/${packageName}/.coverage/coverage-final.json`,
-            `    flags: ${packageName}`,
-            '    token: ${{ inputs.token }}',
-            `- name: Upload @quintal/${packageName} analytics to Codecov`,
-            '  if: ${{ !cancelled() }}',
-            '  uses: codecov/test-results-action@v1',
-            '  with:',
-            '    fail_ci_if_error: true',
-            '    handle_no_reports_found: true',
-            '    disable_search: true',
-            `    file: ./packages/${packageName}/junit.xml`,
-            `    flags: ${packageName}`,
-            '    token: ${{ inputs.token }}',
-          ]
-            .map((line) => ' '.repeat(4) + line)
-            .join('\n'),
-        ),
-      )
-      .concat(['']),
+    ].concat(
+      Object.keys(workspace.packages).map((packageName) =>
+        [
+          `    - name: Upload @quintal/${packageName} coverage to Codecov`,
+          `      if: \${{ !cancelled() && hashFiles('./packages/${packageName}/.coverage/coverage-final.json') != '' }}`,
+          '      uses: codecov/codecov-action@v4',
+          '      with:',
+          '        fail_ci_if_error: true',
+          '        handle_no_reports_found: true',
+          '        disable_search: true',
+          `        file: ./packages/${packageName}/.coverage/coverage-final.json`,
+          `        flags: ${packageName}`,
+          '        token: ${{ inputs.token }}',
+          '',
+          `    - name: Upload @quintal/${packageName} analytics to Codecov`,
+          `      if: \${{ !cancelled() && hashFiles('./packages/${packageName}/junit.xml') != '' }}`,
+          '      uses: codecov/test-results-action@v1',
+          '      with:',
+          '        fail_ci_if_error: true',
+          '        handle_no_reports_found: true',
+          '        disable_search: true',
+          `        file: ./packages/${packageName}/junit.xml`,
+          `        flags: ${packageName}`,
+          '        token: ${{ inputs.token }}',
+          '',
+        ].join('\n'),
+      ),
+    ),
   );
 }
 

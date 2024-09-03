@@ -3,12 +3,7 @@
   "version": "0.2.0",
   "license": "MIT",
   "description": "Framework-agnostic environment variable validation for TypeScript",
-  "keywords": [
-    "environment",
-    "validation",
-    "typescript",
-    "zod"
-  ],
+  "keywords": ["environment", "validation", "typescript", "zod"],
   "author": {
     "name": "William Ford",
     "email": "william@quintalwebsolutions.com",
@@ -24,9 +19,7 @@
   "main": "./.dist/index.cjs",
   "module": "./.dist/index.mjs",
   "types": "./.dist/index.d.ts",
-  "files": [
-    ".dist"
-  ],
+  "files": [".dist"],
   "scripts": {
     "build": "run-s build:*",
     "build:clean": "shx rm -rf .dist",
@@ -34,21 +27,22 @@
     "clean": "shx rm -rf .coverage .coverage-ts .dist .turbo node_modules",
     "dev": "vitest --watch",
     "lint": "pnpm lint:fix && pnpm lint:types",
-    "lint:check": "biome ci .",
-    "lint:fix": "biome check --apply .",
+    "lint:check": "biome ci",
+    "lint:fix": "biome check --write",
     "lint:types": "tsc --noEmit",
     "test": "run-s test:*",
-    "test:source": "vitest",
-    "test:types": "typescript-coverage-report --outputDir .coverage-ts --strict"
+    "test:source": "vitest"
   },
   "peerDependencies": {
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@quintal/config": "workspace:*",
+    "@biomejs/biome": "1.8.3",
     "@vitest/coverage-v8": "2.0.5",
+    "@quintal/config": "workspace:*",
     "happy-dom": "15.7.3",
-    "typescript-coverage-report": "1.0.0",
+    "npm-run-all": "4.1.5",
+    "shx": "0.3.4",
     "vite": "5.4.2",
     "vitest": "2.0.5",
     "zod": "3.23.8"

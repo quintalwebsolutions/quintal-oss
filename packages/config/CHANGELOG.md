@@ -1,5 +1,11 @@
 # @quintal/config
 
+## 0.2.1
+
+### Patch Changes
+
+- 782dc4c: Update all packages and pipelines
+
 ## 0.2.0
 
 ### Minor Changes

@@ -1,5 +1,15 @@
 # @quintal/monads
 
+## 0.3.0
+
+### Minor Changes
+
+- cdbf54a: Add fromSerialized function to easily parse serialized monads back to their original form
+
+### Patch Changes
+
+- 782dc4c: Update all packages and pipelines
+
 ## 0.2.0
 
 ### Minor Changes

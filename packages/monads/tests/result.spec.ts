@@ -44,14 +44,12 @@ function throws(): 'value' {
   throw new Error('error');
 }
 
-// biome-ignore lint/suspicious/useAwait: test
 async function returnsAsync(): P<'value'> {
-  return 'value';
+  return await Promise.resolve('value');
 }
 
-// biome-ignore lint/suspicious/useAwait: test
 async function throwsAsync(): P<'value'> {
-  throw new Error('error');
+  throw await Promise.resolve(new Error('error'));
 }
 
 type P<TValue> = Promise<TValue>;
@@ -263,10 +261,9 @@ describe('Result', () => {
               }),
             ),
             test(true, (mock) =>
-              // biome-ignore lint/suspicious/useAwait: test
               result.inspect(async (v) => {
                 expect(v).toStrictEqual(value);
-                mock();
+                await Promise.resolve(mock());
               }),
             ),
             test(false, (mock) =>
@@ -276,10 +273,9 @@ describe('Result', () => {
               }),
             ),
             test(false, (mock) =>
-              // biome-ignore lint/suspicious/useAwait: test
               result.inspectErr(async (e) => {
                 expect(e).toStrictEqual(value);
-                mock();
+                await Promise.resolve(mock());
               }),
             ),
           ]);

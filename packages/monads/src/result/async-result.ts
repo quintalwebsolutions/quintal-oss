@@ -14,7 +14,6 @@ export class AsyncResult<TResult extends AnyResult> {
     this._promise = promise;
   }
 
-  // TODO Cache promise result?
   // biome-ignore lint/suspicious/noThenProperty: We explicitly want to make this class thenable
   then<TResult1 = TResult, TResult2 = never>(
     onfulfilled?: (value: TResult) => TResult1 | PromiseLike<TResult1>,

@@ -72,8 +72,18 @@ export const workspace: Workspace = {
     },
     environment: {
       title: 'Quintal Environment',
-      description: 'Framework-agnostic environment variable validation for TypeScript',
+      description:
+        'Framework-agnostic environment variable validation for TypeScript powered by Zod',
       keywords: ['environment', 'validation', 'typescript', 'zod'],
+      features: [
+        { icon: '🔍', text: 'Use Zod to validate and transform environment variables' },
+        { icon: '🔒', text: 'Secure environment variables by marking them as server-only' },
+        { icon: '📦', text: 'Nest environment variables into groups' },
+        { icon: '🛡️', text: 'Enjoy full type-safety in every step of the process' },
+      ],
+      examples: [
+        { title: 'Kitchen sink', href: 'https://codesandbox.io/p/sandbox/x2slnv?file=%2Findex.ts' },
+      ],
     },
     'form-engine-react': {
       title: 'Quintal React Form Engine',

@@ -12,7 +12,8 @@ export {
   AsyncResult,
   type AsyncOk,
   type AsyncErr,
-  asyncResultFromThrowable as asyncResult,
+  asyncResultFromThrowable,
+  asyncResultFromSerialized,
   asyncOk,
   asyncErr,
 } from './async-result';

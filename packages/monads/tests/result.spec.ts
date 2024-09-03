@@ -2,21 +2,26 @@ import { type Mock, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import {
   type AnyOption,
   type AnyResult,
+  type AsyncErr,
+  type AsyncOk,
   type AsyncResult,
   type Err,
+  type None,
   type Ok,
+  type Option,
   type Result,
+  type Some,
   asyncErr,
   asyncOk,
-  asyncResult,
+  asyncResultFromSerialized,
+  asyncResultFromThrowable,
   err,
+  none,
   ok,
   resultFromSerialized,
   resultFromTrowable,
+  some,
 } from '../src';
-import { type None, type Option, type Some, none, some } from '../src';
-import type { AsyncErr, AsyncOk } from '../src';
-import { asyncResultFromSerialized } from '../src/result/async-result';
 import type { And, Equal, MaybePromise, Ternary } from './util';
 
 function expectU<TResult extends AnyResult>(result: TResult) {
@@ -82,8 +87,8 @@ const asyncErrRes2 = asyncErr('e2') as AsyncResult<Result<'v2', 'e2'>>;
 
 const okResVal = resultFromTrowable(returns);
 const errResVal = resultFromTrowable(throws);
-const asyncOkResVal = asyncResult(returnsAsync);
-const asyncErrResVal = asyncResult(throwsAsync);
+const asyncOkResVal = asyncResultFromThrowable(returnsAsync);
+const asyncErrResVal = asyncResultFromThrowable(throwsAsync);
 
 type ResVal = typeof okResVal;
 type AsyncResVal = typeof asyncOkResVal;

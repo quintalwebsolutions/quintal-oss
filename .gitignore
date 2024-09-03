@@ -4,6 +4,7 @@ node_modules
 # Testing
 .coverage
 .coverage-ts
+junit.xml
 
 # Generated output
 .dist

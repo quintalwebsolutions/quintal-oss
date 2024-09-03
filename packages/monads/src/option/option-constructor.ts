@@ -1,5 +1,3 @@
-/* c8 ignore start */
-
 import type { Err, Ok } from '../result';
 import type { MaybePromise, Ternary } from '../util';
 import type { None, Some } from './option';

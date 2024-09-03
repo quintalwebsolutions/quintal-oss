@@ -19,6 +19,9 @@ Framework-agnostic environment variable validation for TypeScript powered by Zod
 - 🔍 Use Zod to validate and transform environment variables,
 - 🔒 Secure environment variables by marking them as server-only,
 - 📦 Nest environment variables into groups,
+- ✅ CommonJS and ES Modules support,
+- ⚖️ Super lightweight (only ~10kb gzipped),
+- 🧪 100% test coverage,
 - 🛡️ Enjoy full type-safety in every step of the process.
 
 ## Table of Contents

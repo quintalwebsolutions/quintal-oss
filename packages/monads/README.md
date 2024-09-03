@@ -16,6 +16,7 @@ A collection of monads (Result, Option) for TypeScript, inspired by [the Rust pr
 
 ## Features
 
+- 🛡️ Easy type-safe error- and empty-value handling,
 - 🦀 Implements all relevant methods from Rust,
 - ✅ CommonJS and ES Modules support,
 - 📖 Extensive documentation,
@@ -27,8 +28,8 @@ A collection of monads (Result, Option) for TypeScript, inspired by [the Rust pr
 
 The following features are planned for future releases:
 
-- [ ] Figure out a way to emulate [Rust's question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-)
-- [ ] Serialize and deserialize monads for API usage
+- [x] Serialize and deserialize monads for API usage
+- [ ] Find a nice way to emulate [Rust's question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-)
 - [ ] Write docs on [Rust's must-use property](https://doc.rust-lang.org/std/result/#results-must-be-used)
 
 ## Table of Contents
@@ -86,7 +87,7 @@ type GetUniqueItemError = 'no-items' | 'too-many-items';
 // `Result` is an explicit part of the function declaration, making it clear to the
 // consumer that this function may error and what kind of errors it might return.
 function getUniqueItem<T>(items: T[]): Result<T, GetUniqueItemError> {
-  // We do not throw, we return `err()`, allowing for a more straightforward control flow
+  // We do not throw, we return `err()`, allowing for a control flow that is easier to process
   if (items.length === 0) return err('no-items');
   if (items.length > 1) return err('too-many-items');
   return ok(items[0]!);
@@ -194,6 +195,15 @@ async function authenticateUser(
 }
 ```
 
+### Creating a Result
+
+There are a few ways to initialize a `Result`, each with a different set of use cases:
+
+- The examples above use the `ok(value)` and `err(error)` utilities, which are aliases for the object instantiations `new Ok(value)` and `new Err(error)`. These functions are used in the cases when you know what the result is when creating it.
+- The same use case counts for the `asyncOk(value)` and `asyncErr(error)` utilities, which are `ok(value)` and `err(error)`'s async counterparts, acting as aliases for easily creating `AsyncResult` objects.
+- If you are unsure that an external function you're using might throw an error, you can use the `resultFromThrowable(() => value)` or `asyncResultFromThrowable(() => Promise.resolve(value))` functions. These functions return a `Result` with as value type the return type of the function, and as error type `unknown`, in case it unexpectedly throws an error.
+- If you have serialized a `Result` and want to deserialize it, you can use `resultFromSerialized` or `asyncResultFromSerialized`.
+
 ### Method Overview
 
 `Result` comes with a wide variety of convenience methods that make working with it more succinct.
@@ -241,6 +251,7 @@ These methods treat the `Result` as a boolean value, where `ok` acts like `true`
 Because we are not actually working with Rust, we are missing some essential syntax to work with the `Result` monad. These methods attempt to emulate some of this syntax.
 
 - `match` allows you to pattern match on both variants of a `Result`.
+- `serialize` reduces the `Result` class to a simple object literal.
 
 > If you have an idea on how to approach emulating Rust's [question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-), [if let syntax](https://doc.rust-lang.org/rust-by-example/flow_control/if_let.html), or other Rust language features that are not easily achieved in Typescript, feel free to [open an issue](https://github.com/quintalwebsolutions/quintal-oss/issues/new).
 
@@ -264,7 +275,7 @@ import { type Option, some, none } from '@quintal/monads';
 // consumer that this function may return nothing.
 function safeDivide(numerator: number, denominator: number): Option<number> {
   if (denominator === 0) return none;
-  else return some(numerator / denominator);
+  return some(numerator / denominator);
 }
 
 // Pattern match the result, forcing the user to account for both the some and none state.
@@ -324,4 +335,4 @@ Because we are not actually working with Rust, we are missing some essential syn
 
 ## Acknowledgement
 
-Though this is not a fork, my implementation draws prior work from [Sniptt's `monads` package](https://github.com/sniptt-official/monads/) and [Supermacro's `neverthrow` package](https://github.com/supermacro/neverthrow/). I was very inspired by their work and the issues filed for their repositories.
+Though this is not a fork, my implementation draws prior work from [Sniptt's `monads` package](https://github.com/sniptt-official/monads/) and [Supermacro's `neverthrow` package](https://github.com/supermacro/neverthrow/). I was very inspired by their work and the issues the community filed to these repositories.

@@ -19,7 +19,6 @@ runs:
       uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: true
-        handle_no_reports_found: true
         disable_search: true
         file: ./packages/config/.coverage/coverage-final.json
         flags: config
@@ -30,7 +29,6 @@ runs:
       uses: codecov/test-results-action@v1
       with:
         fail_ci_if_error: true
-        handle_no_reports_found: true
         disable_search: true
         file: ./packages/config/junit.xml
         flags: config
@@ -41,7 +39,6 @@ runs:
       uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: true
-        handle_no_reports_found: true
         disable_search: true
         file: ./packages/environment/.coverage/coverage-final.json
         flags: environment
@@ -52,7 +49,6 @@ runs:
       uses: codecov/test-results-action@v1
       with:
         fail_ci_if_error: true
-        handle_no_reports_found: true
         disable_search: true
         file: ./packages/environment/junit.xml
         flags: environment
@@ -63,7 +59,6 @@ runs:
       uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: true
-        handle_no_reports_found: true
         disable_search: true
         file: ./packages/form-engine-react/.coverage/coverage-final.json
         flags: form-engine-react
@@ -74,7 +69,6 @@ runs:
       uses: codecov/test-results-action@v1
       with:
         fail_ci_if_error: true
-        handle_no_reports_found: true
         disable_search: true
         file: ./packages/form-engine-react/junit.xml
         flags: form-engine-react
@@ -85,7 +79,6 @@ runs:
       uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: true
-        handle_no_reports_found: true
         disable_search: true
         file: ./packages/monads/.coverage/coverage-final.json
         flags: monads
@@ -96,7 +89,6 @@ runs:
       uses: codecov/test-results-action@v1
       with:
         fail_ci_if_error: true
-        handle_no_reports_found: true
         disable_search: true
         file: ./packages/monads/junit.xml
         flags: monads
@@ -107,7 +99,6 @@ runs:
       uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: true
-        handle_no_reports_found: true
         disable_search: true
         file: ./packages/table-engine-react/.coverage/coverage-final.json
         flags: table-engine-react
@@ -118,7 +109,6 @@ runs:
       uses: codecov/test-results-action@v1
       with:
         fail_ci_if_error: true
-        handle_no_reports_found: true
         disable_search: true
         file: ./packages/table-engine-react/junit.xml
         flags: table-engine-react

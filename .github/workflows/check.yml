@@ -24,9 +24,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Check
-        run: pnpm turbo run lint:check lint:types test build
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: pnpm turbo run lint:check lint:types test
 
       - name: Collect test analytics
         uses: "./.github/actions/collect_test_analytics"

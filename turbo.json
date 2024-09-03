@@ -17,17 +17,11 @@
       "cache": false,
       "persistent": true
     },
-    "lint": {
-      "dependsOn": ["build"]
-    },
+    "lint": {},
     "//#lint": {},
-    "lint:check": {
-      "dependsOn": ["build"]
-    },
+    "lint:check": {},
     "//#lint:check": {},
-    "lint:types": {
-      "dependsOn": ["build"]
-    },
+    "lint:types": {},
     "test": {
       "inputs": ["src/**", "tests/**"],
       "env": ["CI"],

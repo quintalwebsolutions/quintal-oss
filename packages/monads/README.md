@@ -16,8 +16,6 @@ A collection of monads (Result, Option) for TypeScript, inspired by [the Rust pr
 
 ## Features
 
-
-
 - 🦀 Implements all relevant methods from Rust,
 - ✅ CommonJS and ES Modules support,
 - 📖 Extensive documentation,

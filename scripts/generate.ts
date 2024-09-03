@@ -208,10 +208,15 @@ async function makePackageReadme(packageDir: string, name: string, p: Package): 
   const makeListSection = <TItem>(
     arr: TItem[] | undefined,
     title: string,
-    description: string,
+    description: string | null,
     makeItem: (item: TItem, index: number) => string,
   ) =>
-    arr && arr.length > 0 ? [`## ${title}`, '', description, '', ...arr.map(makeItem), ''] : [];
+    arr && arr.length > 0
+      ? [`## ${title}`, '']
+          .concat(description ? [description, ''] : [])
+          .concat(arr.map(makeItem))
+          .concat([''])
+      : [];
 
   await writeFile(
     [filePath],
@@ -237,7 +242,7 @@ async function makePackageReadme(packageDir: string, name: string, p: Package): 
       ...makeListSection(
         p.features,
         'Features',
-        '',
+        null,
         ({ icon, text }, i) => `- ${icon} ${text}${i + 1 === p.features?.length ? '.' : ','}`,
       ),
 

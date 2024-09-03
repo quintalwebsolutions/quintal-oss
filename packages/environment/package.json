@@ -37,8 +37,7 @@
     "lint:check": "biome ci",
     "lint:fix": "biome check --write",
     "lint:types": "tsc --noEmit",
-    "test": "run-s test:*",
-    "test:source": "vitest"
+    "test": "vitest"
   },
   "peerDependencies": {
     "zod": "^3.23.8"

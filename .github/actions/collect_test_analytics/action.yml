@@ -26,6 +26,7 @@ runs:
       uses: codecov/test-results-action@v1
       with:
         fail_ci_if_error: true
+        file: ./packages/config/junit.xml
         flags: config
         token: ${{ inputs.token }}
     - name: Upload @quintal/environment coverage to Codecov
@@ -41,6 +42,7 @@ runs:
       uses: codecov/test-results-action@v1
       with:
         fail_ci_if_error: true
+        file: ./packages/environment/junit.xml
         flags: environment
         token: ${{ inputs.token }}
     - name: Upload @quintal/form-engine-react coverage to Codecov
@@ -56,6 +58,7 @@ runs:
       uses: codecov/test-results-action@v1
       with:
         fail_ci_if_error: true
+        file: ./packages/form-engine-react/junit.xml
         flags: form-engine-react
         token: ${{ inputs.token }}
     - name: Upload @quintal/monads coverage to Codecov
@@ -71,6 +74,7 @@ runs:
       uses: codecov/test-results-action@v1
       with:
         fail_ci_if_error: true
+        file: ./packages/monads/junit.xml
         flags: monads
         token: ${{ inputs.token }}
     - name: Upload @quintal/table-engine-react coverage to Codecov
@@ -86,5 +90,6 @@ runs:
       uses: codecov/test-results-action@v1
       with:
         fail_ci_if_error: true
+        file: ./packages/table-engine-react/junit.xml
         flags: table-engine-react
         token: ${{ inputs.token }}

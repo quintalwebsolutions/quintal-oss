@@ -338,7 +338,7 @@ export type ResultConstructor<TValue, TVariant extends Variant> = {
     fn: (error: Error<TValue, TVariant>) => TResultB,
   ) => EvaluateVariant<TVariant, Ok<TValue>, TResultB>;
 
-  // Utilities
+  // Rust syntax utilities
 
   /**
    * Emulates Rust's `match` syntax by facilitating a pattern match, forcing
@@ -362,8 +362,8 @@ export type ResultConstructor<TValue, TVariant extends Variant> = {
    * Serialize the result into an object literal that can be passed over the network
    *
    * @example
-   * ok('value').serialize() // { isOk: true, value: 'value' }
-   * err('error').serialize() // { isOk: false, error: 'error' }
+   * ok('value').serialize() // { type: 'ok', value: 'value' }
+   * err('error').serialize() // { type: 'err', error: 'error' }
    */
   serialize: () => EvaluateVariant<
     TVariant,

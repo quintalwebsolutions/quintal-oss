@@ -1,3 +1,5 @@
+/* c8 ignore start */
+
 import type { None, Some } from '../option';
 import type { MaybePromise } from '../util';
 import type { AsyncErr, AsyncOk } from './async-result';
@@ -5,17 +7,17 @@ import type { Err, Ok } from './result';
 import type { AnyResult, ResultMatch } from './util';
 
 type Variant = 'OK' | 'ERR';
-type Eval<V extends Variant, TIsOk, TIsErr> = V extends 'OK'
+type Eval<TVariant extends Variant, TIsOk, TIsErr> = TVariant extends 'OK'
   ? TIsOk
-  : V extends 'ERR'
+  : TVariant extends 'ERR'
     ? TIsErr
     : never;
 
-type Value<T, V extends Variant> = V extends 'OK' ? T : never;
-type Error<T, V extends Variant> = V extends 'ERR' ? T : never;
+type Value<TValue, TVariant extends Variant> = TVariant extends 'OK' ? TValue : never;
+type Error<TError, TVariant extends Variant> = TVariant extends 'ERR' ? TError : never;
 
 /** A data structure that represents either success or failure */
-export type ResultConstructor<T, V extends Variant> = {
+export type ResultConstructor<TValue, TVariant extends Variant> = {
   // Querying the contained value
 
   /**
@@ -33,7 +35,7 @@ export type ResultConstructor<T, V extends Variant> = {
    *   // `r.unwrap()` is of type `never`, `r.unwrapErr()` is of type `unknown`
    * }
    */
-  isOk: Eval<V, true, false>;
+  isOk: Eval<TVariant, true, false>;
   /**
    * Is `true` if the result is `err`.
    *
@@ -49,7 +51,7 @@ export type ResultConstructor<T, V extends Variant> = {
    *   // `r.unwrap()` is of type `boolean`, `r.unwrapErr()` is of type `never`
    * }
    */
-  isErr: Eval<V, false, true>;
+  isErr: Eval<TVariant, false, true>;
   /**
    * Returns `true` if the result is `ok` and the value inside of it matches a predicate.
    *
@@ -59,7 +61,9 @@ export type ResultConstructor<T, V extends Variant> = {
    * err('error').isOkAnd(() => true); // false
    * err('error').isOkAnd(() => false); // false
    */
-  isOkAnd: <P extends MaybePromise<boolean>>(fn: (value: Value<T, V>) => P) => Eval<V, P, false>;
+  isOkAnd: <TPredicate extends MaybePromise<boolean>>(
+    fn: (value: Value<TValue, TVariant>) => TPredicate,
+  ) => Eval<TVariant, TPredicate, false>;
   /**
    * Returns `true` if the result is `err` and the value inside of it matches a predicate.
    *
@@ -69,7 +73,9 @@ export type ResultConstructor<T, V extends Variant> = {
    * err('error').isErrAnd(() => true); // true
    * err('error').isErrAnd(() => false); // false
    */
-  isErrAnd: <P extends MaybePromise<boolean>>(fn: (error: Error<T, V>) => P) => Eval<V, false, P>;
+  isErrAnd: <TPredicate extends MaybePromise<boolean>>(
+    fn: (error: Error<TValue, TVariant>) => TPredicate,
+  ) => Eval<TVariant, false, TPredicate>;
   /**
    * Calls the provided closure with the contained value (if `ok`).
    *
@@ -77,7 +83,9 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok('value').inspect((value) => console.log(value)); // logs 'value' to the console
    * err('error').inspect((value) => console.log(value)); // Doesn't do anything
    */
-  inspect: (fn: (value: Value<T, V>) => MaybePromise<void>) => ResultConstructor<T, V>;
+  inspect: (
+    fn: (value: Value<TValue, TVariant>) => MaybePromise<void>,
+  ) => ResultConstructor<TValue, TVariant>;
   /**
    * Calls the provided closure with the contained error (if `err`).
    *
@@ -85,7 +93,9 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok('value').inspectErr((value) => console.log(value)); // Doesn't do anything
    * err('error').inspectErr((value) => console.log(value)); // Logs 'error' to the console
    */
-  inspectErr: (fn: (error: Error<T, V>) => MaybePromise<void>) => ResultConstructor<T, V>;
+  inspectErr: (
+    fn: (error: Error<TValue, TVariant>) => MaybePromise<void>,
+  ) => ResultConstructor<TValue, TVariant>;
 
   // Extracting the contained value
 
@@ -100,7 +110,7 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok('value').expect('Value should be ok'); // 'value'
    * err('error').expect('Value should be ok'); // Throws 'Value should be ok'
    */
-  expect: (message: string) => Value<T, V>;
+  expect: (message: string) => Value<TValue, TVariant>;
   /**
    * Returns the contained `err` value, or throws the given error message it is an `ok`.
    *
@@ -112,7 +122,7 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok('value').expectErr('Value should be err'); // Throws 'Value should be err'
    * err('error').expectErr('Value should be err'); // 'error'
    */
-  expectErr: (message: string) => Error<T, V>;
+  expectErr: (message: string) => Error<TValue, TVariant>;
   /**
    * Returns the contained `ok` value, or throws the value if it is an `err`.
    *
@@ -122,7 +132,7 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok('value').unwrap(); // 'value'
    * err('error').unwrap(); // Throws 'error'
    */
-  unwrap: () => Value<T, V>;
+  unwrap: () => Value<TValue, TVariant>;
   /**
    * Returns the contained `err` value, or throws the value if it is is an `ok`.
    *
@@ -132,7 +142,7 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok('value').unwrapErr(); // Throws 'value'
    * err('error').unwrapErr(); // 'error'
    */
-  unwrapErr: () => Error<T, V>;
+  unwrapErr: () => Error<TValue, TVariant>;
   /**
    * Returns the contained `ok` value, or a provided default.
    *
@@ -142,7 +152,7 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok('value').unwrapOr('default'); // 'value'
    * err('error').unwrapOr('default'); // 'default'
    */
-  unwrapOr: <U>(defaultValue: U) => Eval<V, T, U>;
+  unwrapOr: <TDefaultValue>(defaultValue: TDefaultValue) => Eval<TVariant, TValue, TDefaultValue>;
   /**
    * Returns the contained `ok` value, or computes a default from a provided closure.
    *
@@ -150,7 +160,9 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok('value').unwrapOrElse((_error) => 'default'); // 'value'
    * err('error').unwrapOrElse((_error) => 'default'); // 'default'
    */
-  unwrapOrElse: <U>(fn: (error: Error<T, V>) => U) => Eval<V, T, U>;
+  unwrapOrElse: <TDefaultValue>(
+    fn: (error: Error<TValue, TVariant>) => TDefaultValue,
+  ) => Eval<TVariant, TValue, TDefaultValue>;
 
   // Transforming the contained value
 
@@ -161,7 +173,7 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok('value').ok(); // some('value')
    * err('error').ok(); // none
    */
-  ok: () => Eval<V, Some<T>, None>;
+  ok: () => Eval<TVariant, Some<TValue>, None>;
   /**
    * Converts from `Result<T, E>` to `Option<E>`, discarding the success value, if any.
    *
@@ -169,7 +181,7 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok('value').err(); // none
    * err('error').err(); // some('error')
    */
-  err: () => Eval<V, None, Some<T>>;
+  err: () => Eval<TVariant, None, Some<TValue>>;
   /**
    * Transposes a `Result` of an `Option` into an `Option` of a `Result`
    *
@@ -182,9 +194,9 @@ export type ResultConstructor<T, V extends Variant> = {
    * err('error').transpose(); // some(err('error'))
    */
   transpose: () => Eval<
-    V,
-    T extends None ? T : Some<Ok<T extends Some<infer TSome> ? TSome : T>>,
-    Some<Err<T>>
+    TVariant,
+    TValue extends None ? TValue : Some<Ok<TValue extends Some<infer TSome> ? TSome : TValue>>,
+    Some<Err<TValue>>
   >;
   /**
    * Flattens at most one level of `Result` nesting.
@@ -199,7 +211,7 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok(ok(ok('value'))).flatten(); // ok(ok('value'))
    * ok(ok(ok('value'))).flatten().flatten(); // ok('value')
    */
-  flatten: () => Eval<V, T extends AnyResult ? T : Ok<T>, Err<T>>;
+  flatten: () => Eval<TVariant, TValue extends AnyResult ? TValue : Ok<TValue>, Err<TValue>>;
   /**
    * Maps a `Result<T, E>` to a `Result<U, E>` by applying a function to a contained `ok` value, leaving an `err` value untouched.
    *
@@ -209,9 +221,13 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok(2).map((v) => v * 2).unwrap(); // 4
    * err(2).map((v) => v * 2).unwrapErr(); // 2
    */
-  map: <U>(
-    fn: (value: Value<T, V>) => U,
-  ) => Eval<V, U extends Promise<infer TValue> ? AsyncOk<TValue> : Ok<U>, Err<T>>;
+  map: <TNextValue>(
+    fn: (value: Value<TValue, TVariant>) => TNextValue,
+  ) => Eval<
+    TVariant,
+    TNextValue extends Promise<infer TValue> ? AsyncOk<TValue> : Ok<TNextValue>,
+    Err<TValue>
+  >;
   /**
    * Maps a `Result<T, E>` to a `Result<T, F>` by applying a function to a contained `err` value, leaving an `ok` value untouched.
    *
@@ -221,9 +237,13 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok(2).mapErr((v) => v * 2).unwrap(); // 2
    * err(2).mapErr((v) => v * 2).unwrapErr(); // 4
    */
-  mapErr: <F>(
-    fn: (error: Error<T, V>) => F,
-  ) => Eval<V, Ok<T>, F extends Promise<infer TValue> ? AsyncErr<TValue> : Err<F>>;
+  mapErr: <TNextError>(
+    fn: (error: Error<TValue, TVariant>) => TNextError,
+  ) => Eval<
+    TVariant,
+    Ok<TValue>,
+    TNextError extends Promise<infer TValue> ? AsyncErr<TValue> : Err<TNextError>
+  >;
   /**
    * Returns the provided default (if `err`), or applies a function to the contained value (if `ok`).
    *
@@ -235,7 +255,10 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok(2).mapOr(0, (v) => v * 2).unwrap(); // 4
    * err(2).mapOr(0, (v) => v * 2).unwrapErr() // 0
    */
-  mapOr: <D, U>(defaultValue: D, fn: (value: Value<T, V>) => U) => Eval<V, U, D>;
+  mapOr: <TDefaultValue, TNextValue>(
+    defaultValue: TDefaultValue,
+    fn: (value: Value<TValue, TVariant>) => TNextValue,
+  ) => Eval<TVariant, TNextValue, TDefaultValue>;
   /**
    * Maps a `Result<T, E>` to `U` by applying fallback function `defaultFn` to an `err` value, or function `fn` to an `ok` value.
    *
@@ -245,10 +268,10 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok(2).mapOrElse((_error) => 42, (v) => v * 2).unwrap(); // 4
    * err(2).mapOrElse((_error) => 42, (v) => v * 2).unwrapErr() // 42
    */
-  mapOrElse: <D, U>(
-    defaultFn: (error: Error<T, V>) => D,
-    fn: (value: Value<T, V>) => U,
-  ) => Eval<V, U, D>;
+  mapOrElse: <TDefaultValue, TNextValue>(
+    defaultFn: (error: Error<TValue, TVariant>) => TDefaultValue,
+    fn: (value: Value<TValue, TVariant>) => TNextValue,
+  ) => Eval<TVariant, TNextValue, TDefaultValue>;
 
   // Boolean operators
 
@@ -263,7 +286,7 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok('early value').and(err('late error')).unwrapErr(); // 'late error'
    * ok('early value').and(ok('late value')).unwrap(); // 'late value'
    */
-  and: <B extends AnyResult>(resB: B) => Eval<V, B, Err<T>>;
+  and: <TResultB extends AnyResult>(resB: TResultB) => Eval<TVariant, TResultB, Err<TValue>>;
   /**
    * Returns `res` if the result is `err`, otherwise returns its own `ok` value.
    *
@@ -275,7 +298,7 @@ export type ResultConstructor<T, V extends Variant> = {
    * err('early error').or(ok('late value')).unwrap(); // 'late value'
    * err('early error').or(err('late error)).unwrapErr(); // 'late error'
    */
-  or: <B extends AnyResult>(resB: B) => Eval<V, Ok<T>, B>;
+  or: <TResultB extends AnyResult>(resB: TResultB) => Eval<TVariant, Ok<TValue>, TResultB>;
   /**
    * Calls `fn` if the result is `ok`, otherwise return its own `err` value.
    *
@@ -287,7 +310,9 @@ export type ResultConstructor<T, V extends Variant> = {
    * ok(42).andThen(s).unwrapErr(); // 'bad number'
    * err('not a number').andThen(s).unwrapErr(); // 'not a number'
    */
-  andThen: <B extends AnyResult>(fn: (value: Value<T, V>) => B) => Eval<V, B, Err<T>>;
+  andThen: <TResultB extends AnyResult>(
+    fn: (value: Value<TValue, TVariant>) => TResultB,
+  ) => Eval<TVariant, TResultB, Err<TValue>>;
   /**
    * Calls `fn` if the result is `err`, otherwise returns its own `ok` value.
    *
@@ -301,7 +326,9 @@ export type ResultConstructor<T, V extends Variant> = {
    * err(2).orElse(s).orElse(e).unwrap(); // 4
    * err(3).orElse(e).orElse(e).unwrapErr(); // 3
    */
-  orElse: <B extends AnyResult>(fn: (error: Error<T, V>) => B) => Eval<V, Ok<T>, B>;
+  orElse: <TResultB extends AnyResult>(
+    fn: (error: Error<TValue, TVariant>) => TResultB,
+  ) => Eval<TVariant, Ok<TValue>, TResultB>;
 
   // Rust syntax utilities
 
@@ -320,7 +347,9 @@ export type ResultConstructor<T, V extends Variant> = {
    *   err: (error) => 'Some error handling',
    * }); // 'Some error handling'
    */
-  match: <U>(m: ResultMatch<Value<T, V>, Error<T, V>, U>) => U;
+  match: <TOutput>(
+    m: ResultMatch<Value<TValue, TVariant>, Error<TValue, TVariant>, TOutput>,
+  ) => TOutput;
   /**
    * Serialize the result into an object literal that can be passed over the network
    *
@@ -329,7 +358,7 @@ export type ResultConstructor<T, V extends Variant> = {
    * err('error').serialize() // { isOk: false, isErr: true, error: 'error' }
    */
   serialize: () => {
-    isOk: Eval<V, true, false>;
-    isErr: Eval<V, false, true>;
-  } & Eval<V, { value: Value<T, V> }, { error: Error<T, V> }>;
+    isOk: Eval<TVariant, true, false>;
+    isErr: Eval<TVariant, false, true>;
+  } & Eval<TVariant, { value: Value<TValue, TVariant> }, { error: Error<TValue, TVariant> }>;
 };

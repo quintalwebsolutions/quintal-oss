@@ -3,14 +3,14 @@ import type { MaybePromise, Ternary } from '../util';
 import type { OptionConstructor } from './option-constructor';
 import type { AnyOption, OptionMatch } from './util';
 
-export class Some<T> implements OptionConstructor<T, 'SOME'> {
-  protected _value: T;
+export class Some<TValue> implements OptionConstructor<TValue, 'SOME'> {
+  protected _value: TValue;
 
-  constructor(value: T) {
+  constructor(value: TValue) {
     this._value = value;
   }
 
-  get value(): T {
+  get value(): TValue {
     return this._value;
   }
 
@@ -22,82 +22,92 @@ export class Some<T> implements OptionConstructor<T, 'SOME'> {
     return false;
   }
 
-  isSomeAnd<P extends MaybePromise<boolean>>(fn: (value: T) => P): P {
+  isSomeAnd<TPredicate extends MaybePromise<boolean>>(
+    fn: (value: TValue) => TPredicate,
+  ): TPredicate {
     return fn(this.value);
   }
 
-  inspect(fn: (value: T) => void): Some<T> {
+  inspect(fn: (value: TValue) => void): Some<TValue> {
     fn(this.value);
     return this;
   }
 
-  expect(_message: string): T {
+  expect(_message: string): TValue {
     return this.value;
   }
 
-  unwrap(): T {
+  unwrap(): TValue {
     return this.value;
   }
 
-  unwrapOr<U>(_defaultValue: U): T {
+  unwrapOr<TDefaultValue>(_defaultValue: TDefaultValue): TValue {
     return this.value;
   }
 
-  unwrapOrElse<U>(_fn: () => U): T {
+  unwrapOrElse<TDefaultValue>(_fn: () => TDefaultValue): TValue {
     return this.value;
   }
 
-  okOr<E>(_error: E): Ok<T> {
+  okOr<TError>(_error: TError): Ok<TValue> {
     return ok(this.value);
   }
 
-  okOrElse<E>(_errorFn: () => E): Ok<T> {
+  okOrElse<TError>(_errorFn: () => TError): Ok<TValue> {
     return ok(this.value);
   }
 
-  map<U>(fn: (value: T) => U): Some<U> {
+  map<TNextValue>(fn: (value: TValue) => TNextValue): Some<TNextValue> {
     return some(fn(this.value));
   }
 
-  mapOr<D, U>(_defaultValue: D, fn: (value: T) => U): U {
+  mapOr<TDefaultValue, TNextValue>(
+    _defaultValue: TDefaultValue,
+    fn: (value: TValue) => TNextValue,
+  ): TNextValue {
     return fn(this.value);
   }
 
-  mapOrElse<D, U>(_defaultFn: () => D, fn: (value: T) => U): U {
+  mapOrElse<TDefaultValue, TNextValue>(
+    _defaultFn: () => TDefaultValue,
+    fn: (value: TValue) => TNextValue,
+  ): TNextValue {
     return fn(this.value);
   }
 
-  filter<P extends boolean>(predicate: (value: T) => P): P extends true ? Some<T> : None {
+  filter<TPredicate extends boolean>(
+    predicate: (value: TValue) => TPredicate,
+  ): TPredicate extends true ? Some<TValue> : None {
     // TODO achieve without cast?
-    type Cast = ReturnType<typeof predicate> extends true ? Some<T> : None;
+    type Cast = ReturnType<typeof predicate> extends true ? Some<TValue> : None;
 
     return (predicate(this.value) ? this : none) as Cast;
   }
 
-  and<O extends AnyOption>(opt: O): O {
+  and<TOptionB extends AnyOption>(opt: TOptionB): TOptionB {
     return opt;
   }
 
-  or<O extends AnyOption>(_opt: O): Some<T> {
+  or<TOptionB extends AnyOption>(_opt: TOptionB): Some<TValue> {
     return this;
   }
 
-  xor<O extends AnyOption>(opt: O): Ternary<O['isSome'], None, Some<T>> {
+  xor<TOptionB extends AnyOption>(opt: TOptionB): Ternary<TOptionB['isSome'], None, Some<TValue>> {
     // TODO achieve without cast
-    type Cast = Ternary<(typeof opt)['isSome'], None, Some<T>>;
+    type Cast = Ternary<(typeof opt)['isSome'], None, Some<TValue>>;
 
     return (opt.isSome ? none : this) as Cast;
   }
 
-  andThen<O extends AnyOption>(fn: (value: T) => O): O {
+  andThen<TOptionB extends AnyOption>(fn: (value: TValue) => TOptionB): TOptionB {
     return fn(this.value);
   }
 
-  orElse<O extends AnyOption>(_fn: () => O): Some<T> {
+  orElse<TOptionB extends AnyOption>(_fn: () => TOptionB): Some<TValue> {
     return this;
   }
 
-  match<U>(m: OptionMatch<T, U>): U {
+  match<TOutput>(m: OptionMatch<TValue, TOutput>): TOutput {
     return m.some(this.value);
   }
 }
@@ -111,7 +121,7 @@ export class None implements OptionConstructor<never, 'NONE'> {
     return true;
   }
 
-  isSomeAnd<P extends MaybePromise<boolean>>(_fn: (value: never) => P): false {
+  isSomeAnd<TPredicate extends MaybePromise<boolean>>(_fn: (value: never) => TPredicate): false {
     return false;
   }
 
@@ -127,69 +137,75 @@ export class None implements OptionConstructor<never, 'NONE'> {
     throw new Error(`Attempted to unwrap a 'none' value`);
   }
 
-  unwrapOr<U>(defaultValue: U): U {
+  unwrapOr<TDefaultValue>(defaultValue: TDefaultValue): TDefaultValue {
     return defaultValue;
   }
 
-  unwrapOrElse<U>(fn: () => U): U {
+  unwrapOrElse<TDefaultValue>(fn: () => TDefaultValue): TDefaultValue {
     return fn();
   }
 
-  okOr<E>(error: E): Err<E> {
+  okOr<TError>(error: TError): Err<TError> {
     return err(error);
   }
 
-  okOrElse<E>(errorFn: () => E): Err<E> {
+  okOrElse<TError>(errorFn: () => TError): Err<TError> {
     return err(errorFn());
   }
 
-  map<U>(_fn: (value: never) => U): None {
+  map<TNextValue>(_fn: (value: never) => TNextValue): None {
     return this;
   }
 
-  mapOr<D, U>(defaultValue: D, _fn: (value: never) => U): D {
+  mapOr<TDefaultValue, TNextValue>(
+    defaultValue: TDefaultValue,
+    _fn: (value: never) => TNextValue,
+  ): TDefaultValue {
     return defaultValue;
   }
 
-  mapOrElse<D, U>(defaultFn: () => D, _fn: (value: never) => U): D {
+  mapOrElse<TDefaultValue, TNextValue>(
+    defaultFn: () => TDefaultValue,
+    _fn: (value: never) => TNextValue,
+  ): TDefaultValue {
     return defaultFn();
   }
 
-  filter<P extends boolean>(_predicate: (value: never) => P): None {
+  filter<TPredicate extends boolean>(_predicate: (value: never) => TPredicate): None {
     return this;
   }
 
-  and<O extends AnyOption>(_opt: O): None {
+  and<TOptionB extends AnyOption>(_opt: TOptionB): None {
     return this;
   }
 
-  or<O extends AnyOption>(opt: O): O {
+  or<TOptionB extends AnyOption>(opt: TOptionB): TOptionB {
     return opt;
   }
 
-  xor<O extends AnyOption>(opt: O): Ternary<O['isSome'], O, None> {
+  xor<TOptionB extends AnyOption>(opt: TOptionB): Ternary<TOptionB['isSome'], TOptionB, None> {
     // TODO achieve without cast
     type Cast = Ternary<(typeof opt)['isSome'], typeof opt, None>;
 
     return (opt.isSome ? opt : none) as Cast;
   }
 
-  andThen<O extends AnyOption>(_fn: (value: never) => O): None {
+  andThen<TOption extends AnyOption>(_fn: (value: never) => TOption): None {
     return this;
   }
 
-  orElse<O extends AnyOption>(fn: () => O): O {
+  orElse<TOption extends AnyOption>(fn: () => TOption): TOption {
     return fn();
   }
 
-  match<U>(m: OptionMatch<never, U>): U {
+  match<TOutput>(m: OptionMatch<never, TOutput>): TOutput {
     return m.none();
   }
 }
 
-export type Option<T> = Some<T> | None;
+export type Option<TValue> = Some<TValue> | None;
 
-export function some<T>(value: T): Some<T> {
+export function some<TValue>(value: TValue): Some<TValue> {
   return new Some(value);
 }
 

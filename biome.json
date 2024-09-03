@@ -2,7 +2,15 @@
   "$schema": "node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
     "include": ["*"],
-    "ignore": ["node_modules", ".coverage", ".coverage-ts", ".dist", ".turbo", "package.json"]
+    "ignore": [
+      "node_modules",
+      ".coverage",
+      ".coverage-ts",
+      ".dist",
+      ".turbo",
+      "package.json",
+      "vite.config.mjs"
+    ]
   },
   "organizeImports": {
     "enabled": true

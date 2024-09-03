@@ -1,5 +1,7 @@
 /* c8 ignore start */
 
-export type Ternary<Condition extends boolean, True, False> = Condition extends true ? True : False;
+export type Ternary<TCondition extends boolean, TTrue, TFalse> = TCondition extends true
+  ? TTrue
+  : TFalse;
 
-export type MaybePromise<T> = T | Promise<T>;
+export type MaybePromise<TValue> = TValue | Promise<TValue>;

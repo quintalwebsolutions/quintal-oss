@@ -17,18 +17,18 @@ import { type None, type Option, type Some, none, some } from '../src';
 import type { AsyncErr, AsyncOk } from '../src';
 import type { And, Equal, MaybePromise, Ternary } from './util';
 
-function expectU<Result extends AnyResult>(result: Result) {
+function expectU<TResult extends AnyResult>(result: TResult) {
   return {
-    toBe: async <Unwrap, UnwrapErr>(
+    toBe: async <TUnwrap, TUnwrapErr>(
       isOk: Ternary<
         And<
-          Equal<ReturnType<Result['unwrap']>, Unwrap>,
-          Equal<ReturnType<Result['unwrapErr']>, UnwrapErr>
+          Equal<ReturnType<TResult['unwrap']>, TUnwrap>,
+          Equal<ReturnType<TResult['unwrapErr']>, TUnwrapErr>
         >,
         boolean,
         never
       >,
-      unwrappedValue: Awaited<Unwrap | UnwrapErr>,
+      unwrappedValue: Awaited<TUnwrap | TUnwrapErr>,
     ) => {
       if (isOk) expect(await result.unwrap()).toStrictEqual(unwrappedValue);
       else expect(await result.unwrapErr()).toStrictEqual(unwrappedValue);
@@ -54,7 +54,7 @@ async function throwsAsync(): P<'value'> {
   throw new Error('error');
 }
 
-type P<T> = Promise<T>;
+type P<TValue> = Promise<TValue>;
 
 const okVal = ok('value' as const);
 const asyncOkVal = asyncOk('value' as const);
@@ -142,7 +142,7 @@ describe('Result', () => {
   it('should validate `ok` and `err` values against sync and async predicats with `isOkAnd` and `isErrAnd`', async () => {
     function expectPredicate<TBool extends MaybePromise<boolean>>(bool: TBool) {
       return {
-        toBe: async <T>(value: Ternary<Equal<T, TBool>, Awaited<T>, never>) =>
+        toBe: async <TValue>(value: Ternary<Equal<TValue, TBool>, Awaited<TValue>, never>) =>
           expect(await bool).toBe(value),
       };
     }
@@ -372,9 +372,11 @@ describe('Result', () => {
     const dfFn = () => dfVal;
     const aDfFn = () => aDfVal;
 
-    function expectUnwrap<T>(value: T) {
+    function expectUnwrap<TValue>(value: TValue) {
       return {
-        toBe: async <TValue>(expectValue: Ternary<Equal<T, TValue>, Awaited<T>, never>) => {
+        toBe: async <TValue>(
+          expectValue: Ternary<Equal<TValue, TValue>, Awaited<TValue>, never>,
+        ) => {
           expect(await value).toBe(expectValue);
         },
       };
@@ -583,10 +585,10 @@ describe('Result', () => {
     const asyncMapFn = async (v: string) => mapFn(v);
     const amef = async (v: unknown) => mapErrFn(v);
 
-    function expectMap<T extends AnyResult>(value: T) {
+    function expectMap<TResult extends AnyResult>(value: TResult) {
       return {
         toBe: async <TValue extends AnyResult>(
-          isOk: Ternary<Equal<T, TValue>, boolean, never>,
+          isOk: Ternary<Equal<TResult, TValue>, boolean, never>,
           v: ReturnType<Awaited<TValue>['unwrap'] | Awaited<TValue>['unwrapErr']>,
         ) => {
           if (isOk) expect((await value).unwrap()).toBe(v);

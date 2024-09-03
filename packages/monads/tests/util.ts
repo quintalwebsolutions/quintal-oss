@@ -1,12 +1,20 @@
-export type Ternary<Condition extends boolean, True, False> = Condition extends true ? True : False;
+export type Ternary<TCondition extends boolean, TTrue, TFalse> = TCondition extends true
+  ? TTrue
+  : TFalse;
 
-export type MaybePromise<T> = T | Promise<T>;
+export type MaybePromise<TValue> = TValue | Promise<TValue>;
 
 // Source https://www.totaltypescript.com/how-to-test-your-types
-export type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
+export type Equal<TValue1, TValue2> = (<TValue>() => TValue extends TValue1 ? 1 : 2) extends <
+  TValue,
+>() => TValue extends TValue2 ? 1 : 2
   ? true
   : false;
 
-export type And<X extends boolean, Y extends boolean> = Ternary<X, Y, false>;
+export type And<TValue1 extends boolean, TValue2 extends boolean> = Ternary<
+  TValue1,
+  TValue2,
+  false
+>;
 
-export type Or<X extends boolean, Y extends boolean> = Ternary<X, true, Y>;
+export type Or<TValue1 extends boolean, TValue2 extends boolean> = Ternary<TValue1, true, TValue2>;

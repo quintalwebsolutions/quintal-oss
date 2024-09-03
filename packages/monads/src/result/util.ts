@@ -10,6 +10,6 @@ export type ResultMatch<TValue, TError, TOutput> = {
 // biome-ignore lint/suspicious/noExplicitAny: This type exists solely for generic parameters to extend
 export type AnyResult = Result<any, any> | AsyncResult<any>;
 
-export function isAnyResult<T>(res: T | AnyResult): res is AnyResult {
+export function isAnyResult<TResult>(res: TResult | AnyResult): res is AnyResult {
   return res instanceof Ok || res instanceof Err || res instanceof AsyncResult;
 }

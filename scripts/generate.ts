@@ -123,6 +123,7 @@ async function makeCollectTestAnalyticsYml(rootDir: string): Promise<void> {
       'inputs:',
       '  token:',
       '    required: true',
+      "    description: 'Codecov token'",
       '',
       'runs:',
       '  using: composite',

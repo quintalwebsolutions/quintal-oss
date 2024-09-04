@@ -3,6 +3,7 @@ import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
+import { externalizeDeps } from 'vite-plugin-externalize-deps';
 
 const fileName = {
   es: 'index.mjs',
@@ -40,6 +41,7 @@ export default function getViteConfig(bundleName) {
     plugins: [
       react(),
       dts({ rollupTypes: true }),
+      externalizeDeps(),
       codecovVitePlugin({
         enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
         bundleName,

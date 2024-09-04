@@ -9,7 +9,7 @@ TO EDIT THE CONTENT, PLEASE MODIFY `/workspace.ts` OR `/scripts/generate.ts`
 [![NPM downloads](https://img.shields.io/npm/dt/@quintal/environment?style=flat-square)](https://npmjs.com/@quintal/environment)
 [![License](https://img.shields.io/npm/l/@quintal/environment?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/LICENSE)
 [![Bundle size](https://img.shields.io/bundlephobia/minzip/@quintal/environment?style=flat-square)](https://bundlephobia.com/package/@quintal/environment)
-[![Code coverage](https://img.shields.io/codecov/c/github/quintalwebsolutions/quintal-oss?style=flat-square&token=3ORY9UP6H7&flag=environment&logo=codecov)](https://codecov.io/gh/quintalwebsolutions/quintal-oss)
+[![Code coverage](https://img.shields.io/codecov/c/github/quintalwebsolutions/quintal-oss?style=flat-square&token=3ORY9UP6H7&flag=environment&logo=codecov)](https://app.codecov.io/gh/quintalwebsolutions/quintal-oss/flags?historicalTrend=LAST_7_DAYS&flags%5B0%5D=environment)
 [![Pull requests welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CONTRIBUTING.md)
 
 Framework-agnostic environment variable validation for TypeScript powered by Zod

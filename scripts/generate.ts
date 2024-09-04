@@ -165,7 +165,7 @@ async function makeRootReadme(rootDir: string): Promise<void> {
       '',
       `![Top language](${shieldRoot}/github/languages/top/quintalwebsolutions/quintal-oss${shieldStyle}&logo=typescript&logoColor=FAF9F8&labelColor=3178C6&color=3178C6)`,
       `[![Build status](${shieldRoot}/github/actions/workflow/status/${repoName}/release.yml${shieldStyle})](${githubRoot}/actions/workflows/release.yml)`,
-      `[![Codacy grade](${shieldRoot}/codacy/grade/bb3b006255104e4da8b9a4a7793dcffe${shieldStyle}&logo=codacy)](https://app.codacy.com/gh/${repoName}dashboard)`,
+      `[![Codacy grade](${shieldRoot}/codacy/grade/bb3b006255104e4da8b9a4a7793dcffe${shieldStyle}&logo=codacy)](https://app.codacy.com/gh/${repoName}/dashboard)`,
       `[![Code coverage](${shieldRoot}/codecov/c/github/${repoName}${shieldStyle}&token=3ORY9UP6H7&logo=codecov)](https://codecov.io/gh/${repoName})`,
       `[![GitHub License](${shieldRoot}/github/license/${repoName}${shieldStyle})](${githubRoot}/blob/main/LICENSE)`,
       `[![Contributor Covenant](${shieldRoot}/badge/Contributor%20Covenant-2.1-4baaaa.svg${shieldStyle})](${githubRoot}/blob/main/CODE_OF_CONDUCT.md)`,
@@ -230,7 +230,7 @@ async function makePackageReadme(packageDir: string, name: string, p: Package): 
       `[![NPM downloads](${shieldRoot}/npm/dt/${packageName}${shieldStyle})](https://npmjs.com/${packageName})`,
       `[![License](${shieldRoot}/npm/l/${packageName}${shieldStyle})](${githubRoot}/blob/main/LICENSE)`,
       `[![Bundle size](${shieldRoot}/bundlephobia/minzip/${packageName}${shieldStyle})](https://bundlephobia.com/package/${packageName})`,
-      `[![Code coverage](${shieldRoot}/codecov/c/github/${repoName}${shieldStyle}&token=3ORY9UP6H7&flag=${name}&logo=codecov)](https://codecov.io/gh/${repoName})`,
+      `[![Code coverage](${shieldRoot}/codecov/c/github/${repoName}${shieldStyle}&token=3ORY9UP6H7&flag=${name}&logo=codecov)](https://app.codecov.io/gh/${repoName}/flags?historicalTrend=LAST_7_DAYS&flags%5B0%5D=${name})`,
       `[![Pull requests welcome](${shieldRoot}/badge/PRs-welcome-brightgreen.svg${shieldStyle})](${githubRoot}/blob/main/CONTRIBUTING.md)`,
       '',
 

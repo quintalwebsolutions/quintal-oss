@@ -9,7 +9,7 @@ TO EDIT THE CONTENT, PLEASE MODIFY `/workspace.ts` OR `/scripts/generate.ts`
 [![NPM downloads](https://img.shields.io/npm/dt/@quintal/monads?style=flat-square)](https://npmjs.com/@quintal/monads)
 [![License](https://img.shields.io/npm/l/@quintal/monads?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/LICENSE)
 [![Bundle size](https://img.shields.io/bundlephobia/minzip/@quintal/monads?style=flat-square)](https://bundlephobia.com/package/@quintal/monads)
-[![Code coverage](https://img.shields.io/codecov/c/github/quintalwebsolutions/quintal-oss?style=flat-square&token=3ORY9UP6H7&flag=monads&logo=codecov)](https://codecov.io/gh/quintalwebsolutions/quintal-oss)
+[![Code coverage](https://img.shields.io/codecov/c/github/quintalwebsolutions/quintal-oss?style=flat-square&token=3ORY9UP6H7&flag=monads&logo=codecov)](https://app.codecov.io/gh/quintalwebsolutions/quintal-oss/flags?historicalTrend=LAST_7_DAYS&flags%5B0%5D=monads)
 [![Pull requests welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/quintalwebsolutions/quintal-oss/blob/main/CONTRIBUTING.md)
 
 A collection of monads (Result, Option) for TypeScript, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/).
@@ -17,7 +17,7 @@ A collection of monads (Result, Option) for TypeScript, inspired by [the Rust pr
 ## Features
 
 - 🛡️ Easy type-safe error- and empty-value handling,
-- 🦀 Implements all relevant methods from Rust,
+- 🦀 Implements all relevant utility methods from Rust,
 - ✅ CommonJS and ES Modules support,
 - 📖 Extensive documentation,
 - ⚖️ Super lightweight (only ~1kb gzipped),
@@ -36,6 +36,7 @@ The following features are planned for future releases:
 
 - [Getting Started](#getting-started)
 - [Result](#result)
+  - [Creating a Result](#creating-a-result)
   - [Method Overview](#method-overview)
     - [Querying the contained value](#querying-the-contained-value)
     - [Extracting the contained value](#extracting-the-contained-value)

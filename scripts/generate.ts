@@ -165,7 +165,7 @@ async function makeRootReadme(rootDir: string): Promise<void> {
       '',
       `![Top language](${shieldRoot}/github/languages/top/quintalwebsolutions/quintal-oss${shieldStyle}&logo=typescript&logoColor=FAF9F8&labelColor=3178C6&color=3178C6)`,
       `[![Build status](${shieldRoot}/github/actions/workflow/status/${repoName}/release.yml${shieldStyle})](${githubRoot}/actions/workflows/release.yml)`,
-      `[![CI status](${shieldRoot}/github/actions/workflow/status/${repoName}/check.yml${shieldStyle})](${githubRoot}/actions/workflows/check.yml)`,
+      `[![CI status](${shieldRoot}/github/actions/workflow/status/${repoName}/check.yml${shieldStyle}&label=ci)](${githubRoot}/actions/workflows/check.yml)`,
       `[![Codacy grade](${shieldRoot}/codacy/grade/bb3b006255104e4da8b9a4a7793dcffe${shieldStyle}&logo=codacy)](https://app.codacy.com/gh/${repoName}/dashboard)`,
       `[![Code coverage](${shieldRoot}/codecov/c/github/${repoName}${shieldStyle}&token=3ORY9UP6H7&logo=codecov)](https://codecov.io/gh/${repoName})`,
       `[![GitHub License](${shieldRoot}/github/license/${repoName}${shieldStyle})](${githubRoot}/blob/main/LICENSE)`,

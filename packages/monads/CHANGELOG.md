@@ -1,5 +1,12 @@
 # @quintal/monads
 
+## 0.3.1
+
+### Patch Changes
+
+- 0cfdcef: No longer require `as const` for inferring simple ok and err types
+- 2731baa: Fix codecov link in README
+
 ## 0.3.0
 
 ### Minor Changes

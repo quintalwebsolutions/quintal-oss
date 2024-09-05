@@ -1,5 +1,12 @@
 # @quintal/environment
 
+## 1.0.1
+
+### Patch Changes
+
+- acde6bf: Externalize dependencies
+- 2731baa: Fix codecov link in README
+
 ## 1.0.0
 
 ### Major Changes

@@ -1,5 +1,5 @@
 import { type None, type Some, isAnyOption, none, some } from '../option';
-import type { MaybePromise } from '../util';
+import type { InferredValue, MaybePromise } from '../util';
 import { type AsyncErr, type AsyncOk, AsyncResult } from './async-result';
 import type { ResultConstructor } from './result-constructor';
 import {
@@ -296,10 +296,14 @@ export class Err<TError> implements ResultConstructor<TError, 'ERR'> {
 
 export type Result<TValue, TError> = Ok<TValue> | Err<TError>;
 
+export function ok<TValue extends InferredValue>(value: TValue): Ok<TValue>;
+export function ok<TValue>(value: TValue): Ok<TValue>;
 export function ok<TValue>(value: TValue): Ok<TValue> {
   return new Ok(value);
 }
 
+export function err<TError extends InferredValue>(value: TError): Err<TError>;
+export function err<TError>(error: TError): Err<TError>;
 export function err<TError>(error: TError): Err<TError> {
   return new Err(error);
 }

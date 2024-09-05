@@ -307,7 +307,7 @@ These methods extract the contained value from an `Option<T>` when it is the `so
 
 #### Transforming the contained value
 
-- `okOr` transforms `Option<T>` into `Result<T, E>, mapping `some(value)`to`ok(value)`and`none`to`err`using the provided default`err` value.
+- `okOr` transforms `Option<T>` into `Result<T, E>`, mapping `some(value)` to `ok(value)` and `none` to `err` using the provided default `err` value.
 - `okOrElse` transforms `Option<T>` into `Result<T, E>`, mapping `some(value)` to `ok(value)` and `none` to a value of `err` using the provided function.
 - `transpose` transforms an `Option` of a `Result` into a `Result` of an `Option`.
 - `flatten` removes at most one level of nesting from an `Option<Option<T>>`.

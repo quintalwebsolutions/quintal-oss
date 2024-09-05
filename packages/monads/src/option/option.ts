@@ -1,5 +1,5 @@
 import { type Err, type Ok, err, ok } from '../result';
-import type { MaybePromise, Ternary } from '../util';
+import type { InferredValue, MaybePromise, Ternary } from '../util';
 import type { OptionConstructor } from './option-constructor';
 import type { AnyOption, OptionMatch } from './util';
 
@@ -205,6 +205,8 @@ export class None implements OptionConstructor<never, 'NONE'> {
 
 export type Option<TValue> = Some<TValue> | None;
 
+export function some<TValue extends InferredValue>(value: TValue): Some<TValue>;
+export function some<TValue>(value: TValue): Some<TValue>;
 export function some<TValue>(value: TValue): Some<TValue> {
   return new Some(value);
 }

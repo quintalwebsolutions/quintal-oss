@@ -1,5 +1,11 @@
 # @quintal/form-engine-react
 
+## 0.0.2
+
+### Patch Changes
+
+- 2731baa: Fix codecov link in README
+
 ## 0.0.1
 
 ### Patch Changes

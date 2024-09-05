@@ -1,5 +1,11 @@
 # @quintal/config
 
+## 0.2.2
+
+### Patch Changes
+
+- 2731baa: Fix codecov link in README
+
 ## 0.2.1
 
 ### Patch Changes

@@ -61,20 +61,20 @@ async function throwsAsync(): P<'value'> {
 
 type P<TValue> = Promise<TValue>;
 
-const okVal = ok('value' as const);
-const asyncOkVal = asyncOk('value' as const);
-const errVal = err('error' as const);
-const asyncErrVal = asyncErr('error' as const);
+const okVal = ok('value');
+const asyncOkVal = asyncOk('value');
+const errVal = err('error');
+const asyncErrVal = asyncErr('error');
 
-const earlyOk = ok('early' as const);
-const earlyErr = err('early' as const);
-const asyncEarlyOk = asyncOk('early' as const);
-const asyncEarlyErr = asyncErr('early' as const);
+const earlyOk = ok('early');
+const earlyErr = err('early');
+const asyncEarlyOk = asyncOk('early');
+const asyncEarlyErr = asyncErr('early');
 
-const lateOk = ok('late' as const);
-const lateErr = err('late' as const);
-const asyncLateOk = asyncOk('late' as const);
-const asyncLateErr = asyncErr('late' as const);
+const lateOk = ok('late');
+const lateErr = err('late');
+const asyncLateOk = asyncOk('late');
+const asyncLateErr = asyncErr('late');
 
 const okRes1 = ok('v1') as Result<'v1', 'e1'>;
 const okRes2 = ok('v2') as Result<'v2', 'e2'>;
@@ -471,7 +471,7 @@ describe('Result', () => {
     expectTypeOf(okNone).toEqualTypeOf<None>();
     expect(okNone.isNone).toBe(true);
 
-    const okSome = ok(some('value' as const)).transpose();
+    const okSome = ok(some('value')).transpose();
     expectTypeOf(okSome).toEqualTypeOf<Some<Ok<'value'>>>();
     expect(okSome.isSome).toBe(true);
     expect(okSome.unwrap().isOk).toBe(true);
@@ -489,7 +489,7 @@ describe('Result', () => {
     expect(errNone.unwrap().isErr).toBe(true);
     expect(errNone.unwrap().unwrapErr().isNone).toBe(true);
 
-    const errSome = err(some('value' as const)).transpose();
+    const errSome = err(some('value')).transpose();
     expectTypeOf(errSome).toEqualTypeOf<Some<Err<Some<'value'>>>>();
     expect(errSome.isSome).toBe(true);
     expect(errSome.unwrap().isErr).toBe(true);
@@ -506,7 +506,7 @@ describe('Result', () => {
     expectTypeOf(asyncOkNone).toEqualTypeOf<Promise<None>>(); // TODO AsyncNone
     // expect(asyncOkNone.isNone).resolves.toBe(true);
 
-    const asyncOkSome = asyncOk(some('value' as const)).transpose();
+    const asyncOkSome = asyncOk(some('value')).transpose();
     expectTypeOf(asyncOkSome).toEqualTypeOf<Promise<Some<Ok<'value'>>>>(); // TODO AsyncSome
     // expect(asyncOkSome.isSome).resolves.toBe(true);
 
@@ -518,7 +518,7 @@ describe('Result', () => {
     expectTypeOf(asyncErrNone).toEqualTypeOf<Promise<Some<Err<None>>>>(); // TODO AsyncSome
     // expect(asyncErrNone.isSome).resolves.toBe(true);
 
-    const asyncErrSome = asyncErr(some('value' as const)).transpose();
+    const asyncErrSome = asyncErr(some('value')).transpose();
     expectTypeOf(asyncErrSome).toEqualTypeOf<Promise<Some<Err<Some<'value'>>>>>(); // TODO AsyncSome
     // expect(asyncErrSome.isSome).resolves.toBe(true);
 
@@ -1166,6 +1166,35 @@ describe('Result', () => {
     expectTypeOf(asyncErrResMatch).toEqualTypeOf<P<'v1' | 'e1'>>();
     await expect(asyncErrResMatch).resolves.toBe('e1');
     expect(mockFn).toHaveBeenCalledTimes(8);
+  });
+
+  it('Infers simple types', () => {
+    expectTypeOf(ok('hello world')).toEqualTypeOf<Ok<'hello world'>>();
+    expectTypeOf(ok(42)).toEqualTypeOf<Ok<42>>();
+    expectTypeOf(ok(true)).toEqualTypeOf<Ok<true>>();
+    expectTypeOf(ok(null)).toEqualTypeOf<Ok<null>>();
+    expectTypeOf(ok({ hello: 'world' })).toEqualTypeOf<Ok<{ hello: string }>>();
+
+    expectTypeOf(err('hello world')).toEqualTypeOf<Err<'hello world'>>();
+    expectTypeOf(err(42)).toEqualTypeOf<Err<42>>();
+    expectTypeOf(err(true)).toEqualTypeOf<Err<true>>();
+    expectTypeOf(err(null)).toEqualTypeOf<Err<null>>();
+    expectTypeOf(err(undefined)).toEqualTypeOf<Err<undefined>>();
+    expectTypeOf(err({ hello: 'world' })).toEqualTypeOf<Err<{ hello: string }>>();
+
+    expectTypeOf(asyncOk('hello world')).toEqualTypeOf<AsyncOk<'hello world'>>();
+    expectTypeOf(asyncOk(42)).toEqualTypeOf<AsyncOk<42>>();
+    expectTypeOf(asyncOk(true)).toEqualTypeOf<AsyncOk<true>>();
+    expectTypeOf(asyncOk(null)).toEqualTypeOf<AsyncOk<null>>();
+    expectTypeOf(asyncOk(undefined)).toEqualTypeOf<AsyncOk<undefined>>();
+    expectTypeOf(asyncOk({ hello: 'world' })).toEqualTypeOf<AsyncOk<{ hello: string }>>();
+
+    expectTypeOf(asyncErr('hello world')).toEqualTypeOf<AsyncErr<'hello world'>>();
+    expectTypeOf(asyncErr(42)).toEqualTypeOf<AsyncErr<42>>();
+    expectTypeOf(asyncErr(true)).toEqualTypeOf<AsyncErr<true>>();
+    expectTypeOf(asyncErr(null)).toEqualTypeOf<AsyncErr<null>>();
+    expectTypeOf(asyncErr(undefined)).toEqualTypeOf<AsyncErr<undefined>>();
+    expectTypeOf(asyncErr({ hello: 'world' })).toEqualTypeOf<AsyncErr<{ hello: string }>>();
   });
 
   it('Serializes into a type-safe object literal', async () => {

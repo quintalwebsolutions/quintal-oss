@@ -1,4 +1,4 @@
-import type { MaybePromise } from '../util';
+import type { InferredValue, MaybePromise } from '../util';
 import { type Err, type Ok, type Result, err, ok, resultFromSerialized } from './result';
 import type {
   AnyResult,
@@ -207,10 +207,14 @@ export class AsyncResult<TResult extends AnyResult> {
 export type AsyncOk<TValue> = AsyncResult<Ok<TValue>>;
 export type AsyncErr<TError> = AsyncResult<Err<TError>>;
 
+export function asyncOk<TValue extends InferredValue>(value: TValue): AsyncOk<TValue>;
+export function asyncOk<TValue>(value: TValue): AsyncOk<TValue>;
 export function asyncOk<TValue>(value: TValue): AsyncOk<TValue> {
   return new AsyncResult(Promise.resolve(ok(value)));
 }
 
+export function asyncErr<TError extends InferredValue>(error: TError): AsyncErr<TError>;
+export function asyncErr<TError>(error: TError): AsyncErr<TError>;
 export function asyncErr<TError>(error: TError): AsyncErr<TError> {
   return new AsyncResult(Promise.resolve(err(error)));
 }

@@ -1,5 +1,12 @@
 # @quintal/monads
 
+## 0.3.2
+
+### Patch Changes
+
+- fd3eb1d: Make match statement more type-flexible
+- fd3eb1d: Fix typo resultFromTrowable => resultfromThrowable
+
 ## 0.3.1
 
 ### Patch Changes

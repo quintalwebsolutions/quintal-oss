@@ -1,6 +1,6 @@
 {
   "name": "@quintal/monads",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "license": "MIT",
   "description": "A collection of monads (Result, Option) for TypeScript, inspired by [the Rust programming language](https://doc.rust-lang.org/std/result/).",
   "keywords": [

@@ -19,7 +19,7 @@ import {
   none,
   ok,
   resultFromSerialized,
-  resultFromTrowable,
+  resultFromThrowable,
   some,
 } from '../src';
 import type { And, Equal, MaybePromise, Ternary } from './util';
@@ -85,8 +85,8 @@ const asyncOkRes2 = asyncOk('v2') as AsyncResult<Result<'v2', 'e2'>>;
 const asyncErrRes1 = asyncErr('e1') as AsyncResult<Result<'v1', 'e1'>>;
 const asyncErrRes2 = asyncErr('e2') as AsyncResult<Result<'v2', 'e2'>>;
 
-const okResVal = resultFromTrowable(returns);
-const errResVal = resultFromTrowable(throws);
+const okResVal = resultFromThrowable(returns);
+const errResVal = resultFromThrowable(throws);
 const asyncOkResVal = asyncResultFromThrowable(returnsAsync);
 const asyncErrResVal = asyncResultFromThrowable(throwsAsync);
 
@@ -1021,6 +1021,34 @@ describe('Result', () => {
   });
 
   it('should emulate Rust\'s "match" syntax', async () => {
+    const mismatchedTypesMatch = { ok: () => 42 as const, err: () => true as const };
+    type OkMismatch = ReturnType<(typeof mismatchedTypesMatch)['ok']>;
+    type ErrMismatch = ReturnType<(typeof mismatchedTypesMatch)['err']>;
+
+    const okMismatch = okVal.match(mismatchedTypesMatch);
+    expectTypeOf(okMismatch).toEqualTypeOf<OkMismatch>();
+
+    const errMismatch = errVal.match(mismatchedTypesMatch);
+    expectTypeOf(errMismatch).toEqualTypeOf<ErrMismatch>();
+
+    const asyncOkMismatch = asyncOkVal.match(mismatchedTypesMatch);
+    expectTypeOf(asyncOkMismatch).toEqualTypeOf<P<OkMismatch>>();
+
+    const asyncErrMismatch = asyncErrVal.match(mismatchedTypesMatch);
+    expectTypeOf(asyncErrMismatch).toEqualTypeOf<P<ErrMismatch>>();
+
+    const okResMismatch = okRes1.match(mismatchedTypesMatch);
+    expectTypeOf(okResMismatch).toEqualTypeOf<OkMismatch | ErrMismatch>();
+
+    const errResMismatch = errRes1.match(mismatchedTypesMatch);
+    expectTypeOf(errResMismatch).toEqualTypeOf<OkMismatch | ErrMismatch>();
+
+    const asyncOkResMismatch = asyncOkRes1.match(mismatchedTypesMatch);
+    expectTypeOf(asyncOkResMismatch).toEqualTypeOf<P<OkMismatch | ErrMismatch>>();
+
+    const asyncErrResMismatch = asyncErrRes1.match(mismatchedTypesMatch);
+    expectTypeOf(asyncErrResMismatch).toEqualTypeOf<P<OkMismatch | ErrMismatch>>();
+
     const mockFn = vi.fn();
 
     const okMatch = okVal.match({

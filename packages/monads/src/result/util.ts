@@ -2,9 +2,9 @@ import { AsyncResult } from './async-result';
 import type { Result } from './result';
 import { Err, Ok } from './result';
 
-export type ResultMatch<TValue, TError, TOutput> = {
-  ok: (value: TValue) => TOutput;
-  err: (error: TError) => TOutput;
+export type ResultMatch<TValue, TError, TOutputOk, TOutputErr> = {
+  ok: (value: TValue) => TOutputOk;
+  err: (error: TError) => TOutputErr;
 };
 
 export type SerializedOk<TValue> = {

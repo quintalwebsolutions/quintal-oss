@@ -4,7 +4,7 @@ export {
   Ok,
   Err,
   resultFromSerialized,
-  resultFromTrowable,
+  resultFromThrowable,
   ok,
   err,
 } from './result';

@@ -355,9 +355,9 @@ export type ResultConstructor<TValue, TVariant extends Variant> = {
    *   err: (error) => 'Some error handling',
    * }); // 'Some error handling'
    */
-  match: <TOutput>(
-    match: ResultMatch<Value<TValue, TVariant>, Error<TValue, TVariant>, TOutput>,
-  ) => TOutput;
+  match: <TOutputOk, TOutputErr>(
+    match: ResultMatch<Value<TValue, TVariant>, Error<TValue, TVariant>, TOutputOk, TOutputErr>,
+  ) => EvaluateVariant<TVariant, TOutputOk, TOutputErr>;
   /**
    * Serialize the result into an object literal that can be passed over the network
    *

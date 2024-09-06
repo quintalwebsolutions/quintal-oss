@@ -24,5 +24,5 @@ export {
   err,
   isAnyResult,
   ok,
-  resultFromTrowable,
+  resultFromThrowable,
 } from './result';

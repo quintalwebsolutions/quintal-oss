@@ -148,7 +148,7 @@ export class Ok<TValue> implements ResultConstructor<TValue, 'OK'> {
     return this;
   }
 
-  match<TOutput>(m: ResultMatch<TValue, never, TOutput>): TOutput {
+  match<TOutputOk, TOutputErr>(m: ResultMatch<TValue, never, TOutputOk, TOutputErr>): TOutputOk {
     return m.ok(this.value);
   }
 
@@ -282,7 +282,7 @@ export class Err<TError> implements ResultConstructor<TError, 'ERR'> {
     return fn(this.error);
   }
 
-  match<TOutput>(m: ResultMatch<never, TError, TOutput>): TOutput {
+  match<TOutputOk, TOutputErr>(m: ResultMatch<never, TError, TOutputOk, TOutputErr>): TOutputErr {
     return m.err(this.error);
   }
 
@@ -316,7 +316,7 @@ export function resultFromSerialized<TSerializedResult extends AnySerializedResu
   return err(serializedResult.error) as ResultFromSerialized<TSerializedResult>;
 }
 
-export function resultFromTrowable<TValue>(fn: () => TValue): Result<TValue, unknown> {
+export function resultFromThrowable<TValue>(fn: () => TValue): Result<TValue, unknown> {
   try {
     const value = fn();
     return ok(value);

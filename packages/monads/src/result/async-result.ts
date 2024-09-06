@@ -188,8 +188,10 @@ export class AsyncResult<TResult extends AnyResult> {
     return new AsyncResult(this.then((res) => res.orElse(fn)));
   }
 
-  match<TOutput>(m: ResultMatch<Value<TResult>, Error<TResult>, TOutput>): Promise<TOutput> {
-    return this.then((res) => res.match(m));
+  match<TOutputOk, TOutputErr>(
+    m: ResultMatch<Value<TResult>, Error<TResult>, TOutputOk, TOutputErr>,
+  ): Promise<IsOk<TResult, TOutputOk, TOutputErr>> {
+    return this.then((res) => res.match(m) as IsOk<TResult, TOutputOk, TOutputErr>);
   }
 
   serialize(): Promise<IsOk<TResult, SerializedOk<Value<TResult>>, SerializedErr<Error<TResult>>>> {

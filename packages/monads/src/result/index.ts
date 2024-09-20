@@ -1,4 +1,12 @@
-export { type AnyResult, isAnyResult } from './util';
+export {
+  type AnyResult,
+  isAnyResult,
+  type AnySerializedResult,
+  type SerializedErr,
+  type SerializedOk,
+  type SerializedResult,
+} from './util';
+
 export {
   type Result,
   Ok,

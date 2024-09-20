@@ -25,4 +25,8 @@ export {
   isAnyResult,
   ok,
   resultFromThrowable,
+  type AnySerializedResult,
+  type SerializedErr,
+  type SerializedOk,
+  type SerializedResult,
 } from './result';

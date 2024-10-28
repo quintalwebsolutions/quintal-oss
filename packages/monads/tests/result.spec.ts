@@ -1276,4 +1276,57 @@ describe('Result', () => {
     const asyncErrResSerPar = await asyncResultFromSerialized(asyncErrResSer);
     expectU(asyncErrResSerPar).toBe<'v1', 'e1'>(false, 'e1');
   });
+
+  it('Merges two or more results into one', async () => {
+    await Promise.all([
+      expectU(okVal.merge(okVal)).toBe<['value', 'value'], never>(true, ['value', 'value']),
+      expectU(okVal.merge(errVal)).toBe<never, 'error'>(false, 'error'),
+
+      expectU(errVal.merge(okVal)).toBe<never, 'error'>(false, 'error'),
+      expectU(errVal.merge(errVal)).toBe<never, 'error'>(false, 'error'),
+    ]);
+
+    // const okRes2 = ok('v2');
+    // const errRes2 = err('e2');
+    // const asyncOkRes2 = asyncOk('v2');
+    // const asyncErrRes2 = asyncErr('e2');
+
+    // const okRes3 = ok('v3');
+    // const errRes3 = err('e3');
+    // const asyncOkRes3 = asyncOk('v3');
+    // const asyncErrRes3 = asyncErr('e3');
+
+    // const okRes4 = ok('v4');
+    // const errRes4 = err('e4');
+    // const asyncOkRes4 = asyncOk('v4');
+    // const asyncErrRes4 = asyncErr('e4');
+
+    // const okRes5 = ok('v5');
+    // const errRes5 = err('e5');
+    // const asyncOkRes5 = asyncOk('v5');
+    // const asyncErrRes5 = asyncErr('e5');
+
+    // await Promise.all([
+    //   expectU(okRes1.merge(okRes2)).toBe<'v1' | 'v2', never>(true, 'v1'),
+    //   expectU(okRes1.merge(errRes2)).toBe<'v1' | 'v2', 'e2'>(true, 'v1'),
+    //   expectU(okRes1.merge(asyncOkRes2)).toBe<'v1' | P<'v2'>, P<never>>(true, 'v1'),
+    //   expectU(okRes1.merge(asyncErrRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1'),
+
+    //   expectU(errRes1.merge(okRes2)).toBe<'v2' | 'v1', 'e1'>(true, 'v2'),
+    //   expectU(errRes1.merge(errRes2)).toBe<'v1' | 'v2', 'e1' | 'e2'>(true, 'v1'),
+    //   expectU(errRes1.merge(asyncOkRes2)).toBe<'v2' | P<'v1'>, 'e1'>(true, 'v2'),
+    //   expectU(errRes1.merge(asyncErrRes2)).toBe<'v1' | P<'v2'>, 'e1' | 'e2'>(true, 'v1'),
+
+    //   expectU(asyncOkRes1.merge(okRes2)).toBe<P<'v1' | 'v2'>, P<'e'>>(true, 'v1'),
+    //   expectU(asyncOkRes1.merge(errRes2)).toBe<P<'v1' | 'v2'>, P<'e'>>(true, 'v1'),
+    //   expectU(asyncOkRes1.merge(asyncOkRes2)).toBe<P<'v1' | 'v2'>, P<'e'>>(true, 'v1'),
+    //   expectU(asyncOkRes1.merge(asyncErrRes2)).toBe<P<'v1' | 'v2'>, P<'e'>>(true, 'v1'),
+
+    //   expectU(asyncErrRes1.merge(okRes2)).toBe<P<'v2' | 'v1'>, P<'e1'>>(true, 'v2'),
+    //   expectU(asyncErrRes1.merge(errRes2)).toBe<P<'v1' | 'v2'>, P<'e1'>>(true, 'v1'),
+    //   expectU(asyncErrRes1.merge(asyncOkRes2)).toBe<P<'v2' | 'v1'>, P<'e1'>>(true, 'v2'),
+    //   expectU(asyncErrRes1.merge(asyncErrRes2)).toBe<P<'v1' | 'v2'>, P<'e1'>>(true, 'v1'),
+
+    //   expectU(okRes1.merge(okRes2, okRes3)).toBe<'v1' | 'v2' | 'v3', never>(true, 'v1'),
+  });
 });

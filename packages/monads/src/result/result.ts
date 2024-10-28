@@ -158,6 +158,23 @@ export class Ok<TValue> implements ResultConstructor<TValue, 'OK'> {
       value: this.value,
     };
   }
+
+  merge<TResultB extends AnyResult>(
+    resultB: TResultB,
+  ): TResultB extends Ok<infer TValueB> ? Ok<[TValue, TValueB]> : TResultB {
+    // TODO achieve without cast?
+    type Cast = TResultB extends Ok<infer TValueB> ? Ok<[TValue, TValueB]> : TResultB;
+
+    if (resultB.isErr) return resultB as Cast;
+    return ok([this._value, resultB.value]) as Cast;
+  }
+
+  // merge<TResultB extends AnyResult>(
+  //   resultB: TResultB,
+  // ) {
+  //   if (resultB.isErr) return resultB;
+  //   return ok([this._value, resultB.value]);
+  // }
 }
 
 export class Err<TError> implements ResultConstructor<TError, 'ERR'> {
@@ -291,6 +308,10 @@ export class Err<TError> implements ResultConstructor<TError, 'ERR'> {
       type: 'err',
       error: this.error,
     };
+  }
+
+  merge<TResultB extends AnyResult>(_resultB: TResultB): Err<TError> {
+    return this;
   }
 }
 

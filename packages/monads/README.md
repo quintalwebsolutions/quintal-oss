@@ -252,7 +252,8 @@ These methods treat the `Result` as a boolean value, where `ok` acts like `true`
 Because we are not actually working with Rust, we are missing some essential syntax to work with the `Result` monad. These methods attempt to emulate some of this syntax.
 
 - `match` allows you to pattern match on both variants of a `Result`.
-- `serialize` reduces the `Result` class to a simple object literal.
+- `merge` allows you to use multiple `Result` objects in the same control flow.
+- `serialize` reduces the `Result` object to a simple, type-safe object literal.
 
 > If you have an idea on how to approach emulating Rust's [question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-), [if let syntax](https://doc.rust-lang.org/rust-by-example/flow_control/if_let.html), or other Rust language features that are not easily achieved in Typescript, feel free to [open an issue](https://github.com/quintalwebsolutions/quintal-oss/issues/new).
 

@@ -4,6 +4,7 @@ import type { AsyncErr, AsyncOk } from './async-result';
 import type { Err, Ok } from './result';
 import type { AnyResult, ResultMatch, SerializedErr, SerializedOk } from './util';
 
+// TODO ASYNC variant
 type Variant = 'OK' | 'ERR';
 type EvaluateVariant<TVariant extends Variant, TIsOk, TIsErr> = TVariant extends 'OK'
   ? TIsOk
@@ -25,7 +26,7 @@ export type ResultConstructor<TValue, TVariant extends Variant> = {
    *
    * @example
    * // `r.unwrap()` is of type `boolean`, `r.unwrapErr()` is of type `unknown`
-   * const r = result(() => true);
+   * const r = resultFromThrowable(() => true);
    *
    * if (r.isOk) {
    *   // `r.unwrap()` is of type `boolean`, `r.unwrapErr()` is of type `never`
@@ -41,7 +42,7 @@ export type ResultConstructor<TValue, TVariant extends Variant> = {
    *
    * @example
    * // `r.unwrap()` is of type `boolean`, `r.unwrapErr()` is of type `unknown`
-   * const r = result(() => true);
+   * const r = resultFromThrowable(() => true);
    *
    * if (r.isErr) {
    *   // `r.unwrap()` is of type `never`, `r.unwrapErr()` is of type `unknown`
@@ -100,7 +101,7 @@ export type ResultConstructor<TValue, TVariant extends Variant> = {
   /**
    * Returns the contained `ok` value, or throws a given error message it is an `err`.
    *
-   * It is recommended that expect messages are used to describe the reason you expect the `Result` should be `ok` (hint: use the word 'should').
+   * It is recommended that expect messages are used to describe the reason you expect the `Result` to be `ok` (hint: use the word 'should').
    *
    * * Because this function may throw, its use is generally discouraged. Instead, prefer to use `ok`, `unwrapOr`, or `unwrapOrElse`.
    *
@@ -112,7 +113,7 @@ export type ResultConstructor<TValue, TVariant extends Variant> = {
   /**
    * Returns the contained `err` value, or throws the given error message it is an `ok`.
    *
-   * It is recommended that expect messages are used to describe the reason you expect the `Result` should be `err` (hint: use the word 'should').
+   * It is recommended that expect messages are used to describe the reason you expect the `Result` to be `err` (hint: use the word 'should').
    *
    * * Because this function may throw, its use is generally discouraged. Instead, prefer to use `err`.
    *
@@ -285,10 +286,10 @@ export type ResultConstructor<TValue, TVariant extends Variant> = {
    * * If you are passing the result of a function call to `res`, it is recommended to use `andThen`, which is lazily evaluated.
    *
    * @example
+   * ok('early value').and(ok('late value')).unwrap(); // 'late value'
+   * ok('early value').and(err('late error')).unwrapErr(); // 'late error'
    * err('early error').and(ok('late value')).unwrapErr(); // 'early error'
    * err('early error').and(err('late error')).unwrapErr(); // 'early error'
-   * ok('early value').and(err('late error')).unwrapErr(); // 'late error'
-   * ok('early value').and(ok('late value')).unwrap(); // 'late value'
    */
   and: <TResultB extends AnyResult>(
     resultB: TResultB,
@@ -313,11 +314,12 @@ export type ResultConstructor<TValue, TVariant extends Variant> = {
    * This function can be used for control flow based on Result values.
    *
    * @example
-   * const s = (x: number) => x === 42 ? err('bad number') : ok(x * x);
-   * ok(2).andThen(s).unwrap(); // 4
-   * ok(42).andThen(s).unwrapErr(); // 'bad number'
-   * err('not a number').andThen(s).unwrapErr(); // 'not a number'
+   * const square = (x: number) => x === 42 ? err('bad number') : ok(x * x);
+   * ok(2).andThen(square).unwrap(); // 4
+   * ok(42).andThen(square).unwrapErr(); // 'bad number'
+   * err('not a number').andThen(square).unwrapErr(); // 'not a number'
    */
+  // TODO allow to pass a Promise<TResultB> to return an AsyncResult
   andThen: <TResultB extends AnyResult>(
     fn: (value: Value<TValue, TVariant>) => TResultB,
   ) => EvaluateVariant<TVariant, TResultB, Err<TValue>>;
@@ -327,13 +329,14 @@ export type ResultConstructor<TValue, TVariant extends Variant> = {
    * This function can be used for control flow based on result values.
    *
    * @example
-   * const s = (x: number) => ok(x * x);
-   * const e = (x: number) => err(x);
-   * ok(2).orElse(s).orElse(s).unwrap(); // 2
-   * ok(2).orElse(e).orElse(s).unwrap(); // 2
-   * err(2).orElse(s).orElse(e).unwrap(); // 4
-   * err(3).orElse(e).orElse(e).unwrapErr(); // 3
+   * const square = (x: number) => ok(x * x);
+   * const error = (x: number) => err(x);
+   * ok(2).orElse(square).orElse(square).unwrap(); // 2
+   * ok(2).orElse(error).orElse(square).unwrap(); // 2
+   * err(2).orElse(square).orElse(error).unwrap(); // 4
+   * err(3).orElse(error).orElse(error).unwrapErr(); // 3
    */
+  // TODO allow to pass a Promise<TResultB> to return an AsyncResult
   orElse: <TResultB extends AnyResult>(
     fn: (error: Error<TValue, TVariant>) => TResultB,
   ) => EvaluateVariant<TVariant, Ok<TValue>, TResultB>;
@@ -369,5 +372,22 @@ export type ResultConstructor<TValue, TVariant extends Variant> = {
     TVariant,
     SerializedOk<Value<TValue, TVariant>>,
     SerializedErr<Error<TValue, TVariant>>
+  >;
+  /**
+   * Merge the result with another result, returning the first error encountered
+   *
+   * @example
+   * ok('value1').merge(ok('value2')).unwrap(); // ['value1', 'value2']
+   * ok('value1').merge(err('error2')).unwrap(); // 'error2'
+   * err('error1').merge(ok('value2')).unwrap(); // 'error1'
+   * err('error1').merge(err('error2')).unwrap(); // 'error1'
+   */
+  merge: <TResultB extends AnyResult>(
+    resultB: TResultB,
+    // TODO if resultB is AsyncResult, output should be one merged AsyncResult
+  ) => EvaluateVariant<
+    TVariant,
+    TResultB extends Ok<infer TValueB> ? Ok<[TValue, TValueB]> : TResultB,
+    Err<TValue>
   >;
 };

@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import { type AnyOption, type Option, none, some } from '../src';
-import type { Equal } from './util';
+import { type AnyOption, type Option, none, some } from '../old';
+import type { Equal } from '../tests/util';
 
 function expectOptionUnwrap<TOption extends AnyOption>(_option: TOption) {
   return {

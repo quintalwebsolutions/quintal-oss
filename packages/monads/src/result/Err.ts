@@ -1,4 +1,4 @@
-import { none, some } from '../../old/option';
+import { none, some } from '..';
 import { AsyncResult } from './AsyncResult';
 import type { ResultDocs } from './ResultDocs';
 import { err } from './constructors';
@@ -49,7 +49,7 @@ export class Err<TError> implements ResultDocs<TError, 'err'> {
   }
 
   unwrap(): never {
-    throw new Error(`Attempted to unwrap an 'err' value: ${this.error}`);
+    throw new Error(`Attempted to unwrap an Err value: ${this.error}`);
   }
 
   unwrapErr() {
@@ -65,7 +65,7 @@ export class Err<TError> implements ResultDocs<TError, 'err'> {
   }
 
   ok() {
-    return none;
+    return none();
   }
 
   err() {

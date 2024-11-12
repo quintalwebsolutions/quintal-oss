@@ -1,4 +1,4 @@
-import type { None, Some } from '../../old/option';
+import type { AsyncNone, AsyncSome, None, Some } from '..';
 import type { Err } from './Err';
 import type { Ok } from './Ok';
 import type {
@@ -17,17 +17,17 @@ import type {
 type ResultVariant = 'ok' | 'err' | 'async';
 
 type EvaluateResultVariant<
-  TResultVariant extends ResultVariant,
+  TVariant extends ResultVariant,
   TMap extends Record<ResultVariant, unknown>,
-> = TMap[TResultVariant];
+> = TMap[TVariant];
 
-type Value<TValue, TResultVariant extends ResultVariant> = EvaluateResultVariant<
-  TResultVariant,
+type ResultValue<TValue, TVariant extends ResultVariant> = EvaluateResultVariant<
+  TVariant,
   { ok: TValue; err: never; async: ValueFromOk<TValue> }
 >;
 
-type Error<TValue, TResultVariant extends ResultVariant> = EvaluateResultVariant<
-  TResultVariant,
+type ResultError<TValue, TVariant extends ResultVariant> = EvaluateResultVariant<
+  TVariant,
   { ok: never; err: TValue; async: ValueFromErr<TValue> }
 >;
 
@@ -104,7 +104,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * err('error').isOkAnd(async () => false); // false
    */
   isOkAnd: <TPredicate extends MaybePromise<boolean>>(
-    fn: (value: Value<TValue, TResultVariant>) => TPredicate,
+    fn: (value: ResultValue<TValue, TResultVariant>) => TPredicate,
   ) => EvaluateResultVariant<
     TResultVariant,
     {
@@ -127,7 +127,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * await err('error').isErrAnd(async () => false); // false
    */
   isErrAnd: <TPredicate extends MaybePromise<boolean>>(
-    fn: (error: Error<TValue, TResultVariant>) => TPredicate,
+    fn: (error: ResultError<TValue, TResultVariant>) => TPredicate,
   ) => EvaluateResultVariant<
     TResultVariant,
     {
@@ -145,7 +145,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * err('error').inspect((value) => console.log(value)); // Doesn't do anything
    */
   inspect: (
-    fn: (value: Value<TValue, TResultVariant>) => MaybePromise<void>,
+    fn: (value: ResultValue<TValue, TResultVariant>) => MaybePromise<void>,
   ) => ResultDocs<TValue, TResultVariant>;
   /**
    * Calls the provided closure with the contained error (if `err`).
@@ -156,7 +156,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * err('error').inspectErr(async (value) => console.log(value)); // Logs 'error' to the console asynchronously
    */
   inspectErr: (
-    fn: (error: Error<TValue, TResultVariant>) => MaybePromise<void>,
+    fn: (error: ResultError<TValue, TResultVariant>) => MaybePromise<void>,
   ) => ResultDocs<TValue, TResultVariant>;
   // #endregion
 
@@ -260,7 +260,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * await asyncErr('error').unwrapOrElse((_error) => 'default'); // 'default'
    */
   unwrapOrElse: <TDefaultValue>(
-    fn: (error: Error<TValue, TResultVariant>) => TDefaultValue,
+    fn: (error: ResultError<TValue, TResultVariant>) => TDefaultValue,
   ) => EvaluateResultVariant<
     TResultVariant,
     {
@@ -286,7 +286,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: Some<TValue>;
       err: None;
-      async: Promise<ResultTernary<TValue, Some<TValue>, None>>; // TODO AsyncOption
+      async: ResultTernary<TValue, AsyncSome<TValue>, AsyncNone>;
     }
   >;
   /**
@@ -303,11 +303,42 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: None;
       err: Some<TValue>;
-      async: Promise<ResultTernary<TValue, None, Some<TValue>>>; // TODO AsyncOption
+      async: ResultTernary<TValue, AsyncNone, AsyncSome<TValue>>;
     }
   >;
-  // TODO transpose
-  // TODO flatten
+  // TODO transpose and flatten + async examples
+  // /**
+  //  * Transposes a `Result` of an `Option` into an `Option` of a `Result`
+  //  *
+  //  * @example
+  //  * ok(none).transpose(); // none
+  //  * ok(some('value')).transpose(); // some(ok('value'))
+  //  * ok('value').transpose(); // some(ok('value'))
+  //  * err(none).transpose(); // some(err(none))
+  //  * err(some('value')).transpose(); // some(err(some('value')))
+  //  * err('error').transpose(); // some(err('error'))
+  //  */
+  // transpose: () =>
+  //   EvaluateVariant<
+  //     TVariant,
+  //     TValue extends None ? TValue : Some<Ok<TValue extends Some<infer TSome> ? TSome : TValue>>,
+  //     Some<Err<TValue>>
+  //   >;
+  // /**
+  //  * Flattens at most one level of `Result` nesting.
+  //  *
+  //  * @example
+  //  * ok('value').flatten(); // ok('value')
+  //  * err('error').flatten(); // err('error')
+  //  * ok(ok('value')).flatten(); // ok('value')
+  //  * ok(err('error')).flatten(); // err('error')
+  //  * err(ok('value')).flatten(); // err(ok('value'))
+  //  * err(err('error)).flatten(); // err(err('error'))
+  //  * ok(ok(ok('value'))).flatten(); // ok(ok('value'))
+  //  * ok(ok(ok('value'))).flatten().flatten(); // ok('value')
+  //  */
+  // flatten: () =>
+  //   EvaluateVariant<TVariant, TValue extends AnyResult ? TValue : Ok<TValue>, Err<TValue>>;
   /**
    * Maps a `Result<T, E>` to a `Result<U, E>` by applying a function to a contained `ok` value, leaving an `err` value untouched.
    *
@@ -322,7 +353,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * await asyncErr(2).map((v) => v * 2).unwrapErr(); // 2
    */
   map: <TMappedValue>(
-    fn: (value: Value<TValue, TResultVariant>) => TMappedValue,
+    fn: (value: ResultValue<TValue, TResultVariant>) => TMappedValue,
   ) => EvaluateResultVariant<
     TResultVariant,
     {
@@ -347,7 +378,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * await asyncErr(2).mapErr((v) => v * 2).unwrapErr(); // 4
    */
   mapErr: <TMappedError>(
-    fn: (error: Error<TValue, TResultVariant>) => TMappedError,
+    fn: (error: ResultError<TValue, TResultVariant>) => TMappedError,
   ) => EvaluateResultVariant<
     TResultVariant,
     {
@@ -375,7 +406,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    */
   mapOr: <TDefaultValue, TMappedValue>(
     defaultValue: TDefaultValue,
-    fn: (value: Value<TValue, TResultVariant>) => TMappedValue,
+    fn: (value: ResultValue<TValue, TResultVariant>) => TMappedValue,
   ) => EvaluateResultVariant<
     TResultVariant,
     {
@@ -398,8 +429,8 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * await asyncErr(2).mapOrElse((_error) => 42, (v) => v * 2); // 42
    */
   mapOrElse: <TDefaultValue, TMappedValue>(
-    defaultFn: (error: Error<TValue, TResultVariant>) => TDefaultValue,
-    fn: (value: Value<TValue, TResultVariant>) => TMappedValue,
+    defaultFn: (error: ResultError<TValue, TResultVariant>) => TDefaultValue,
+    fn: (value: ResultValue<TValue, TResultVariant>) => TMappedValue,
   ) => EvaluateResultVariant<
     TResultVariant,
     {
@@ -467,7 +498,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    */
   // TODO allow to pass a Promise<TResultB> to return an AsyncResult
   andThen: <TResultB extends AnyResult>(
-    fn: (value: Value<TValue, TResultVariant>) => TResultB,
+    fn: (value: ResultValue<TValue, TResultVariant>) => TResultB,
   ) => EvaluateResultVariant<
     TResultVariant,
     {
@@ -491,7 +522,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    */
   // TODO allow to pass a Promise<TResultB> to return an AsyncResult
   orElse: <TResultB extends AnyResult>(
-    fn: (error: Error<TValue, TResultVariant>) => TResultB,
+    fn: (error: ResultError<TValue, TResultVariant>) => TResultB,
   ) => EvaluateResultVariant<
     TResultVariant,
     {
@@ -520,8 +551,8 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    */
   match: <TOutputOk, TOutputErr>(
     match: ResultMatch<
-      Value<TValue, TResultVariant>,
-      Error<TValue, TResultVariant>,
+      ResultValue<TValue, TResultVariant>,
+      ResultError<TValue, TResultVariant>,
       TOutputOk,
       TOutputErr
     >,
@@ -530,7 +561,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: TOutputOk;
       err: TOutputErr;
-      async: any; // TODO
+      async: Promise<ResultTernary<TValue, TOutputOk, TOutputErr>>;
     }
   >;
   /**
@@ -543,9 +574,15 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
   serialize: () => EvaluateResultVariant<
     TResultVariant,
     {
-      ok: SerializedOk<Value<TValue, TResultVariant>>;
-      err: SerializedErr<Error<TValue, TResultVariant>>;
-      async: any; // TODO
+      ok: SerializedOk<ResultValue<TValue, TResultVariant>>;
+      err: SerializedErr<ResultError<TValue, TResultVariant>>;
+      async: Promise<
+        ResultTernary<
+          TValue,
+          SerializedOk<ValueFromOk<TValue>>,
+          SerializedErr<ValueFromErr<TValue>>
+        >
+      >;
     }
   >;
   /**

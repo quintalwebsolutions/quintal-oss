@@ -1,11 +1,14 @@
-import type { None, Some } from '../../old/option';
+import { type AnySyncOption, type AsyncNone, AsyncOption, type AsyncSome } from '../option';
 import type { ResultDocs } from './ResultDocs';
 import type {
   AnySyncResult,
   AsyncErr,
   AsyncOk,
   MaybePromise,
+  ResultMatch,
   ResultTernary,
+  SerializedErr,
+  SerializedOk,
   ValueFromErr,
   ValueFromOk,
 } from './types';
@@ -90,13 +93,15 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
   }
 
   ok() {
-    type Return = ResultTernary<TResult, Some<TResult>, None>;
-    return this.then((res) => res.ok() as Return);
+    type Return = ResultTernary<TResult, AsyncSome<TResult>, AsyncNone>;
+    const promise = this.then((res) => res.ok() as AnySyncOption);
+    return new AsyncOption(promise) as Return;
   }
 
   err() {
-    type Return = ResultTernary<TResult, None, Some<TResult>>;
-    return this.then((res) => res.err() as Return);
+    type Return = ResultTernary<TResult, AsyncNone, AsyncSome<TResult>>;
+    const promise = this.then((res) => res.err() as AnySyncOption);
+    return new AsyncOption(promise) as Return;
   }
 
   // TODO transpose
@@ -149,5 +154,45 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
   ) {
     type Return = Promise<Awaited<ResultTernary<TResult, TMappedValue, TDefaultValue>>>;
     return this.then(async (res) => await res.mapOrElse(defaultFn, fn)) as Return;
+  }
+
+  // and<TResultB extends AnyResult>(
+  //   resB: TResultB,
+  // ): AsyncResult<IsOk<TResult, Awaited<TResultB>, Err<Error<TResult>>>> {
+  //   return new AsyncResult(this.then((res) => res.and(resB)));
+  // }
+
+  // or<TResultB extends AnyResult>(
+  //   resB: TResultB,
+  // ): AsyncResult<IsOk<TResult, Ok<Value<TResult>>, Awaited<TResultB>>> {
+  //   return new AsyncResult(this.then((res) => res.or(resB)));
+  // }
+
+  // andThen<TResultB extends AnyResult>(
+  //   fn: (value: Value<TResult>) => TResultB,
+  // ): AsyncResult<IsOk<TResult, Awaited<TResultB>, Err<Error<TResult>>>> {
+  //   return new AsyncResult(this.then((res) => res.andThen(fn)));
+  // }
+
+  // orElse<TResultB extends AnyResult>(
+  //   fn: (error: Error<TResult>) => TResultB,
+  // ): AsyncResult<IsOk<TResult, Ok<Value<TResult>>, Awaited<TResultB>>> {
+  //   return new AsyncResult(this.then((res) => res.orElse(fn)));
+  // }
+
+  match<TOutputOk, TOutputErr>(
+    match: ResultMatch<ValueFromOk<TResult>, ValueFromErr<TResult>, TOutputOk, TOutputErr>,
+  ) {
+    type Return = ResultTernary<TResult, TOutputOk, TOutputErr>;
+    return this.then((res) => res.match(match) as Return);
+  }
+
+  serialize() {
+    type Return = ResultTernary<
+      TResult,
+      SerializedOk<ValueFromOk<TResult>>,
+      SerializedErr<ValueFromErr<TResult>>
+    >;
+    return this.then((res) => res.serialize() as Return);
   }
 }

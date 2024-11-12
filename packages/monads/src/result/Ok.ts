@@ -1,4 +1,4 @@
-import { none, some } from '../../old/option';
+import { none, some } from '..';
 import { AsyncResult } from './AsyncResult';
 import type { ResultDocs } from './ResultDocs';
 import { ok } from './constructors';
@@ -53,7 +53,7 @@ export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
   }
 
   unwrapErr(): never {
-    throw new Error(`Attempted to unwrapErr an 'ok' value: ${this.value}`);
+    throw new Error(`Attempted to unwrapErr an Ok value: ${this.value}`);
   }
 
   unwrapOr<TDefaultValue>(_defaultValue: TDefaultValue) {
@@ -69,7 +69,7 @@ export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
   }
 
   err() {
-    return none;
+    return none();
   }
 
   // TODO transpose

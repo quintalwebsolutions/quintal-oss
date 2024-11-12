@@ -337,4 +337,4 @@ Because we are not actually working with Rust, we are missing some essential syn
 
 ## Acknowledgement
 
-Though this is not a fork, my implementation draws prior work from [Sniptt's `monads` package](https://github.com/sniptt-official/monads/) and [Supermacro's `neverthrow` package](https://github.com/supermacro/neverthrow/). I was very inspired by their work and the issues the community filed to these repositories.
+Though it is not a fork, this implementation draws prior work from [Sniptt's `monads` package](https://github.com/sniptt-official/monads/) and [Supermacro's `neverthrow` package](https://github.com/supermacro/neverthrow/). I was very inspired by their work and the issues the community filed to these repositories.

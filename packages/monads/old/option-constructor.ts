@@ -3,17 +3,6 @@ import type { MaybePromise, Ternary } from '../util';
 import type { None, Some } from './option';
 import type { AnyOption, OptionMatch } from './util';
 
-type Variant = 'SOME' | 'NONE';
-type EvaluateVariant<TVariant extends Variant, TIsSome, TIsNone> = TVariant extends 'SOME'
-  ? TIsSome
-  : TVariant extends 'NONE'
-    ? TIsNone
-    : never;
-
-type Value<TValue, TVariant extends Variant> = TVariant extends 'SOME' ? TValue : never;
-
-// TODO docs
-/** A data structure that represents either the presence or the absence of a value */
 export type OptionConstructor<TValue, TVariant extends Variant> = {
   // Querying
 

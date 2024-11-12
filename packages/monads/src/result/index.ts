@@ -28,7 +28,5 @@ export type {
   SerializedResult,
   ValueFromErr,
   ValueFromOk,
-  isAnyAsyncResult,
-  isAnyResult,
-  isAnySyncResult,
 } from './types';
+export { isAnyAsyncResult, isAnyResult, isAnySyncResult } from './types';

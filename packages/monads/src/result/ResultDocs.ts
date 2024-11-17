@@ -286,7 +286,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: Some<TValue>;
       err: None;
-      async: ResultTernary<TValue, AsyncSome<TValue>, AsyncNone>;
+      async: ResultTernary<TValue, AsyncSome<ValueFromOk<TValue>>, AsyncNone>;
     }
   >;
   /**
@@ -303,7 +303,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: None;
       err: Some<TValue>;
-      async: ResultTernary<TValue, AsyncNone, AsyncSome<TValue>>;
+      async: ResultTernary<TValue, AsyncNone, AsyncSome<ValueFromErr<TValue>>>;
     }
   >;
   // TODO transpose and flatten + async examples

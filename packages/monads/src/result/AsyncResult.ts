@@ -93,13 +93,13 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
   }
 
   ok() {
-    type Return = ResultTernary<TResult, AsyncSome<TResult>, AsyncNone>;
+    type Return = ResultTernary<TResult, AsyncSome<ValueFromOk<TResult>>, AsyncNone>;
     const promise = this.then((res) => res.ok() as AnySyncOption);
     return new AsyncOption(promise) as Return;
   }
 
   err() {
-    type Return = ResultTernary<TResult, AsyncNone, AsyncSome<TResult>>;
+    type Return = ResultTernary<TResult, AsyncNone, AsyncSome<ValueFromErr<TResult>>>;
     const promise = this.then((res) => res.err() as AnySyncOption);
     return new AsyncOption(promise) as Return;
   }
@@ -143,7 +143,7 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
   mapOr<TDefaultValue, TMappedValue>(
     defaultValue: TDefaultValue,
     fn: (value: ValueFromOk<TResult>) => TMappedValue,
-  ) {
+  ): Promise<Awaited<ResultTernary<TResult, TMappedValue, TDefaultValue>>> {
     type Return = Promise<Awaited<ResultTernary<TResult, TMappedValue, TDefaultValue>>>;
     return this.then(async (res) => await res.mapOr(defaultValue, fn)) as Return;
   }
@@ -151,7 +151,7 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
   mapOrElse<TDefaultValue, TMappedValue>(
     defaultFn: (error: ValueFromErr<TResult>) => TDefaultValue,
     fn: (value: ValueFromOk<TResult>) => TMappedValue,
-  ) {
+  ): Promise<Awaited<ResultTernary<TResult, TMappedValue, TDefaultValue>>> {
     type Return = Promise<Awaited<ResultTernary<TResult, TMappedValue, TDefaultValue>>>;
     return this.then(async (res) => await res.mapOrElse(defaultFn, fn)) as Return;
   }

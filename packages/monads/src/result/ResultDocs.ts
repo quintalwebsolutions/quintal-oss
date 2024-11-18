@@ -1,4 +1,4 @@
-import type { AsyncNone, AsyncSome, None, Some } from '..';
+import type { AsyncNone, AsyncResult, AsyncSome, None, Some } from '..';
 import type { Err } from './Err';
 import type { Ok } from './Ok';
 import type {
@@ -461,7 +461,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: TResultB;
       err: Err<TValue>;
-      async: any; // TODO
+      async: AsyncResult<ResultTernary<TValue, Awaited<TResultB>, Err<ValueFromErr<TValue>>>>;
     }
   >;
   /**
@@ -482,7 +482,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: Ok<TValue>;
       err: TResultB;
-      async: any; // TODO
+      async: AsyncResult<ResultTernary<TValue, Ok<ValueFromOk<TValue>>, Awaited<TResultB>>>;
     }
   >;
   /**
@@ -496,7 +496,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * ok(42).andThen(square).unwrapErr(); // 'bad number'
    * err('not a number').andThen(square).unwrapErr(); // 'not a number'
    */
-  // TODO allow to pass a Promise<TResultB> to return an AsyncResult
+  // TODO allow to pass a Promise<AnySyncResult> to return an AsyncResult
   andThen: <TResultB extends AnyResult>(
     fn: (value: ResultValue<TValue, TResultVariant>) => TResultB,
   ) => EvaluateResultVariant<
@@ -504,7 +504,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: TResultB;
       err: Err<TValue>;
-      async: any; // TODO
+      async: AsyncResult<ResultTernary<TValue, Awaited<TResultB>, Err<ValueFromErr<TValue>>>>;
     }
   >;
   /**
@@ -520,7 +520,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * err(2).orElse(square).orElse(error).unwrap(); // 4
    * err(3).orElse(error).orElse(error).unwrapErr(); // 3
    */
-  // TODO allow to pass a Promise<TResultB> to return an AsyncResult
+  // TODO allow to pass a Promise<AnySyncResult> to return an AsyncResult
   orElse: <TResultB extends AnyResult>(
     fn: (error: ResultError<TValue, TResultVariant>) => TResultB,
   ) => EvaluateResultVariant<
@@ -528,7 +528,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: Ok<TValue>;
       err: TResultB;
-      async: any; // TODO
+      async: AsyncResult<ResultTernary<TValue, Ok<ValueFromOk<TValue>>, Awaited<TResultB>>>;
     }
   >;
   // #endregion

@@ -585,25 +585,5 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
       >;
     }
   >;
-  /**
-   * Merge the result with another result, returning the first error encountered
-   *
-   * @example
-   * ok('value1').merge(ok('value2')).unwrap(); // ['value1', 'value2']
-   * ok('value1').merge(err('error2')).unwrap(); // 'error2'
-   * err('error1').merge(ok('value2')).unwrap(); // 'error1'
-   * err('error1').merge(err('error2')).unwrap(); // 'error1'
-   * ok('value1').merge(ok('value2'), ok('value3')).unwrap(); // ['value1', 'value2', 'value3']
-   * ok('value1').merge(ok('value2'), err('error3')).unwrap(); // 'error3'
-   */
-  // TODO merge
-  // merge: <TResultB extends AnyResult[]>(
-  //   ...resultB: TResultB
-  //   // TODO if any of resultB is AsyncResult, output should be one merged AsyncResult
-  // ) => EvaluateVariant<
-  //   TVariant,
-  //   TResultB extends Ok<infer TValueB> ? Ok<[TValue, TValueB]> : TResultB,
-  //   Err<TValue>
-  // >;
   // #endregion
 };

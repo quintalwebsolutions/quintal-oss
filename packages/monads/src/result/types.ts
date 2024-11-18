@@ -53,6 +53,17 @@ export type ResultFromSerialized<TSerializedResult extends AnySerializedResult> 
       ? Err<TError>
       : never;
 
+export type ResultFromResults<
+  TResults extends AnySyncResult[],
+  TValues extends unknown[] = [],
+> = TResults extends [infer THeadResult, ...infer TTailResults extends AnySyncResult[]]
+  ? THeadResult extends Ok<infer TValue>
+    ? ResultFromResults<TTailResults, [...TValues, TValue]>
+    : THeadResult extends AnyErr
+      ? THeadResult
+      : never
+  : Ok<TValues>;
+
 export type ResultTernary<TResult, TIfOk, TIfErr> = TResult extends AnyOk ? TIfOk : TIfErr;
 
 export type ValueFromOk<TOk> = TOk extends Ok<infer TValue> ? TValue : never;

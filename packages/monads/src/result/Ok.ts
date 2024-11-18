@@ -147,22 +147,4 @@ export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
   serialize() {
     return { type: 'ok', value: this.value } satisfies SerializedOk<TValue>;
   }
-
-  // TODO merge
-  // merge<TResultB extends AnyResult>(
-  //   resultB: TResultB,
-  // ): TResultB extends Ok<infer TValueB> ? Ok<[TValue, TValueB]> : TResultB {
-  //   // TODO achieve without cast?
-  //   type Cast = TResultB extends Ok<infer TValueB> ? Ok<[TValue, TValueB]> : TResultB;
-
-  //   if (resultB.isErr) return resultB as Cast;
-  //   return ok([this._value, resultB.value]) as Cast;
-  // }
-
-  // merge<TResultB extends AnyResult>(
-  //   resultB: TResultB,
-  // ) {
-  //   if (resultB.isErr) return resultB;
-  //   return ok([this._value, resultB.value]);
-  // }
 }

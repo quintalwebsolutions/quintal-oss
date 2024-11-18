@@ -132,9 +132,4 @@ export class Err<TError> implements ResultDocs<TError, 'err'> {
   serialize() {
     return { type: 'err', error: this.error } satisfies SerializedErr<TError>;
   }
-
-  // TODO merge
-  // merge<TResultB extends AnyResult>(_resultB: TResultB): Err<TError> {
-  //   return this;
-  // }
 }

@@ -17,6 +17,9 @@ import {
   asyncResultFromSerialized,
   asyncResultFromThrowable,
   err,
+  isAnyAsyncResult,
+  isAnyResult,
+  isAnySyncResult,
   ok,
   resultFromSerialized,
   resultFromThrowable,
@@ -177,6 +180,37 @@ describe('Result', () => {
     expectTypeOf(asyncErr(null)).toEqualTypeOf<AsyncErr<null>>();
     expectTypeOf(asyncErr(undefined)).toEqualTypeOf<AsyncErr<undefined>>();
     expectTypeOf(asyncErr({ hello: 'world' })).toEqualTypeOf<AsyncErr<{ hello: string }>>();
+  });
+
+  it('Provides type guards for result instances', () => {
+    expect(isAnyResult('anything else')).toBe(false);
+
+    expect(isAnySyncResult(okVal)).toBe(true);
+    expect(isAnySyncResult(errVal)).toBe(true);
+    expect(isAnySyncResult(okResVal)).toBe(true);
+    expect(isAnySyncResult(errResVal)).toBe(true);
+    expect(isAnySyncResult(asyncOkVal)).toBe(false);
+    expect(isAnySyncResult(asyncErrVal)).toBe(false);
+    expect(isAnySyncResult(asyncOkResVal)).toBe(false);
+    expect(isAnySyncResult(asyncErrResVal)).toBe(false);
+
+    expect(isAnyAsyncResult(okVal)).toBe(false);
+    expect(isAnyAsyncResult(errVal)).toBe(false);
+    expect(isAnyAsyncResult(okResVal)).toBe(false);
+    expect(isAnyAsyncResult(errResVal)).toBe(false);
+    expect(isAnyAsyncResult(asyncOkVal)).toBe(true);
+    expect(isAnyAsyncResult(asyncErrVal)).toBe(true);
+    expect(isAnyAsyncResult(asyncOkResVal)).toBe(true);
+    expect(isAnyAsyncResult(asyncErrResVal)).toBe(true);
+
+    expect(isAnyResult(okVal)).toBe(true);
+    expect(isAnyResult(errVal)).toBe(true);
+    expect(isAnyResult(okResVal)).toBe(true);
+    expect(isAnyResult(errResVal)).toBe(true);
+    expect(isAnyResult(asyncOkVal)).toBe(true);
+    expect(isAnyResult(asyncErrVal)).toBe(true);
+    expect(isAnyResult(asyncOkResVal)).toBe(true);
+    expect(isAnyResult(asyncErrResVal)).toBe(true);
   });
 
   test('isOk', () => {
@@ -2063,5 +2097,143 @@ describe('Result', () => {
     await eua(asyncErrResParsed).toBe<P<'value'>, P<unknown>>(false, error);
   });
 
-  test.todo('merge', async () => {});
+  test.todo('merge', async () => {
+    // const mockFn = vi.fn();
+    // const okMatch = okVal.match({
+    //   ok: (value) => {
+    //     expectTypeOf(value).toEqualTypeOf<'value'>();
+    //     expect(value).toBe('value');
+    //     mockFn();
+    //     return value;
+    //   },
+    //   err: (error) => {
+    //     expectTypeOf(error).toEqualTypeOf<never>();
+    //     mockFn();
+    //     return error;
+    //   },
+    // });
+    // expect(mockFn).toHaveBeenCalledTimes(1);
+    // expectTypeOf(okMatch).toEqualTypeOf<'value'>();
+    // expect(okMatch).toBe('value');
+    // const errMatch = errVal.match({
+    //   ok: (value) => {
+    //     expectTypeOf(value).toEqualTypeOf<never>();
+    //     mockFn();
+    //     return value;
+    //   },
+    //   err: (error) => {
+    //     expectTypeOf(error).toEqualTypeOf<'error'>();
+    //     expect(error).toBe('error');
+    //     mockFn();
+    //     return error;
+    //   },
+    // });
+    // expect(mockFn).toHaveBeenCalledTimes(2);
+    // expectTypeOf(errMatch).toEqualTypeOf<'error'>();
+    // expect(errMatch).toBe('error');
+    // const asyncOkMatch = asyncOkVal.match({
+    //   ok: (value) => {
+    //     expectTypeOf(value).toEqualTypeOf<'value'>();
+    //     expect(value).toBe('value');
+    //     mockFn();
+    //     return value;
+    //   },
+    //   err: (error) => {
+    //     expectTypeOf(error).toEqualTypeOf<never>();
+    //     mockFn();
+    //     return error;
+    //   },
+    // });
+    // expect(mockFn).toHaveBeenCalledTimes(2);
+    // expectTypeOf(asyncOkMatch).toEqualTypeOf<P<'value'>>();
+    // await expect(asyncOkMatch).resolves.toBe('value');
+    // expect(mockFn).toHaveBeenCalledTimes(3);
+    // const asyncErrMatch = asyncErrVal.match({
+    //   ok: (value) => {
+    //     expectTypeOf(value).toEqualTypeOf<never>();
+    //     mockFn();
+    //     return value;
+    //   },
+    //   err: (error) => {
+    //     expectTypeOf(error).toEqualTypeOf<'error'>();
+    //     expect(error).toBe('error');
+    //     mockFn();
+    //     return error;
+    //   },
+    // });
+    // expect(mockFn).toHaveBeenCalledTimes(3);
+    // expectTypeOf(asyncErrMatch).toEqualTypeOf<P<'error'>>();
+    // await expect(asyncErrMatch).resolves.toBe('error');
+    // expect(mockFn).toHaveBeenCalledTimes(4);
+    // const okResMatch = okRes1.match({
+    //   ok: (value) => {
+    //     expectTypeOf(value).toEqualTypeOf<'v1'>();
+    //     expect(value).toBe('v1');
+    //     mockFn();
+    //     return value;
+    //   },
+    //   err: (error) => {
+    //     expectTypeOf(error).toEqualTypeOf<'e1'>();
+    //     expect(error).toBe('e1');
+    //     mockFn();
+    //     return error;
+    //   },
+    // });
+    // expect(mockFn).toHaveBeenCalledTimes(5);
+    // expectTypeOf(okResMatch).toEqualTypeOf<'v1' | 'e1'>();
+    // expect(okResMatch).toBe('v1');
+    // const errResMatch = errRes1.match({
+    //   ok: (value) => {
+    //     expectTypeOf(value).toEqualTypeOf<'v1'>();
+    //     expect(value).toBe('v1');
+    //     mockFn();
+    //     return value;
+    //   },
+    //   err: (error) => {
+    //     expectTypeOf(error).toEqualTypeOf<'e1'>();
+    //     expect(error).toBe('e1');
+    //     mockFn();
+    //     return error;
+    //   },
+    // });
+    // expect(mockFn).toHaveBeenCalledTimes(6);
+    // expectTypeOf(errResMatch).toEqualTypeOf<'v1' | 'e1'>();
+    // expect(errResMatch).toBe('e1');
+    // const asyncOkResMatch = asyncOkRes1.match({
+    //   ok: (value) => {
+    //     expectTypeOf(value).toEqualTypeOf<'v1'>();
+    //     expect(value).toBe('v1');
+    //     mockFn();
+    //     return value;
+    //   },
+    //   err: (error) => {
+    //     expectTypeOf(error).toEqualTypeOf<'e1'>();
+    //     expect(error).toBe('e1');
+    //     mockFn();
+    //     return error;
+    //   },
+    // });
+    // expect(mockFn).toHaveBeenCalledTimes(6);
+    // expectTypeOf(asyncOkResMatch).toEqualTypeOf<P<'v1' | 'e1'>>();
+    // await expect(asyncOkResMatch).resolves.toBe('v1');
+    // expect(mockFn).toHaveBeenCalledTimes(7);
+    // const asyncErrResMatch = asyncErrRes1.match({
+    //   ok: (value) => {
+    //     expectTypeOf(value).toEqualTypeOf<'v1'>();
+    //     expect(value).toBe('v1');
+    //     mockFn();
+    //     return value;
+    //   },
+    //   err: (error) => {
+    //     expectTypeOf(error).toEqualTypeOf<'e1'>();
+    //     expect(error).toBe('e1');
+    //     mockFn();
+    //     return error;
+    //   },
+    // });
+    // expect(mockFn).toHaveBeenCalledTimes(7);
+    // expectTypeOf(asyncErrResMatch).toEqualTypeOf<P<'v1' | 'e1'>>();
+    // await expect(asyncErrResMatch).resolves.toBe('e1');
+    // expect(mockFn).toHaveBeenCalledTimes(8);
+  });
 });

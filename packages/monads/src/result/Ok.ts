@@ -2,7 +2,14 @@ import { none, some } from '..';
 import { AsyncResult } from './AsyncResult';
 import type { ResultDocs } from './ResultDocs';
 import { ok } from './constructors';
-import type { AnyResult, AsyncOk, MaybePromise, ResultMatch, SerializedOk } from './types';
+import type {
+  AnyResult,
+  AnySyncResult,
+  AsyncOk,
+  MaybePromise,
+  ResultMatch,
+  SerializedOk,
+} from './types';
 
 export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
   private _value: TValue;
@@ -124,19 +131,28 @@ export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
     return fn(this.value);
   }
 
-  and<TResultB extends AnyResult>(resultB: TResultB) {
-    return resultB;
+  and<TResultB extends AnyResult | Promise<AnySyncResult>>(resultB: TResultB) {
+    type Return = TResultB extends Promise<infer TInternalResultB extends AnySyncResult>
+      ? AsyncResult<TInternalResultB>
+      : TResultB;
+    if (resultB instanceof Promise) return new AsyncResult(resultB) as Return;
+    return resultB as Return;
   }
 
-  or<TResultB extends AnyResult>(_resultB: TResultB) {
+  or<TResultB extends AnyResult | Promise<AnySyncResult>>(_resultB: TResultB) {
     return this;
   }
 
-  andThen<TResultB extends AnyResult>(fn: (value: TValue) => TResultB) {
-    return fn(this.value);
+  andThen<TResultB extends AnyResult | Promise<AnySyncResult>>(fn: (value: TValue) => TResultB) {
+    type Return = TResultB extends Promise<infer TInternalResultB extends AnySyncResult>
+      ? AsyncResult<TInternalResultB>
+      : TResultB;
+    const result = fn(this.value);
+    if (result instanceof Promise) return new AsyncResult(result) as Return;
+    return result as Return;
   }
 
-  orElse<TResultB extends AnyResult>(_fn: (error: never) => TResultB) {
+  orElse<TResultB extends AnyResult | Promise<AnySyncResult>>(_fn: (error: never) => TResultB) {
     return this;
   }
 

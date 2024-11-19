@@ -3,6 +3,7 @@ import type { Err } from './Err';
 import type { Ok } from './Ok';
 import type {
   AnyResult,
+  AnySyncResult,
   AsyncErr,
   AsyncOk,
   MaybePromise,
@@ -48,15 +49,6 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * } else {
    *   // `r.unwrap()` is of type `never`, `r.unwrapErr()` is of type `unknown`
    * }
-   *
-   * // `await r.unwrap()` is of type `boolean`, `await r.unwrapErr()` is of type `never`
-   * const r = asyncResultFromThrowable(async () => true);
-   *
-   * if (await r.isOk) {
-   *  // `await r.unwrap()` is of type `boolean`, `await r.unwrapErr()` is of type `never`
-   * } else {
-   * // `await r.unwrap()` is of type `never`, `await r.unwrapErr()` is of type `unknown`
-   * }
    */
   isOk: EvaluateResultVariant<
     TResultVariant,
@@ -75,15 +67,6 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    *   // `r.unwrap()` is of type `never`, `r.unwrapErr()` is of type `unknown`
    * } else {
    *   // `r.unwrap()` is of type `boolean`, `r.unwrapErr()` is of type `never`
-   * }
-   *
-   * // `await r.unwrap()` is of type `boolean`, `await r.unwrapErr()` is of type `never`
-   * const r = asyncResultFromThrowable(async () => true);
-   *
-   * if (await r.isErr) {
-   *  // `await r.unwrap()` is of type `never`, `await r.unwrapErr()` is of type `unknown`
-   * } else {
-   * // `await r.unwrap()` is of type `boolean`, `await r.unwrapErr()` is of type `never`
    * }
    */
   isErr: EvaluateResultVariant<
@@ -441,7 +424,6 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
   >;
   // #endregion
 
-  // TODO more async examples
   // #region Boolean operators
   /**
    * Returns `res` if the result is `ok`, otherwise returns its own `err` value.
@@ -453,13 +435,21 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * ok('early value').and(err('late error')).unwrapErr(); // 'late error'
    * err('early error').and(ok('late value')).unwrapErr(); // 'early error'
    * err('early error').and(err('late error')).unwrapErr(); // 'early error'
+   *
+   * @example
+   * await ok('early value').and(Promise.resolve(ok('late value'))).unwrap(); // 'late value'
+   * await ok('early value').and(Promise.resolve(err('late error'))).unwrapErr(); // 'late error'
+   * err('early error').and(Promise.resolve(ok('late value'))).unwrapErr(); // 'early error'
+   * err('early error').and(Promise.resolve(err('late error'))).unwrapErr(); // 'early error'
    */
-  and: <TResultB extends AnyResult>(
+  and: <TResultB extends AnyResult | Promise<AnySyncResult>>(
     resultB: TResultB,
   ) => EvaluateResultVariant<
     TResultVariant,
     {
-      ok: TResultB;
+      ok: TResultB extends Promise<infer TInternalResultB extends AnySyncResult>
+        ? AsyncResult<TInternalResultB>
+        : TResultB;
       err: Err<TValue>;
       async: AsyncResult<ResultTernary<TValue, Awaited<TResultB>, Err<ValueFromErr<TValue>>>>;
     }
@@ -474,14 +464,22 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * ok('early value').or(err('late error')).unwrap(); // 'early value'
    * err('early error').or(ok('late value')).unwrap(); // 'late value'
    * err('early error').or(err('late error)).unwrapErr(); // 'late error'
+   *
+   * @example
+   * ok('early value').or(Promise.resolve(ok('late value'))).unwrap(); // 'early value'
+   * ok('early value').or(Promise.resolve(err('late error'))).unwrap(); // 'early value'
+   * await err('early error').or(Promise.resolve(ok('late value'))).unwrap(); // 'late value'
+   * await err('early error').or(Promise.resolve(err('late error'))).unwrapErr(); // 'late error'
    */
-  or: <TResultB extends AnyResult>(
+  or: <TResultB extends AnyResult | Promise<AnySyncResult>>(
     resultB: TResultB,
   ) => EvaluateResultVariant<
     TResultVariant,
     {
       ok: Ok<TValue>;
-      err: TResultB;
+      err: TResultB extends Promise<infer TInternalResultB extends AnySyncResult>
+        ? AsyncResult<TInternalResultB>
+        : TResultB;
       async: AsyncResult<ResultTernary<TValue, Ok<ValueFromOk<TValue>>, Awaited<TResultB>>>;
     }
   >;
@@ -491,18 +489,25 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * This function can be used for control flow based on Result values.
    *
    * @example
-   * const square = (x: number) => x === 42 ? err('bad number') : ok(x * x);
-   * ok(2).andThen(square).unwrap(); // 4
-   * ok(42).andThen(square).unwrapErr(); // 'bad number'
-   * err('not a number').andThen(square).unwrapErr(); // 'not a number'
+   * ok('early value').andThen(() => ok('late value')).unwrap(); // 'late value'
+   * ok('early value').andThen(() => err('late error')).unwrapErr(); // 'late error'
+   * err('early error').andThen(() => ok('late value')).unwrapErr(); // 'early error'
+   * err('early error').andThen(() => err('late error')).unwrapErr(); // 'early error'
+   *
+   * @example
+   * await ok('early value').andThen(async () => ok('late value')).unwrap(); // 'late value'
+   * await ok('early value').andThen(async () => err('late error')).unwrapErr(); // 'late error'
+   * err('early error').andThen(async () => ok('late value')).unwrapErr(); // 'early error'
+   * err('early error').andThen(async () => err('late error')).unwrapErr(); // 'early error'
    */
-  // TODO allow to pass a Promise<AnySyncResult> to return an AsyncResult
-  andThen: <TResultB extends AnyResult>(
+  andThen: <TResultB extends AnyResult | Promise<AnySyncResult>>(
     fn: (value: ResultValue<TValue, TResultVariant>) => TResultB,
   ) => EvaluateResultVariant<
     TResultVariant,
     {
-      ok: TResultB;
+      ok: TResultB extends Promise<infer TInternalResultB extends AnySyncResult>
+        ? AsyncResult<TInternalResultB>
+        : TResultB;
       err: Err<TValue>;
       async: AsyncResult<ResultTernary<TValue, Awaited<TResultB>, Err<ValueFromErr<TValue>>>>;
     }
@@ -513,21 +518,26 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * This function can be used for control flow based on result values.
    *
    * @example
-   * const square = (x: number) => ok(x * x);
-   * const error = (x: number) => err(x);
-   * ok(2).orElse(square).orElse(square).unwrap(); // 2
-   * ok(2).orElse(error).orElse(square).unwrap(); // 2
-   * err(2).orElse(square).orElse(error).unwrap(); // 4
-   * err(3).orElse(error).orElse(error).unwrapErr(); // 3
+   * ok('early value').orElse(() => ok('late value')).unwrap(); // 'early value'
+   * ok('early value').orElse(() => err('late error')).unwrap(); // 'early value'
+   * err('early error').orElse(() => ok('late value')).unwrap(); // 'late value'
+   * err('early error').orElse(() => err('late error')).unwrapErr(); // 'late error'
+   *
+   * @example
+   * await ok('early value').orElse(async () => ok('late value')).unwrap(); // 'early value'
+   * await ok('early value').orElse(async () => err('late error')).unwrap(); // 'early value'
+   * await err('early error').orElse(async () => ok('late value')).unwrap(); // 'late value'
+   * await err('early error').orElse(async () => err('late error')).unwrapErr(); // 'late error'
    */
-  // TODO allow to pass a Promise<AnySyncResult> to return an AsyncResult
-  orElse: <TResultB extends AnyResult>(
+  orElse: <TResultB extends AnyResult | Promise<AnySyncResult>>(
     fn: (error: ResultError<TValue, TResultVariant>) => TResultB,
   ) => EvaluateResultVariant<
     TResultVariant,
     {
       ok: Ok<TValue>;
-      err: TResultB;
+      err: TResultB extends Promise<infer TInternalResultB extends AnySyncResult>
+        ? AsyncResult<TInternalResultB>
+        : TResultB;
       async: AsyncResult<ResultTernary<TValue, Ok<ValueFromOk<TValue>>, Awaited<TResultB>>>;
     }
   >;
@@ -540,12 +550,22 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    *
    * @example
    * ok('value').match({
-   *   ok: (value) => `The value was: "${value}""`,
+   *   ok: (value) => `The value is: "${value}""`,
    *   err: (error) => 'Some error handling',
-   * }); // 'The value was: "value"'
+   * }); // 'The value is: "value"'
    *
    * err('error').match({
-   *   ok: (value) => `The value was: "${value}""`,
+   *   ok: (value) => `The value is: "${value}""`,
+   *   err: (error) => 'Some error handling',
+   * }); // 'Some error handling'
+   *
+   * await asyncOk('value').match({
+   *   ok: (value) => `The value is: "${value}""`,
+   *   err: (error) => 'Some error handling',
+   * }); // 'The value is: "value"'
+   *
+   * await asyncErr('error').match({
+   *   ok: (value) => `The value is: "${value}""`,
    *   err: (error) => 'Some error handling',
    * }); // 'Some error handling'
    */
@@ -570,6 +590,8 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * @example
    * ok('value').serialize() // { type: 'ok', value: 'value' }
    * err('error').serialize() // { type: 'err', error: 'error' }
+   * await asyncOk('value').serialize() // { type: 'ok', value: 'value' }
+   * await asyncErr('error').serialize() // { type: 'err', error: 'error' }
    */
   serialize: () => EvaluateResultVariant<
     TResultVariant,

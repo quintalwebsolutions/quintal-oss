@@ -154,7 +154,7 @@ describe('Result', () => {
     }
   });
 
-  it('Infers simple types in constructor functions', () => {
+  it('infers simple types in constructor functions', () => {
     expectTypeOf(ok('hello world')).toEqualTypeOf<Ok<'hello world'>>();
     expectTypeOf(ok(42)).toEqualTypeOf<Ok<42>>();
     expectTypeOf(ok(true)).toEqualTypeOf<Ok<true>>();
@@ -183,7 +183,7 @@ describe('Result', () => {
     expectTypeOf(asyncErr({ hello: 'world' })).toEqualTypeOf<AsyncErr<{ hello: string }>>();
   });
 
-  it('Provides type guards for result instances', () => {
+  it('provides type guards for result instances', () => {
     expect(isAnyResult('anything else')).toBe(false);
 
     expect(isAnySyncResult(okVal)).toBe(true);
@@ -214,7 +214,7 @@ describe('Result', () => {
     expect(isAnyResult(asyncErrResVal)).toBe(true);
   });
 
-  it('Merges multiple results into one', () => {
+  it('merges multiple results into one', () => {
     // biome-ignore lint/correctness/noConstantCondition: allow for test
     if (false) {
       // @ts-expect-error
@@ -1761,6 +1761,15 @@ describe('Result', () => {
     await eua(ok1.and(asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
     await eua(ok1.and(asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
 
+    await eua(ok1.and(Promise.resolve(ok2))).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(ok1.and(Promise.resolve(err2))).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(ok1.and(Promise.resolve(asyncOk2))).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(ok1.and(Promise.resolve(asyncErr2))).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(ok1.and(Promise.resolve(okRes2))).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(ok1.and(Promise.resolve(errRes2))).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+    await eua(ok1.and(Promise.resolve(asyncOkRes2))).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(ok1.and(Promise.resolve(asyncErrRes2))).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+
     eu(err1.and(ok2)).toBe<never, 'e1'>(false, 'e1');
     eu(err1.and(err2)).toBe<never, 'e1'>(false, 'e1');
     eu(err1.and(asyncOk2)).toBe<never, 'e1'>(false, 'e1');
@@ -1769,6 +1778,15 @@ describe('Result', () => {
     eu(err1.and(errRes2)).toBe<never, 'e1'>(false, 'e1');
     eu(err1.and(asyncOkRes2)).toBe<never, 'e1'>(false, 'e1');
     eu(err1.and(asyncErrRes2)).toBe<never, 'e1'>(false, 'e1');
+
+    eu(err1.and(Promise.resolve(ok2))).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.and(Promise.resolve(err2))).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.and(Promise.resolve(asyncOk2))).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.and(Promise.resolve(asyncErr2))).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.and(Promise.resolve(okRes2))).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.and(Promise.resolve(errRes2))).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.and(Promise.resolve(asyncOkRes2))).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.and(Promise.resolve(asyncErrRes2))).toBe<never, 'e1'>(false, 'e1');
 
     eu(okRes1.and(ok2)).toBe<'v2', 'e1'>(true, 'v2');
     eu(okRes1.and(err2)).toBe<never, 'e1' | 'e2'>(false, 'e2');
@@ -1779,6 +1797,15 @@ describe('Result', () => {
     await eua(okRes1.and(asyncOkRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(true, 'v2');
     await eua(okRes1.and(asyncErrRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e2');
 
+    await eua(okRes1.and(Promise.resolve(ok2))).toBe<P<'v2'>, 'e1' | P<never>>(true, 'v2');
+    await eua(okRes1.and(Promise.resolve(err2))).toBe<P<never>, 'e1' | P<'e2'>>(false, 'e2');
+    await eua(okRes1.and(Promise.resolve(asyncOk2))).toBe<P<'v2'>, 'e1' | P<never>>(true, 'v2');
+    await eua(okRes1.and(Promise.resolve(asyncErr2))).toBe<P<never>, 'e1' | P<'e2'>>(false, 'e2');
+    await eua(okRes1.and(Promise.resolve(okRes2))).toBe<P<'v2'>, 'e1' | P<'e2'>>(true, 'v2');
+    await eua(okRes1.and(Promise.resolve(errRes2))).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e2');
+    await eua(okRes1.and(Promise.resolve(asyncOkRes2))).toBe<P<'v2'>, 'e1' | P<'e2'>>(true, 'v2');
+    await eua(okRes1.and(Promise.resolve(asyncErrRes2))).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e2');
+
     eu(errRes1.and(ok2)).toBe<'v2', 'e1'>(false, 'e1');
     eu(errRes1.and(err2)).toBe<never, 'e1' | 'e2'>(false, 'e1');
     eu(errRes1.and(asyncOk2)).toBe<P<'v2'>, 'e1' | P<never>>(false, 'e1');
@@ -1787,6 +1814,15 @@ describe('Result', () => {
     eu(errRes1.and(errRes2)).toBe<'v2', 'e1' | 'e2'>(false, 'e1');
     eu(errRes1.and(asyncOkRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1');
     eu(errRes1.and(asyncErrRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1');
+
+    eu(errRes1.and(Promise.resolve(ok2))).toBe<P<'v2'>, 'e1' | P<never>>(false, 'e1');
+    eu(errRes1.and(Promise.resolve(err2))).toBe<P<never>, 'e1' | P<'e2'>>(false, 'e1');
+    eu(errRes1.and(Promise.resolve(asyncOk2))).toBe<P<'v2'>, 'e1' | P<never>>(false, 'e1');
+    eu(errRes1.and(Promise.resolve(asyncErr2))).toBe<P<never>, 'e1' | P<'e2'>>(false, 'e1');
+    eu(errRes1.and(Promise.resolve(okRes2))).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1');
+    eu(errRes1.and(Promise.resolve(errRes2))).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1');
+    eu(errRes1.and(Promise.resolve(asyncOkRes2))).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1');
+    eu(errRes1.and(Promise.resolve(asyncErrRes2))).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1');
 
     await eua(asyncOk1.and(ok2)).toBe<P<'v2'>, P<never>>(true, 'v2');
     await eua(asyncOk1.and(err2)).toBe<P<never>, P<'e2'>>(false, 'e2');
@@ -1797,6 +1833,15 @@ describe('Result', () => {
     await eua(asyncOk1.and(asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
     await eua(asyncOk1.and(asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
 
+    await eua(asyncOk1.and(Promise.resolve(ok2))).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(asyncOk1.and(Promise.resolve(err2))).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(asyncOk1.and(Promise.resolve(asyncOk2))).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(asyncOk1.and(Promise.resolve(asyncErr2))).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(asyncOk1.and(Promise.resolve(okRes2))).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(asyncOk1.and(Promise.resolve(errRes2))).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+    await eua(asyncOk1.and(Promise.resolve(asyncOkRes2))).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(asyncOk1.and(Promise.resolve(asyncErrRes2))).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+
     await eua(asyncErr1.and(ok2)).toBe<P<never>, P<'e1'>>(false, 'e1');
     await eua(asyncErr1.and(err2)).toBe<P<never>, P<'e1'>>(false, 'e1');
     await eua(asyncErr1.and(asyncOk2)).toBe<P<never>, P<'e1'>>(false, 'e1');
@@ -1805,6 +1850,15 @@ describe('Result', () => {
     await eua(asyncErr1.and(errRes2)).toBe<P<never>, P<'e1'>>(false, 'e1');
     await eua(asyncErr1.and(asyncOkRes2)).toBe<P<never>, P<'e1'>>(false, 'e1');
     await eua(asyncErr1.and(asyncErrRes2)).toBe<P<never>, P<'e1'>>(false, 'e1');
+
+    await eua(asyncErr1.and(Promise.resolve(ok2))).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.and(Promise.resolve(err2))).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.and(Promise.resolve(asyncOk2))).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.and(Promise.resolve(asyncErr2))).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.and(Promise.resolve(okRes2))).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.and(Promise.resolve(errRes2))).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.and(Promise.resolve(asyncOk2))).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.and(Promise.resolve(asyncErr2))).toBe<P<never>, P<'e1'>>(false, 'e1');
 
     await eua(asyncOkRes1.and(ok2)).toBe<P<'v2'>, P<'e1'>>(true, 'v2');
     await eua(asyncOkRes1.and(err2)).toBe<P<never>, P<'e1' | 'e2'>>(false, 'e2');
@@ -1815,6 +1869,24 @@ describe('Result', () => {
     await eua(asyncOkRes1.and(asyncOkRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(true, 'v2');
     await eua(asyncOkRes1.and(asyncErrRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e2');
 
+    await eua(asyncOkRes1.and(Promise.resolve(ok2))).toBe<P<'v2'>, P<'e1'>>(true, 'v2');
+    await eua(asyncOkRes1.and(Promise.resolve(err2))).toBe<P<never>, P<'e1' | 'e2'>>(false, 'e2');
+    await eua(asyncOkRes1.and(Promise.resolve(asyncOk2))).toBe<P<'v2'>, P<'e1'>>(true, 'v2');
+    await eua(asyncOkRes1.and(Promise.resolve(asyncErr2))).toBe<P<never>, P<'e1' | 'e2'>>(
+      false,
+      'e2',
+    );
+    await eua(asyncOkRes1.and(Promise.resolve(okRes2))).toBe<P<'v2'>, P<'e1' | 'e2'>>(true, 'v2');
+    await eua(asyncOkRes1.and(Promise.resolve(errRes2))).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e2');
+    await eua(asyncOkRes1.and(Promise.resolve(asyncOkRes2))).toBe<P<'v2'>, P<'e1' | 'e2'>>(
+      true,
+      'v2',
+    );
+    await eua(asyncOkRes1.and(Promise.resolve(asyncErrRes2))).toBe<P<'v2'>, P<'e1' | 'e2'>>(
+      false,
+      'e2',
+    );
+
     await eua(asyncErrRes1.and(ok2)).toBe<P<'v2'>, P<'e1'>>(false, 'e1');
     await eua(asyncErrRes1.and(err2)).toBe<P<never>, P<'e1' | 'e2'>>(false, 'e1');
     await eua(asyncErrRes1.and(asyncOk2)).toBe<P<'v2'>, P<'e1'>>(false, 'e1');
@@ -1823,6 +1895,27 @@ describe('Result', () => {
     await eua(asyncErrRes1.and(errRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1');
     await eua(asyncErrRes1.and(asyncOkRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1');
     await eua(asyncErrRes1.and(asyncErrRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1');
+
+    await eua(asyncErrRes1.and(Promise.resolve(ok2))).toBe<P<'v2'>, P<'e1'>>(false, 'e1');
+    await eua(asyncErrRes1.and(Promise.resolve(err2))).toBe<P<never>, P<'e1' | 'e2'>>(false, 'e1');
+    await eua(asyncErrRes1.and(Promise.resolve(asyncOk2))).toBe<P<'v2'>, P<'e1'>>(false, 'e1');
+    await eua(asyncErrRes1.and(Promise.resolve(asyncErr2))).toBe<P<never>, P<'e1' | 'e2'>>(
+      false,
+      'e1',
+    );
+    await eua(asyncErrRes1.and(Promise.resolve(okRes2))).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1');
+    await eua(asyncErrRes1.and(Promise.resolve(errRes2))).toBe<P<'v2'>, P<'e1' | 'e2'>>(
+      false,
+      'e1',
+    );
+    await eua(asyncErrRes1.and(Promise.resolve(asyncOkRes2))).toBe<P<'v2'>, P<'e1' | 'e2'>>(
+      false,
+      'e1',
+    );
+    await eua(asyncErrRes1.and(Promise.resolve(asyncErrRes2))).toBe<P<'v2'>, P<'e1' | 'e2'>>(
+      false,
+      'e1',
+    );
   });
 
   test('or', async () => {
@@ -1835,6 +1928,15 @@ describe('Result', () => {
     eu(ok1.or(asyncOkRes2)).toBe<'v1', never>(true, 'v1');
     eu(ok1.or(asyncErrRes2)).toBe<'v1', never>(true, 'v1');
 
+    eu(ok1.or(Promise.resolve(ok2))).toBe<'v1', never>(true, 'v1');
+    eu(ok1.or(Promise.resolve(err2))).toBe<'v1', never>(true, 'v1');
+    eu(ok1.or(Promise.resolve(asyncOk2))).toBe<'v1', never>(true, 'v1');
+    eu(ok1.or(Promise.resolve(asyncErr2))).toBe<'v1', never>(true, 'v1');
+    eu(ok1.or(Promise.resolve(okRes2))).toBe<'v1', never>(true, 'v1');
+    eu(ok1.or(Promise.resolve(errRes2))).toBe<'v1', never>(true, 'v1');
+    eu(ok1.or(Promise.resolve(asyncOkRes2))).toBe<'v1', never>(true, 'v1');
+    eu(ok1.or(Promise.resolve(asyncErrRes2))).toBe<'v1', never>(true, 'v1');
+
     eu(err1.or(ok2)).toBe<'v2', never>(true, 'v2');
     eu(err1.or(err2)).toBe<never, 'e2'>(false, 'e2');
     await eua(err1.or(asyncOk2)).toBe<P<'v2'>, P<never>>(true, 'v2');
@@ -1843,6 +1945,15 @@ describe('Result', () => {
     eu(err1.or(errRes2)).toBe<'v2', 'e2'>(false, 'e2');
     await eua(err1.or(asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
     await eua(err1.or(asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+
+    await eua(err1.or(Promise.resolve(ok2))).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(err1.or(Promise.resolve(err2))).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(err1.or(Promise.resolve(asyncOk2))).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(err1.or(Promise.resolve(asyncErr2))).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(err1.or(Promise.resolve(okRes2))).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(err1.or(Promise.resolve(errRes2))).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+    await eua(err1.or(Promise.resolve(asyncOkRes2))).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(err1.or(Promise.resolve(asyncErrRes2))).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
 
     eu(okRes1.or(ok2)).toBe<'v1' | 'v2', never>(true, 'v1');
     eu(okRes1.or(err2)).toBe<'v1', 'e2'>(true, 'v1');
@@ -1853,6 +1964,15 @@ describe('Result', () => {
     eu(okRes1.or(asyncOkRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1');
     eu(okRes1.or(asyncErrRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1');
 
+    eu(okRes1.or(Promise.resolve(ok2))).toBe<'v1' | P<'v2'>, P<never>>(true, 'v1');
+    eu(okRes1.or(Promise.resolve(err2))).toBe<'v1' | P<never>, P<'e2'>>(true, 'v1');
+    eu(okRes1.or(Promise.resolve(asyncOk2))).toBe<'v1' | P<'v2'>, P<never>>(true, 'v1');
+    eu(okRes1.or(Promise.resolve(asyncErr2))).toBe<'v1' | P<never>, P<'e2'>>(true, 'v1');
+    eu(okRes1.or(Promise.resolve(okRes2))).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1');
+    eu(okRes1.or(Promise.resolve(errRes2))).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1');
+    eu(okRes1.or(Promise.resolve(asyncOkRes2))).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1');
+    eu(okRes1.or(Promise.resolve(asyncErrRes2))).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1');
+
     eu(errRes1.or(ok2)).toBe<'v1' | 'v2', never>(true, 'v2');
     eu(errRes1.or(err2)).toBe<'v1', 'e2'>(false, 'e2');
     await eua(errRes1.or(asyncOk2)).toBe<'v1' | P<'v2'>, P<never>>(true, 'v2');
@@ -1861,6 +1981,15 @@ describe('Result', () => {
     eu(errRes1.or(errRes2)).toBe<'v1' | 'v2', 'e2'>(false, 'e2');
     await eua(errRes1.or(asyncOkRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v2');
     await eua(errRes1.or(asyncErrRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(false, 'e2');
+
+    await eua(errRes1.or(Promise.resolve(ok2))).toBe<'v1' | P<'v2'>, P<never>>(true, 'v2');
+    await eua(errRes1.or(Promise.resolve(err2))).toBe<'v1' | P<never>, P<'e2'>>(false, 'e2');
+    await eua(errRes1.or(Promise.resolve(asyncOk2))).toBe<'v1' | P<'v2'>, P<never>>(true, 'v2');
+    await eua(errRes1.or(Promise.resolve(asyncErr2))).toBe<'v1' | P<never>, P<'e2'>>(false, 'e2');
+    await eua(errRes1.or(Promise.resolve(okRes2))).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(errRes1.or(Promise.resolve(errRes2))).toBe<'v1' | P<'v2'>, P<'e2'>>(false, 'e2');
+    await eua(errRes1.or(Promise.resolve(asyncOkRes2))).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(errRes1.or(Promise.resolve(asyncErrRes2))).toBe<'v1' | P<'v2'>, P<'e2'>>(false, 'e2');
 
     await eua(asyncOk1.or(ok2)).toBe<P<'v1'>, P<never>>(true, 'v1');
     await eua(asyncOk1.or(err2)).toBe<P<'v1'>, P<never>>(true, 'v1');
@@ -1871,6 +2000,15 @@ describe('Result', () => {
     await eua(asyncOk1.or(asyncOkRes2)).toBe<P<'v1'>, P<never>>(true, 'v1');
     await eua(asyncOk1.or(asyncErrRes2)).toBe<P<'v1'>, P<never>>(true, 'v1');
 
+    await eua(asyncOk1.or(Promise.resolve(ok2))).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.or(Promise.resolve(err2))).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.or(Promise.resolve(asyncOk2))).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.or(Promise.resolve(asyncErr2))).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.or(Promise.resolve(okRes2))).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.or(Promise.resolve(errRes2))).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.or(Promise.resolve(asyncOkRes2))).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.or(Promise.resolve(asyncErrRes2))).toBe<P<'v1'>, P<never>>(true, 'v1');
+
     await eua(asyncErr1.or(ok2)).toBe<P<'v2'>, P<never>>(true, 'v2');
     await eua(asyncErr1.or(err2)).toBe<P<never>, P<'e2'>>(false, 'e2');
     await eua(asyncErr1.or(asyncOk2)).toBe<P<'v2'>, P<never>>(true, 'v2');
@@ -1879,6 +2017,15 @@ describe('Result', () => {
     await eua(asyncErr1.or(errRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
     await eua(asyncErr1.or(asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
     await eua(asyncErr1.or(asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+
+    await eua(asyncErr1.or(Promise.resolve(ok2))).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(asyncErr1.or(Promise.resolve(err2))).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(asyncErr1.or(Promise.resolve(asyncOk2))).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(asyncErr1.or(Promise.resolve(asyncErr2))).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(asyncErr1.or(Promise.resolve(okRes2))).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(asyncErr1.or(Promise.resolve(errRes2))).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+    await eua(asyncErr1.or(Promise.resolve(asyncOkRes2))).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(asyncErr1.or(Promise.resolve(asyncErrRes2))).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
 
     await eua(asyncOkRes1.or(ok2)).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v1');
     await eua(asyncOkRes1.or(err2)).toBe<P<'v1'>, P<'e2'>>(true, 'v1');
@@ -1889,6 +2036,21 @@ describe('Result', () => {
     await eua(asyncOkRes1.or(asyncOkRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1');
     await eua(asyncOkRes1.or(asyncErrRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1');
 
+    await eua(asyncOkRes1.or(Promise.resolve(ok2))).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v1');
+    await eua(asyncOkRes1.or(Promise.resolve(err2))).toBe<P<'v1'>, P<'e2'>>(true, 'v1');
+    await eua(asyncOkRes1.or(Promise.resolve(asyncOk2))).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v1');
+    await eua(asyncOkRes1.or(Promise.resolve(asyncErr2))).toBe<P<'v1'>, P<'e2'>>(true, 'v1');
+    await eua(asyncOkRes1.or(Promise.resolve(okRes2))).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1');
+    await eua(asyncOkRes1.or(Promise.resolve(errRes2))).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1');
+    await eua(asyncOkRes1.or(Promise.resolve(asyncOkRes2))).toBe<P<'v1' | 'v2'>, P<'e2'>>(
+      true,
+      'v1',
+    );
+    await eua(asyncOkRes1.or(Promise.resolve(asyncErrRes2))).toBe<P<'v1' | 'v2'>, P<'e2'>>(
+      true,
+      'v1',
+    );
+
     await eua(asyncErrRes1.or(ok2)).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v2');
     await eua(asyncErrRes1.or(err2)).toBe<P<'v1'>, P<'e2'>>(false, 'e2');
     await eua(asyncErrRes1.or(asyncOk2)).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v2');
@@ -1897,9 +2059,36 @@ describe('Result', () => {
     await eua(asyncErrRes1.or(errRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(false, 'e2');
     await eua(asyncErrRes1.or(asyncOkRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v2');
     await eua(asyncErrRes1.or(asyncErrRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(false, 'e2');
+
+    await eua(asyncErrRes1.or(Promise.resolve(ok2))).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v2');
+    await eua(asyncErrRes1.or(Promise.resolve(err2))).toBe<P<'v1'>, P<'e2'>>(false, 'e2');
+    await eua(asyncErrRes1.or(Promise.resolve(asyncOk2))).toBe<P<'v1' | 'v2'>, P<never>>(
+      true,
+      'v2',
+    );
+    await eua(asyncErrRes1.or(Promise.resolve(asyncErr2))).toBe<P<'v1'>, P<'e2'>>(false, 'e2');
+    await eua(asyncErrRes1.or(Promise.resolve(okRes2))).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v2');
+    await eua(asyncErrRes1.or(Promise.resolve(errRes2))).toBe<P<'v1' | 'v2'>, P<'e2'>>(false, 'e2');
+    await eua(asyncErrRes1.or(Promise.resolve(asyncOkRes2))).toBe<P<'v1' | 'v2'>, P<'e2'>>(
+      true,
+      'v2',
+    );
+    await eua(asyncErrRes1.or(Promise.resolve(asyncErrRes2))).toBe<P<'v1' | 'v2'>, P<'e2'>>(
+      false,
+      'e2',
+    );
   });
 
   test('andThen', async () => {
+    const pOk = async () => await Promise.resolve(ok2);
+    const pErr = async () => await Promise.resolve(err2);
+    const pAsyncOk = async () => await Promise.resolve(asyncOk2);
+    const pAsyncErr = async () => await Promise.resolve(asyncErr2);
+    const pOkRes = async () => await Promise.resolve(okRes2);
+    const pErrRes = async () => await Promise.resolve(errRes2);
+    const pAsyncOkRes = async () => await Promise.resolve(asyncOkRes2);
+    const pAsyncErrRes = async () => await Promise.resolve(asyncErrRes2);
+
     eu(ok1.andThen(() => ok2)).toBe<'v2', never>(true, 'v2');
     eu(ok1.andThen(() => err2)).toBe<never, 'e2'>(false, 'e2');
     await eua(ok1.andThen(() => asyncOk2)).toBe<P<'v2'>, P<never>>(true, 'v2');
@@ -1908,6 +2097,15 @@ describe('Result', () => {
     eu(ok1.andThen(() => errRes2)).toBe<'v2', 'e2'>(false, 'e2');
     await eua(ok1.andThen(() => asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
     await eua(ok1.andThen(() => asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+
+    await eua(ok1.andThen(pOk)).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(ok1.andThen(pErr)).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(ok1.andThen(pAsyncOk)).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(ok1.andThen(pAsyncErr)).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(ok1.andThen(pOkRes)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(ok1.andThen(pErrRes)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+    await eua(ok1.andThen(pAsyncOkRes)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(ok1.andThen(pAsyncErrRes)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
 
     eu(err1.andThen(() => ok2)).toBe<never, 'e1'>(false, 'e1');
     eu(err1.andThen(() => err2)).toBe<never, 'e1'>(false, 'e1');
@@ -1918,6 +2116,15 @@ describe('Result', () => {
     eu(err1.andThen(() => asyncOkRes2)).toBe<never, 'e1'>(false, 'e1');
     eu(err1.andThen(() => asyncErrRes2)).toBe<never, 'e1'>(false, 'e1');
 
+    eu(err1.andThen(pOk)).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.andThen(pErr)).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.andThen(pAsyncOk)).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.andThen(pAsyncErr)).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.andThen(pOkRes)).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.andThen(pErrRes)).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.andThen(pAsyncOkRes)).toBe<never, 'e1'>(false, 'e1');
+    eu(err1.andThen(pAsyncErrRes)).toBe<never, 'e1'>(false, 'e1');
+
     eu(okRes1.andThen(() => ok2)).toBe<'v2', 'e1'>(true, 'v2');
     eu(okRes1.andThen(() => err2)).toBe<never, 'e1' | 'e2'>(false, 'e2');
     await eua(okRes1.andThen(() => asyncOk2)).toBe<P<'v2'>, 'e1' | P<never>>(true, 'v2');
@@ -1926,6 +2133,15 @@ describe('Result', () => {
     eu(okRes1.andThen(() => errRes2)).toBe<'v2', 'e1' | 'e2'>(false, 'e2');
     await eua(okRes1.andThen(() => asyncOkRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(true, 'v2');
     await eua(okRes1.andThen(() => asyncErrRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e2');
+
+    await eua(okRes1.andThen(pOk)).toBe<P<'v2'>, 'e1' | P<never>>(true, 'v2');
+    await eua(okRes1.andThen(pErr)).toBe<P<never>, 'e1' | P<'e2'>>(false, 'e2');
+    await eua(okRes1.andThen(pAsyncOk)).toBe<P<'v2'>, 'e1' | P<never>>(true, 'v2');
+    await eua(okRes1.andThen(pAsyncErr)).toBe<P<never>, 'e1' | P<'e2'>>(false, 'e2');
+    await eua(okRes1.andThen(pOkRes)).toBe<P<'v2'>, 'e1' | P<'e2'>>(true, 'v2');
+    await eua(okRes1.andThen(pErrRes)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e2');
+    await eua(okRes1.andThen(pAsyncOkRes)).toBe<P<'v2'>, 'e1' | P<'e2'>>(true, 'v2');
+    await eua(okRes1.andThen(pAsyncErrRes)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e2');
 
     eu(errRes1.andThen(() => ok2)).toBe<'v2', 'e1'>(false, 'e1');
     eu(errRes1.andThen(() => err2)).toBe<never, 'e1' | 'e2'>(false, 'e1');
@@ -1936,6 +2152,15 @@ describe('Result', () => {
     eu(errRes1.andThen(() => asyncOkRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1');
     eu(errRes1.andThen(() => asyncErrRes2)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1');
 
+    eu(errRes1.andThen(pOk)).toBe<P<'v2'>, 'e1' | P<never>>(false, 'e1');
+    eu(errRes1.andThen(pErr)).toBe<P<never>, 'e1' | P<'e2'>>(false, 'e1');
+    eu(errRes1.andThen(pAsyncOk)).toBe<P<'v2'>, 'e1' | P<never>>(false, 'e1');
+    eu(errRes1.andThen(pAsyncErr)).toBe<P<never>, 'e1' | P<'e2'>>(false, 'e1');
+    eu(errRes1.andThen(pOkRes)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1');
+    eu(errRes1.andThen(pErrRes)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1');
+    eu(errRes1.andThen(pAsyncOkRes)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1');
+    eu(errRes1.andThen(pAsyncErrRes)).toBe<P<'v2'>, 'e1' | P<'e2'>>(false, 'e1');
+
     await eua(asyncOk1.andThen(() => ok2)).toBe<P<'v2'>, P<never>>(true, 'v2');
     await eua(asyncOk1.andThen(() => err2)).toBe<P<never>, P<'e2'>>(false, 'e2');
     await eua(asyncOk1.andThen(() => asyncOk2)).toBe<P<'v2'>, P<never>>(true, 'v2');
@@ -1944,6 +2169,15 @@ describe('Result', () => {
     await eua(asyncOk1.andThen(() => errRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
     await eua(asyncOk1.andThen(() => asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
     await eua(asyncOk1.andThen(() => asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+
+    await eua(asyncOk1.andThen(pOk)).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(asyncOk1.andThen(pErr)).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(asyncOk1.andThen(pAsyncOk)).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(asyncOk1.andThen(pAsyncErr)).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(asyncOk1.andThen(pOkRes)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(asyncOk1.andThen(pErrRes)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+    await eua(asyncOk1.andThen(pAsyncOkRes)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(asyncOk1.andThen(pAsyncErrRes)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
 
     await eua(asyncErr1.andThen(() => ok2)).toBe<P<never>, P<'e1'>>(false, 'e1');
     await eua(asyncErr1.andThen(() => err2)).toBe<P<never>, P<'e1'>>(false, 'e1');
@@ -1954,6 +2188,15 @@ describe('Result', () => {
     await eua(asyncErr1.andThen(() => asyncOkRes2)).toBe<P<never>, P<'e1'>>(false, 'e1');
     await eua(asyncErr1.andThen(() => asyncErrRes2)).toBe<P<never>, P<'e1'>>(false, 'e1');
 
+    await eua(asyncErr1.andThen(pOk)).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.andThen(pErr)).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.andThen(pAsyncOk)).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.andThen(pAsyncErr)).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.andThen(pOkRes)).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.andThen(pErrRes)).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.andThen(pAsyncOkRes)).toBe<P<never>, P<'e1'>>(false, 'e1');
+    await eua(asyncErr1.andThen(pAsyncErrRes)).toBe<P<never>, P<'e1'>>(false, 'e1');
+
     await eua(asyncOkRes1.andThen(() => ok2)).toBe<P<'v2'>, P<'e1'>>(true, 'v2');
     await eua(asyncOkRes1.andThen(() => err2)).toBe<P<never>, P<'e1' | 'e2'>>(false, 'e2');
     await eua(asyncOkRes1.andThen(() => asyncOk2)).toBe<P<'v2'>, P<'e1'>>(true, 'v2');
@@ -1963,6 +2206,15 @@ describe('Result', () => {
     await eua(asyncOkRes1.andThen(() => asyncOkRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(true, 'v2');
     await eua(asyncOkRes1.andThen(() => asyncErrRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e2');
 
+    await eua(asyncOkRes1.andThen(pOk)).toBe<P<'v2'>, P<'e1'>>(true, 'v2');
+    await eua(asyncOkRes1.andThen(pErr)).toBe<P<never>, P<'e1' | 'e2'>>(false, 'e2');
+    await eua(asyncOkRes1.andThen(pAsyncOk)).toBe<P<'v2'>, P<'e1'>>(true, 'v2');
+    await eua(asyncOkRes1.andThen(pAsyncErr)).toBe<P<never>, P<'e1' | 'e2'>>(false, 'e2');
+    await eua(asyncOkRes1.andThen(pOkRes)).toBe<P<'v2'>, P<'e1' | 'e2'>>(true, 'v2');
+    await eua(asyncOkRes1.andThen(pErrRes)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e2');
+    await eua(asyncOkRes1.andThen(pAsyncOkRes)).toBe<P<'v2'>, P<'e1' | 'e2'>>(true, 'v2');
+    await eua(asyncOkRes1.andThen(pAsyncErrRes)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e2');
+
     await eua(asyncErrRes1.andThen(() => ok2)).toBe<P<'v2'>, P<'e1'>>(false, 'e1');
     await eua(asyncErrRes1.andThen(() => err2)).toBe<P<never>, P<'e1' | 'e2'>>(false, 'e1');
     await eua(asyncErrRes1.andThen(() => asyncOk2)).toBe<P<'v2'>, P<'e1'>>(false, 'e1');
@@ -1971,9 +2223,27 @@ describe('Result', () => {
     await eua(asyncErrRes1.andThen(() => errRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1');
     await eua(asyncErrRes1.andThen(() => asyncOkRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1');
     await eua(asyncErrRes1.andThen(() => asyncErrRes2)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1');
+
+    await eua(asyncErrRes1.andThen(pOk)).toBe<P<'v2'>, P<'e1'>>(false, 'e1');
+    await eua(asyncErrRes1.andThen(pErr)).toBe<P<never>, P<'e1' | 'e2'>>(false, 'e1');
+    await eua(asyncErrRes1.andThen(pAsyncOk)).toBe<P<'v2'>, P<'e1'>>(false, 'e1');
+    await eua(asyncErrRes1.andThen(pAsyncErr)).toBe<P<never>, P<'e1' | 'e2'>>(false, 'e1');
+    await eua(asyncErrRes1.andThen(pOkRes)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1');
+    await eua(asyncErrRes1.andThen(pErrRes)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1');
+    await eua(asyncErrRes1.andThen(pAsyncOkRes)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1');
+    await eua(asyncErrRes1.andThen(pAsyncErrRes)).toBe<P<'v2'>, P<'e1' | 'e2'>>(false, 'e1');
   });
 
   test('orElse', async () => {
+    const pOk = async () => await Promise.resolve(ok2);
+    const pErr = async () => await Promise.resolve(err2);
+    const pAsyncOk = async () => await Promise.resolve(asyncOk2);
+    const pAsyncErr = async () => await Promise.resolve(asyncErr2);
+    const pOkRes = async () => await Promise.resolve(okRes2);
+    const pErrRes = async () => await Promise.resolve(errRes2);
+    const pAsyncOkRes = async () => await Promise.resolve(asyncOkRes2);
+    const pAsyncErrRes = async () => await Promise.resolve(asyncErrRes2);
+
     eu(ok1.orElse(() => ok2)).toBe<'v1', never>(true, 'v1');
     eu(ok1.orElse(() => err2)).toBe<'v1', never>(true, 'v1');
     eu(ok1.orElse(() => asyncOk2)).toBe<'v1', never>(true, 'v1');
@@ -1982,6 +2252,15 @@ describe('Result', () => {
     eu(ok1.orElse(() => errRes2)).toBe<'v1', never>(true, 'v1');
     eu(ok1.orElse(() => asyncOkRes2)).toBe<'v1', never>(true, 'v1');
     eu(ok1.orElse(() => asyncErrRes2)).toBe<'v1', never>(true, 'v1');
+
+    eu(ok1.orElse(pOk)).toBe<'v1', never>(true, 'v1');
+    eu(ok1.orElse(pErr)).toBe<'v1', never>(true, 'v1');
+    eu(ok1.orElse(pAsyncOk)).toBe<'v1', never>(true, 'v1');
+    eu(ok1.orElse(pAsyncErr)).toBe<'v1', never>(true, 'v1');
+    eu(ok1.orElse(pOkRes)).toBe<'v1', never>(true, 'v1');
+    eu(ok1.orElse(pErrRes)).toBe<'v1', never>(true, 'v1');
+    eu(ok1.orElse(pAsyncOkRes)).toBe<'v1', never>(true, 'v1');
+    eu(ok1.orElse(pAsyncErrRes)).toBe<'v1', never>(true, 'v1');
 
     eu(err1.orElse(() => ok2)).toBe<'v2', never>(true, 'v2');
     eu(err1.orElse(() => err2)).toBe<never, 'e2'>(false, 'e2');
@@ -1992,6 +2271,15 @@ describe('Result', () => {
     await eua(err1.orElse(() => asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
     await eua(err1.orElse(() => asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
 
+    await eua(err1.orElse(pOk)).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(err1.orElse(pErr)).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(err1.orElse(pAsyncOk)).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(err1.orElse(pAsyncErr)).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(err1.orElse(pOkRes)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(err1.orElse(pErrRes)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+    await eua(err1.orElse(pAsyncOkRes)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(err1.orElse(pAsyncErrRes)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+
     eu(okRes1.orElse(() => ok2)).toBe<'v1' | 'v2', never>(true, 'v1');
     eu(okRes1.orElse(() => err2)).toBe<'v1', 'e2'>(true, 'v1');
     eu(okRes1.orElse(() => asyncOk2)).toBe<'v1' | P<'v2'>, P<never>>(true, 'v1');
@@ -2000,6 +2288,15 @@ describe('Result', () => {
     eu(okRes1.orElse(() => errRes2)).toBe<'v1' | 'v2', 'e2'>(true, 'v1');
     eu(okRes1.orElse(() => asyncOkRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1');
     eu(okRes1.orElse(() => asyncErrRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1');
+
+    eu(okRes1.orElse(pOk)).toBe<'v1' | P<'v2'>, P<never>>(true, 'v1');
+    eu(okRes1.orElse(pErr)).toBe<'v1' | P<never>, P<'e2'>>(true, 'v1');
+    eu(okRes1.orElse(pAsyncOk)).toBe<'v1' | P<'v2'>, P<never>>(true, 'v1');
+    eu(okRes1.orElse(pAsyncErr)).toBe<'v1' | P<never>, P<'e2'>>(true, 'v1');
+    eu(okRes1.orElse(pOkRes)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1');
+    eu(okRes1.orElse(pErrRes)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1');
+    eu(okRes1.orElse(pAsyncOkRes)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1');
+    eu(okRes1.orElse(pAsyncErrRes)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v1');
 
     eu(errRes1.orElse(() => ok2)).toBe<'v1' | 'v2', never>(true, 'v2');
     eu(errRes1.orElse(() => err2)).toBe<'v1', 'e2'>(false, 'e2');
@@ -2010,6 +2307,15 @@ describe('Result', () => {
     await eua(errRes1.orElse(() => asyncOkRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v2');
     await eua(errRes1.orElse(() => asyncErrRes2)).toBe<'v1' | P<'v2'>, P<'e2'>>(false, 'e2');
 
+    await eua(errRes1.orElse(pOk)).toBe<'v1' | P<'v2'>, P<never>>(true, 'v2');
+    await eua(errRes1.orElse(pErr)).toBe<'v1' | P<never>, P<'e2'>>(false, 'e2');
+    await eua(errRes1.orElse(pAsyncOk)).toBe<'v1' | P<'v2'>, P<never>>(true, 'v2');
+    await eua(errRes1.orElse(pAsyncErr)).toBe<'v1' | P<never>, P<'e2'>>(false, 'e2');
+    await eua(errRes1.orElse(pOkRes)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(errRes1.orElse(pErrRes)).toBe<'v1' | P<'v2'>, P<'e2'>>(false, 'e2');
+    await eua(errRes1.orElse(pAsyncOkRes)).toBe<'v1' | P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(errRes1.orElse(pAsyncErrRes)).toBe<'v1' | P<'v2'>, P<'e2'>>(false, 'e2');
+
     await eua(asyncOk1.orElse(() => ok2)).toBe<P<'v1'>, P<never>>(true, 'v1');
     await eua(asyncOk1.orElse(() => err2)).toBe<P<'v1'>, P<never>>(true, 'v1');
     await eua(asyncOk1.orElse(() => asyncOk2)).toBe<P<'v1'>, P<never>>(true, 'v1');
@@ -2018,6 +2324,15 @@ describe('Result', () => {
     await eua(asyncOk1.orElse(() => errRes2)).toBe<P<'v1'>, P<never>>(true, 'v1');
     await eua(asyncOk1.orElse(() => asyncOkRes2)).toBe<P<'v1'>, P<never>>(true, 'v1');
     await eua(asyncOk1.orElse(() => asyncErrRes2)).toBe<P<'v1'>, P<never>>(true, 'v1');
+
+    await eua(asyncOk1.orElse(pOk)).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.orElse(pErr)).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.orElse(pAsyncOk)).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.orElse(pAsyncErr)).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.orElse(pOkRes)).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.orElse(pErrRes)).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.orElse(pAsyncOkRes)).toBe<P<'v1'>, P<never>>(true, 'v1');
+    await eua(asyncOk1.orElse(pAsyncErrRes)).toBe<P<'v1'>, P<never>>(true, 'v1');
 
     await eua(asyncErr1.orElse(() => ok2)).toBe<P<'v2'>, P<never>>(true, 'v2');
     await eua(asyncErr1.orElse(() => err2)).toBe<P<never>, P<'e2'>>(false, 'e2');
@@ -2028,6 +2343,15 @@ describe('Result', () => {
     await eua(asyncErr1.orElse(() => asyncOkRes2)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
     await eua(asyncErr1.orElse(() => asyncErrRes2)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
 
+    await eua(asyncErr1.orElse(pOk)).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(asyncErr1.orElse(pErr)).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(asyncErr1.orElse(pAsyncOk)).toBe<P<'v2'>, P<never>>(true, 'v2');
+    await eua(asyncErr1.orElse(pAsyncErr)).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(asyncErr1.orElse(pOkRes)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(asyncErr1.orElse(pErrRes)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+    await eua(asyncErr1.orElse(pAsyncOkRes)).toBe<P<'v2'>, P<'e2'>>(true, 'v2');
+    await eua(asyncErr1.orElse(pAsyncErrRes)).toBe<P<'v2'>, P<'e2'>>(false, 'e2');
+
     await eua(asyncOkRes1.orElse(() => ok2)).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v1');
     await eua(asyncOkRes1.orElse(() => err2)).toBe<P<'v1'>, P<'e2'>>(true, 'v1');
     await eua(asyncOkRes1.orElse(() => asyncOk2)).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v1');
@@ -2037,6 +2361,15 @@ describe('Result', () => {
     await eua(asyncOkRes1.orElse(() => asyncOkRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1');
     await eua(asyncOkRes1.orElse(() => asyncErrRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1');
 
+    await eua(asyncOkRes1.orElse(pOk)).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v1');
+    await eua(asyncOkRes1.orElse(pErr)).toBe<P<'v1'>, P<'e2'>>(true, 'v1');
+    await eua(asyncOkRes1.orElse(pAsyncOk)).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v1');
+    await eua(asyncOkRes1.orElse(pAsyncErr)).toBe<P<'v1'>, P<'e2'>>(true, 'v1');
+    await eua(asyncOkRes1.orElse(pOkRes)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1');
+    await eua(asyncOkRes1.orElse(pErrRes)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1');
+    await eua(asyncOkRes1.orElse(pAsyncOkRes)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1');
+    await eua(asyncOkRes1.orElse(pAsyncErrRes)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v1');
+
     await eua(asyncErrRes1.orElse(() => ok2)).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v2');
     await eua(asyncErrRes1.orElse(() => err2)).toBe<P<'v1'>, P<'e2'>>(false, 'e2');
     await eua(asyncErrRes1.orElse(() => asyncOk2)).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v2');
@@ -2045,6 +2378,15 @@ describe('Result', () => {
     await eua(asyncErrRes1.orElse(() => errRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(false, 'e2');
     await eua(asyncErrRes1.orElse(() => asyncOkRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v2');
     await eua(asyncErrRes1.orElse(() => asyncErrRes2)).toBe<P<'v1' | 'v2'>, P<'e2'>>(false, 'e2');
+
+    await eua(asyncErrRes1.orElse(pOk)).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v2');
+    await eua(asyncErrRes1.orElse(pErr)).toBe<P<'v1'>, P<'e2'>>(false, 'e2');
+    await eua(asyncErrRes1.orElse(pAsyncOk)).toBe<P<'v1' | 'v2'>, P<never>>(true, 'v2');
+    await eua(asyncErrRes1.orElse(pAsyncErr)).toBe<P<'v1'>, P<'e2'>>(false, 'e2');
+    await eua(asyncErrRes1.orElse(pOkRes)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v2');
+    await eua(asyncErrRes1.orElse(pErrRes)).toBe<P<'v1' | 'v2'>, P<'e2'>>(false, 'e2');
+    await eua(asyncErrRes1.orElse(pAsyncOkRes)).toBe<P<'v1' | 'v2'>, P<'e2'>>(true, 'v2');
+    await eua(asyncErrRes1.orElse(pAsyncErrRes)).toBe<P<'v1' | 'v2'>, P<'e2'>>(false, 'e2');
   });
 
   test('match', async () => {

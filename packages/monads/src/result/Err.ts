@@ -2,7 +2,14 @@ import { none, some } from '..';
 import { AsyncResult } from './AsyncResult';
 import type { ResultDocs } from './ResultDocs';
 import { err } from './constructors';
-import type { AnyResult, AsyncErr, MaybePromise, ResultMatch, SerializedErr } from './types';
+import type {
+  AnyResult,
+  AnySyncResult,
+  AsyncErr,
+  MaybePromise,
+  ResultMatch,
+  SerializedErr,
+} from './types';
 
 export class Err<TError> implements ResultDocs<TError, 'err'> {
   private _error: TError;
@@ -109,20 +116,29 @@ export class Err<TError> implements ResultDocs<TError, 'err'> {
     return defaultFn(this.error);
   }
 
-  and<TResultB extends AnyResult>(_resultB: TResultB) {
+  and<TResultB extends AnyResult | Promise<AnySyncResult>>(_resultB: TResultB) {
     return this;
   }
 
-  or<TResultB extends AnyResult>(resultB: TResultB) {
-    return resultB;
+  or<TResultB extends AnyResult | Promise<AnySyncResult>>(resultB: TResultB) {
+    type Return = TResultB extends Promise<infer TInternalResultB extends AnySyncResult>
+      ? AsyncResult<TInternalResultB>
+      : TResultB;
+    if (resultB instanceof Promise) return new AsyncResult(resultB) as Return;
+    return resultB as Return;
   }
 
-  andThen<TResultB extends AnyResult>(_fn: (value: never) => TResultB) {
+  andThen<TResultB extends AnyResult | Promise<AnySyncResult>>(_fn: (value: never) => TResultB) {
     return this;
   }
 
-  orElse<TResultB extends AnyResult>(fn: (error: TError) => TResultB) {
-    return fn(this.error);
+  orElse<TResultB extends AnyResult | Promise<AnySyncResult>>(fn: (error: TError) => TResultB) {
+    type Return = TResultB extends Promise<infer TInternalResultB extends AnySyncResult>
+      ? AsyncResult<TInternalResultB>
+      : TResultB;
+    const result = fn(this.error);
+    if (result instanceof Promise) return new AsyncResult(result) as Return;
+    return result as Return;
   }
 
   match<TOutputOk, TOutputErr>(match: ResultMatch<never, TError, TOutputOk, TOutputErr>) {

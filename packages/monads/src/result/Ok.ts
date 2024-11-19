@@ -83,7 +83,6 @@ export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
   // transpose(): TValue extends None
   //   ? TValue
   //   : Some<Ok<TValue extends Some<infer TSome> ? TSome : TValue>> {
-  //   // TODO achieve without cast?
   //   type Cast = TValue extends None
   //     ? TValue
   //     : Some<Ok<TValue extends Some<infer TSome> ? TSome : TValue>>;
@@ -96,7 +95,6 @@ export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
 
   // TODO flatten
   // flatten(): TValue extends AnyResult ? TValue : Ok<TValue> {
-  //   // TODO achieve without cast?
   //   type Cast = TValue extends AnyResult ? TValue : Ok<TValue>;
 
   //   const v = this.value;

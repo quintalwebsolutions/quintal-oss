@@ -29,6 +29,8 @@ A collection of monads (Result, Option) for TypeScript, inspired by [the Rust pr
 The following features are planned for future releases:
 
 - [x] Serialize and deserialize monads for API usage
+- [ ] Cross-check with Rust to see if any new methods have been added since the start of this project (must be done before v1)
+- [ ] Fully implement the Option monad (must be done before v1)
 - [ ] Find a nice way to emulate [Rust's question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-)
 - [ ] Write docs on [Rust's must-use property](https://doc.rust-lang.org/std/result/#results-must-be-used)
 

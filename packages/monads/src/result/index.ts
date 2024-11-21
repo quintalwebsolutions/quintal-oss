@@ -6,6 +6,7 @@ export {
   asyncResultFromThrowable,
   err,
   ok,
+  resultFromResults,
   resultFromSerialized,
   resultFromThrowable,
 } from './constructors';

@@ -21,10 +21,10 @@ import {
   isAnyResult,
   isAnySyncResult,
   ok,
+  resultFromResults,
   resultFromSerialized,
   resultFromThrowable,
 } from '../src';
-import { resultFromResults } from '../src/result/constructors';
 import type { Ternary } from '../src/util';
 import type { And, Equal } from './util';
 

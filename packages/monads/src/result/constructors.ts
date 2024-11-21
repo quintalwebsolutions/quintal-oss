@@ -1,3 +1,4 @@
+import type { SimpleValue } from '../util';
 import { AsyncResult } from './AsyncResult';
 import { Err } from './Err';
 import { Ok } from './Ok';
@@ -13,31 +14,29 @@ import {
   isAnySyncResult,
 } from './types';
 
-type InferredResultValue = string | number | boolean;
-
 /** Utility function to create an `Ok<TValue>` result */
-export function ok<TValue extends InferredResultValue>(value: TValue): Ok<TValue>;
+export function ok<TValue extends SimpleValue>(value: TValue): Ok<TValue>;
 export function ok<TValue>(value: TValue): Ok<TValue>;
 export function ok<TValue>(value: TValue): Ok<TValue> {
   return new Ok(value);
 }
 
 /** Utility function to create an `Err<TError>` result */
-export function err<TError extends InferredResultValue>(value: TError): Err<TError>;
+export function err<TError extends SimpleValue>(value: TError): Err<TError>;
 export function err<TError>(error: TError): Err<TError>;
 export function err<TError>(error: TError): Err<TError> {
   return new Err(error);
 }
 
 /** Utility function to create an `AsyncResult<Ok<TValue>>` result */
-export function asyncOk<TValue extends InferredResultValue>(value: TValue): AsyncOk<TValue>;
+export function asyncOk<TValue extends SimpleValue>(value: TValue): AsyncOk<TValue>;
 export function asyncOk<TValue>(value: TValue): AsyncOk<TValue>;
 export function asyncOk<TValue>(value: TValue): AsyncOk<TValue> {
   return new AsyncResult(Promise.resolve(ok(value)));
 }
 
 /** Utility function to create an `AsyncResult<Err<TError>>` result */
-export function asyncErr<TError extends InferredResultValue>(error: TError): AsyncErr<TError>;
+export function asyncErr<TError extends SimpleValue>(error: TError): AsyncErr<TError>;
 export function asyncErr<TError>(error: TError): AsyncErr<TError>;
 export function asyncErr<TError>(error: TError): AsyncErr<TError> {
   return new AsyncResult(Promise.resolve(err(error)));

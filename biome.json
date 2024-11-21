@@ -9,8 +9,7 @@
       ".dist",
       ".turbo",
       "package.json",
-      "vite.config.mjs",
-      "old"
+      "vite.config.mjs"
     ]
   },
   "organizeImports": {

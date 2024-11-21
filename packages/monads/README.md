@@ -124,7 +124,7 @@ async function authenticateUser(
   // AsyncResult allows to handle async functions in a Result context
 ): AsyncResult<Result<User, AuthenticateUserError>> {
   // Wrap the dangerous db call with `asyncResult` to catch the error if it's thrown.
-  // `usersResult` is of type `AsyncResult<User[], unknown>`.
+  // `usersResult` is of type `AsyncResult<Result<User[], unknown>>`.
   const usersResult = asyncResult(() =>
     db
       .select()
@@ -134,7 +134,7 @@ async function authenticateUser(
 
   // If there was an error, log it and replace with our own error type.
   // If it was a success, this fuction will not run.
-  // `usersDbResult` is of type `AsyncResult<User[], AuthenticateUserError>`.
+  // `usersDbResult` is of type `AsyncResult<Result<User[], AuthenticateUserError>>`.
   const usersDbResult = usersResult.mapErr((error) => {
     console.error(error);
     // You can differentiate between different kinds of DB errors here
@@ -143,7 +143,7 @@ async function authenticateUser(
 
   // If it was a success, extract the unique user from the returned list of users.
   // If there was an error, this function will not run.
-  // `userResult` is of type `AsyncResult<User, AuthenticateUserError>`.
+  // `userResult` is of type `AsyncResult<Result<User, AuthenticateUserError>>`.
   const userResult = usersResult.andThen(getUniqueItem).mapErr((error) => {
     if (error === 'no-items') return AuthenticateUserError.UNKNOWN_USERNAME;
     if (error === 'too-many-items') return AuthenticateUserError.USER_NOT_UNIQUE;
@@ -176,7 +176,7 @@ enum AuthenticateUserError {
 async function authenticateUser(
   username: string,
   password: string,
-): AsyncResult<User, AuthenticateUserError> {
+): AsyncResult<Result<User, AuthenticateUserError>> {
   return asyncResult(() =>
       db.select().from(users).where({ username: eq(users.username, username) })
   )

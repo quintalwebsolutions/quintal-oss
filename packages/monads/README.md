@@ -204,7 +204,7 @@ There are a few ways to initialize a `Result`, each with a different set of use 
 - The same use case counts for the `asyncOk(value)` and `asyncErr(error)` utilities, which are `ok(value)` and `err(error)`'s async counterparts, acting as aliases for easily creating `AsyncResult` instances.
 - If you are unsure that an external function you're using might throw an error, you can use the `resultFromThrowable(() => value)` or `asyncResultFromThrowable(async () => value)` functions. These functions return a `Result` with the return type of the function as value, and `unknown` as the error type, just in case it unexpectedly throws an error while executing.
 - If you have serialized a `Result` and want to deserialize it, you can use `resultFromSerialized` or `asyncResultFromSerialized`.
-- If you have a set of previously evaluated results you'd like to combine into one, use the `resultFromResults(resultA, resultB, ...)` utility function. This either returns a result with an array of all given result values, or the first encountered error.
+- If you have a set of results you'd like to combine into one, use the `resultFromResults(resultA, resultB, ...)` utility function. This either returns a result with an array of all given result values, or the first encountered error.
 
 ### Method Overview
 

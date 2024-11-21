@@ -1,3 +1,4 @@
+import type { Ternary } from '../util';
 import { AsyncResult } from './AsyncResult';
 import { Err } from './Err';
 import { Ok } from './Ok';
@@ -54,15 +55,30 @@ export type ResultFromSerialized<TSerializedResult extends AnySerializedResult> 
       : never;
 
 export type ResultFromResults<
-  TResults extends AnySyncResult[],
+  TResults extends AnyResult[],
+  TIsAsync extends boolean = false,
   TValues extends unknown[] = [],
-> = TResults extends [infer THeadResult, ...infer TTailResults extends AnySyncResult[]]
-  ? THeadResult extends Ok<infer TValue>
-    ? ResultFromResults<TTailResults, [...TValues, TValue]>
-    : THeadResult extends AnyErr
-      ? THeadResult
-      : never
-  : Ok<TValues>;
+  TErrors extends unknown[] = [],
+> = TResults extends [infer THead extends AnyResult, ...infer TTail extends AnyResult[]]
+  ? THead extends AnyAsyncErr
+    ? [...TErrors, THead][number]
+    : THead extends AnyErr
+      ? [...TErrors, Ternary<TIsAsync, AsyncResult<THead>, THead>][number]
+      : THead extends Ok<infer TValue>
+        ? ResultFromResults<TTail, TIsAsync, [...TValues, TValue], TErrors>
+        : THead extends AsyncOk<infer TValue>
+          ? ResultFromResults<TTail, true, [...TValues, TValue], TErrors>
+          : THead extends Result<infer TValue, infer TError>
+            ? ResultFromResults<
+                TTail,
+                TIsAsync,
+                [...TValues, TValue],
+                [...TErrors, Ternary<TIsAsync, AsyncErr<TError>, Err<TError>>]
+              >
+            : THead extends AsyncResult<Result<infer TValue, infer TError>>
+              ? ResultFromResults<TTail, true, [...TValues, TValue], [...TErrors, AsyncErr<TError>]>
+              : never
+  : Ternary<TIsAsync, AsyncOk<TValues>, Ok<TValues>> | TErrors[number];
 
 export type ResultTernary<TResult, TIfOk, TIfErr> = TResult extends AnyOk ? TIfOk : TIfErr;
 
@@ -73,5 +89,3 @@ export type ResultMatch<TValue, TError, TOutputOk, TOutputErr> = {
   ok: (value: TValue) => TOutputOk;
   err: (error: TError) => TOutputErr;
 };
-
-export type MaybePromise<TValue> = TValue | Promise<TValue>;

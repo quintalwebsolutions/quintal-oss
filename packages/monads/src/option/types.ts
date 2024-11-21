@@ -56,5 +56,3 @@ export type OptionMatch<TValue, TOutputSome, TOutputNone> = {
   some: (value: TValue) => TOutputSome;
   none: () => TOutputNone;
 };
-
-export type MaybePromise<TValue> = TValue | Promise<TValue>;

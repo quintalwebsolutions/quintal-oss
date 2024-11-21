@@ -1,15 +1,9 @@
 import { none, some } from '..';
+import type { MaybePromise } from '../util';
 import { AsyncResult } from './AsyncResult';
 import type { ResultDocs } from './ResultDocs';
 import { err } from './constructors';
-import type {
-  AnyResult,
-  AnySyncResult,
-  AsyncErr,
-  MaybePromise,
-  ResultMatch,
-  SerializedErr,
-} from './types';
+import type { AnyResult, AnySyncResult, AsyncErr, ResultMatch, SerializedErr } from './types';
 
 export class Err<TError> implements ResultDocs<TError, 'err'> {
   private _error: TError;

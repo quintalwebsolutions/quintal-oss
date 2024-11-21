@@ -1,4 +1,5 @@
 import type { AsyncNone, AsyncResult, AsyncSome, None, Some } from '..';
+import type { MaybePromise } from '../util';
 import type { Err } from './Err';
 import type { Ok } from './Ok';
 import type {
@@ -6,7 +7,6 @@ import type {
   AnySyncResult,
   AsyncErr,
   AsyncOk,
-  MaybePromise,
   ResultMatch,
   ResultTernary,
   SerializedErr,

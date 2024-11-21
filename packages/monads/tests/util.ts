@@ -1,8 +1,4 @@
-export type Ternary<TCondition extends boolean, TTrue, TFalse> = TCondition extends true
-  ? TTrue
-  : TFalse;
-
-export type MaybePromise<TValue> = TValue | Promise<TValue>;
+import type { Ternary } from '../src/util';
 
 // Source https://www.totaltypescript.com/how-to-test-your-types
 export type Equal<TValue1, TValue2> = (<TValue>() => TValue extends TValue1 ? 1 : 2) extends <

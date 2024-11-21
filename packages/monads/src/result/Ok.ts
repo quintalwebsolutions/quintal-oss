@@ -1,15 +1,9 @@
 import { none, some } from '..';
+import type { MaybePromise } from '../util';
 import { AsyncResult } from './AsyncResult';
 import type { ResultDocs } from './ResultDocs';
 import { ok } from './constructors';
-import type {
-  AnyResult,
-  AnySyncResult,
-  AsyncOk,
-  MaybePromise,
-  ResultMatch,
-  SerializedOk,
-} from './types';
+import type { AnyResult, AnySyncResult, AsyncOk, ResultMatch, SerializedOk } from './types';
 
 export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
   private _value: TValue;

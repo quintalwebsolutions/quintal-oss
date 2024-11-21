@@ -1,14 +1,16 @@
 import { AsyncResult } from './AsyncResult';
 import { Err } from './Err';
 import { Ok } from './Ok';
-import type {
-  AnySerializedResult,
-  AnySyncResult,
-  AsyncErr,
-  AsyncOk,
-  Result,
-  ResultFromResults,
-  ResultFromSerialized,
+import {
+  type AnyResult,
+  type AnySerializedResult,
+  type AsyncErr,
+  type AsyncOk,
+  type Result,
+  type ResultFromResults,
+  type ResultFromSerialized,
+  isAnyAsyncResult,
+  isAnySyncResult,
 } from './types';
 
 type InferredResultValue = string | number | boolean;
@@ -106,23 +108,41 @@ export function asyncResultFromThrowable<TValue>(
 }
 
 /**
- * Create a result from multiple resolved results
+ * Create a result from multiple results, returning the first error if any
  *
  * @example
+ * resultFromResults(ok(1), ok(2)).unwrap(); // `[1, 2]`
  * resultFromResults(ok(1), ok(2), ok(3)).unwrap(); // `[1, 2, 3]`
- * resultFromResults(ok(1), err(2), err(3)).unwrapErr(); // `2`
+ * await resultFromResults(ok(1), asyncOk(2), ok(3)).unwrap(); // `[1, 2, 3]`
+ * resultFromResults(ok(1), err(2), asyncErr(3)).unwrapErr(); // `2`
+ * await resultFromResults(ok(1), asyncErr(2), err(3)).unwrapErr(); // `2`
  */
 export function resultFromResults<
-  TFirstResult extends AnySyncResult,
-  TSecondResult extends AnySyncResult,
-  TResultTail extends AnySyncResult[],
+  TFirstResult extends AnyResult,
+  TSecondResult extends AnyResult,
+  TResultTail extends AnyResult[],
 >(firstResult: TFirstResult, secondResult: TSecondResult, ...restResults: TResultTail) {
   type Return = ResultFromResults<[TFirstResult, TSecondResult, ...TResultTail]>;
 
   const results = [firstResult, secondResult, ...restResults];
-  const firstError = results.find((res) => res.isErr);
-  if (firstError) return firstError as Return;
+  const firstErrorIndex = results.findIndex((result) => isAnySyncResult(result) && result.isErr);
+  const firstAsyncIndex = results.findIndex((result) => isAnyAsyncResult(result));
 
-  const values = results.map((result) => result.unwrap());
-  return ok(values) as Return;
+  // All results are ok & sync
+  if (firstErrorIndex === -1 && firstAsyncIndex === -1) {
+    return ok(results.map((r) => r.unwrap())) as Return;
+  }
+
+  // All results are sync, but one is an error OR the first sync error is before the first async result
+  if (firstAsyncIndex === -1 || firstErrorIndex < firstAsyncIndex) {
+    return results[firstErrorIndex] as Return;
+  }
+
+  // There is no easy sync error, but there are async results
+  return new AsyncResult(
+    Promise.all(results).then((resolvedResults) => {
+      const firstError = resolvedResults.find((result) => result.isErr);
+      return firstError ?? ok(resolvedResults.map((result) => result.unwrap()));
+    }),
+  ) as Return;
 }

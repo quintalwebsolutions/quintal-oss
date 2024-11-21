@@ -13,17 +13,21 @@ import {
   type Result,
   type Some,
   asyncErr,
+  asyncNone,
   asyncOk,
   asyncResultFromSerialized,
   asyncResultFromThrowable,
+  asyncSome,
   err,
   isAnyAsyncResult,
   isAnyResult,
   isAnySyncResult,
+  none,
   ok,
   resultFromResults,
   resultFromSerialized,
   resultFromThrowable,
+  some,
 } from '../src';
 import type { Ternary } from '../src/util';
 import type { And, Equal } from './util';
@@ -1237,54 +1241,130 @@ describe('Result', () => {
     await expect(asyncErrResValErr.unwrap()).resolves.toStrictEqual(error);
   });
 
-  test.todo('transpose', async () => {
-    // const okNone = ok(none).transpose();
-    // expectTypeOf(okNone).toEqualTypeOf<None>();
-    // expect(okNone.isNone).toBe(true);
-    // const okSome = ok(some('value')).transpose();
-    // expectTypeOf(okSome).toEqualTypeOf<Some<Ok<'value'>>>();
-    // expect(okSome.isSome).toBe(true);
-    // expect(okSome.unwrap().isOk).toBe(true);
-    // expect(okSome.unwrap().unwrap()).toBe('value');
-    // const okTransposed = okVal.transpose();
-    // expectTypeOf(okTransposed).toEqualTypeOf<Some<Ok<'value'>>>();
-    // expect(okTransposed.isSome).toBe(true);
-    // expect(okTransposed.unwrap().isOk).toBe(true);
-    // expect(okTransposed.unwrap().unwrap()).toBe('value');
-    // const errNone = err(none).transpose();
-    // expectTypeOf(errNone).toEqualTypeOf<Some<Err<None>>>();
-    // expect(errNone.isSome).toBe(true);
-    // expect(errNone.unwrap().isErr).toBe(true);
-    // expect(errNone.unwrap().unwrapErr().isNone).toBe(true);
-    // const errSome = err(some('value')).transpose();
-    // expectTypeOf(errSome).toEqualTypeOf<Some<Err<Some<'value'>>>>();
-    // expect(errSome.isSome).toBe(true);
-    // expect(errSome.unwrap().isErr).toBe(true);
-    // expect(errSome.unwrap().unwrapErr().isSome).toBe(true);
-    // expect(errSome.unwrap().unwrapErr().unwrap()).toBe('value');
-    // const errTransposed = errVal.transpose();
-    // expectTypeOf(errTransposed).toEqualTypeOf<Some<Err<'error'>>>();
-    // expect(errTransposed.isSome).toBe(true);
-    // expect(errTransposed.unwrap().isErr).toBe(true);
-    // expect(errTransposed.unwrap().unwrapErr()).toBe('error');
-    // const asyncOkNone = asyncOk(none).transpose();
-    // expectTypeOf(asyncOkNone).toEqualTypeOf<Promise<None>>(); // TODO AsyncNone
-    // // expect(asyncOkNone.isNone).resolves.toBe(true);
-    // const asyncOkSome = asyncOk(some('value')).transpose();
-    // expectTypeOf(asyncOkSome).toEqualTypeOf<Promise<Some<Ok<'value'>>>>(); // TODO AsyncSome
-    // // expect(asyncOkSome.isSome).resolves.toBe(true);
-    // const asyncOkTransposed = asyncOkVal.transpose();
-    // expectTypeOf(asyncOkTransposed).toEqualTypeOf<Promise<Some<Ok<'value'>>>>(); // TODO AsyncSome
-    // // expect(asyncOkSome.isSome).resolves.toBe(true);
-    // const asyncErrNone = asyncErr(none).transpose();
-    // expectTypeOf(asyncErrNone).toEqualTypeOf<Promise<Some<Err<None>>>>(); // TODO AsyncSome
-    // // expect(asyncErrNone.isSome).resolves.toBe(true);
-    // const asyncErrSome = asyncErr(some('value')).transpose();
-    // expectTypeOf(asyncErrSome).toEqualTypeOf<Promise<Some<Err<Some<'value'>>>>>(); // TODO AsyncSome
-    // // expect(asyncErrSome.isSome).resolves.toBe(true);
-    // const asyncErrTransposed = asyncErrVal.transpose();
-    // expectTypeOf(asyncErrTransposed).toEqualTypeOf<Promise<Some<Err<'error'>>>>(); // TODO AsyncSome
-    // // expect(asyncErrTransposed.isSome).resolves.toBe(true);
+  test('transpose', async () => {
+    const okValue = ok('value').transpose();
+    expectTypeOf(okValue).toEqualTypeOf<Some<Ok<'value'>>>();
+    expect(okValue.isSome).toBe(true);
+    expect(okValue.unwrap().isOk).toBe(true);
+    expect(okValue.unwrap().unwrap()).toBe('value');
+
+    const okSome = ok(some('value')).transpose();
+    expectTypeOf(okSome).toEqualTypeOf<Some<Ok<'value'>>>();
+    expect(okSome.isSome).toBe(true);
+    expect(okSome.unwrap().isOk).toBe(true);
+    expect(okSome.unwrap().unwrap()).toBe('value');
+
+    const okNone = ok(none).transpose();
+    expectTypeOf(okNone).toEqualTypeOf<None>();
+    expect(okNone.isNone).toBe(true);
+
+    const okAsyncSome = ok(asyncSome('value')).transpose();
+    expectTypeOf(okAsyncSome).toEqualTypeOf<AsyncSome<Ok<'value'>>>();
+    await expect(okAsyncSome.isSome).resolves.toBe(true);
+    await expect(okAsyncSome.unwrap()).resolves.toHaveProperty('value', 'value');
+
+    const okAsyncNone = ok(asyncNone).transpose();
+    expectTypeOf(okAsyncNone).toEqualTypeOf<AsyncNone>();
+    await expect(okAsyncNone.isNone).resolves.toBe(true);
+
+    const errValue = err('error').transpose();
+    expectTypeOf(errValue).toEqualTypeOf<Some<Err<'error'>>>();
+    expect(errValue.isSome).toBe(true);
+    expect(errValue.unwrap().isErr).toBe(true);
+    expect(errValue.unwrap().unwrapErr()).toBe('error');
+
+    const errSome = err(some('error')).transpose();
+    expectTypeOf(errSome).toEqualTypeOf<Some<Err<Some<'error'>>>>();
+    expect(errSome.isSome).toBe(true);
+    expect(errSome.unwrap().isErr).toBe(true);
+    expect(errSome.unwrap().unwrapErr().isSome).toBe(true);
+    expect(errSome.unwrap().unwrapErr().unwrap()).toBe('error');
+
+    const errNone = err(none).transpose();
+    expectTypeOf(errNone).toEqualTypeOf<Some<Err<None>>>();
+    expect(errNone.isSome).toBe(true);
+    expect(errNone.unwrap().isErr).toBe(true);
+    expect(errNone.unwrap().unwrapErr().isNone).toBe(true);
+
+    const errAsyncSome = err(asyncSome('error')).transpose();
+    expectTypeOf(errAsyncSome).toEqualTypeOf<Some<Err<AsyncSome<'error'>>>>();
+    expect(errAsyncSome.isSome).toBe(true);
+    expect(errAsyncSome.unwrap().isErr).toBe(true);
+    await expect(errAsyncSome.unwrap().unwrapErr()).resolves.toHaveProperty('isSome', true);
+    await expect(errAsyncSome.unwrap().unwrapErr()).resolves.toHaveProperty('value', 'error');
+
+    const errAsyncNone = err(asyncNone).transpose();
+    expectTypeOf(errAsyncNone).toEqualTypeOf<Some<Err<AsyncNone>>>();
+    expect(errAsyncNone.isSome).toBe(true);
+    expect(errAsyncNone.unwrap().isErr).toBe(true);
+    await expect(errAsyncNone.unwrap().unwrapErr()).resolves.toHaveProperty('isNone', true);
+
+    const asyncOkValue = asyncOk('value').transpose();
+    expectTypeOf(asyncOkValue).toEqualTypeOf<AsyncSome<Ok<'value'>>>();
+    await expect(asyncOkValue.isSome).resolves.toBe(true);
+    await expect(asyncOkValue.unwrap()).resolves.toHaveProperty('isOk', true);
+    await expect(asyncOkValue.unwrap()).resolves.toHaveProperty('value', 'value');
+
+    const asyncOkSome = asyncOk(some('value')).transpose();
+    expectTypeOf(asyncOkSome).toEqualTypeOf<AsyncSome<Ok<'value'>>>();
+    await expect(asyncOkSome.isSome).resolves.toBe(true);
+    await expect(asyncOkSome.unwrap()).resolves.toHaveProperty('isOk', true);
+    await expect(asyncOkSome.unwrap()).resolves.toHaveProperty('value', 'value');
+
+    const asyncOkNone = asyncOk(none).transpose();
+    expectTypeOf(asyncOkNone).toEqualTypeOf<AsyncNone>();
+    await expect(asyncOkNone.isNone).resolves.toBe(true);
+
+    const asyncOkAsyncSome = asyncOk(asyncSome('value')).transpose();
+    expectTypeOf(asyncOkAsyncSome).toEqualTypeOf<AsyncSome<Ok<'value'>>>();
+    await expect(asyncOkAsyncSome.isSome).resolves.toBe(true);
+    await expect(asyncOkAsyncSome.unwrap()).resolves.toHaveProperty('isOk', true);
+    await expect(asyncOkAsyncSome.unwrap()).resolves.toHaveProperty('value', 'value');
+
+    const asyncOkAsyncNone = asyncOk(asyncNone).transpose();
+    expectTypeOf(asyncOkAsyncNone).toEqualTypeOf<AsyncNone>();
+    await expect(asyncOkAsyncNone.isNone).resolves.toBe(true);
+
+    const asyncErrValue = asyncErr('error').transpose();
+    expectTypeOf(asyncErrValue).toEqualTypeOf<AsyncSome<Err<'error'>>>();
+    await expect(asyncErrValue.isSome).resolves.toBe(true);
+    await expect(asyncErrValue.unwrap()).resolves.toHaveProperty('isErr', true);
+    await expect(asyncErrValue.unwrap()).resolves.toHaveProperty('error', 'error');
+
+    const asyncErrSome = asyncErr(some('error')).transpose();
+    expectTypeOf(asyncErrSome).toEqualTypeOf<AsyncSome<Err<Some<'error'>>>>();
+    await expect(asyncErrSome.isSome).resolves.toBe(true);
+    await expect(asyncErrSome.unwrap()).resolves.toHaveProperty('isErr', true);
+    expect((await asyncErrSome.unwrap()).unwrapErr().isSome).toBe(true);
+    expect((await asyncErrSome.unwrap()).unwrapErr().value).toBe('error');
+
+    const asyncErrNone = asyncErr(none).transpose();
+    expectTypeOf(asyncErrNone).toEqualTypeOf<AsyncSome<Err<None>>>();
+    await expect(asyncErrNone.isSome).resolves.toBe(true);
+    await expect(asyncErrNone.unwrap()).resolves.toHaveProperty('isErr', true);
+    expect((await asyncErrNone.unwrap()).unwrapErr().isNone).toBe(true);
+
+    const asyncErrAsyncSome = asyncErr(asyncSome('error')).transpose();
+    expectTypeOf(asyncErrAsyncSome).toEqualTypeOf<AsyncSome<Err<AsyncSome<'error'>>>>();
+    await expect(asyncErrAsyncSome.isSome).resolves.toBe(true);
+    await expect(asyncErrAsyncSome.unwrap()).resolves.toHaveProperty('isErr', true);
+    await expect((await asyncErrAsyncSome.unwrap()).unwrapErr()).resolves.toHaveProperty(
+      'isSome',
+      true,
+    );
+    await expect((await asyncErrAsyncSome.unwrap()).unwrapErr()).resolves.toHaveProperty(
+      'value',
+      'error',
+    );
+
+    const asyncErrAsyncNone = asyncErr(asyncNone).transpose();
+    expectTypeOf(asyncErrAsyncNone).toEqualTypeOf<AsyncSome<Err<AsyncNone>>>();
+    await expect(asyncErrAsyncNone.isSome).resolves.toBe(true);
+    await expect(asyncErrAsyncNone.unwrap()).resolves.toHaveProperty('isErr', true);
+    await expect((await asyncErrAsyncNone.unwrap()).unwrapErr()).resolves.toHaveProperty(
+      'isNone',
+      true,
+    );
   });
 
   test.todo('flatten', async () => {

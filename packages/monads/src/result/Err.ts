@@ -66,17 +66,16 @@ export class Err<TError> implements ResultDocs<TError, 'err'> {
   }
 
   ok() {
-    return none();
+    return none;
   }
 
   err() {
     return some(this.error);
   }
 
-  // TODO transpose
-  // transpose(): Some<Err<TError>> {
-  //   return some(this);
-  // }
+  transpose() {
+    return some(this);
+  }
 
   // TODO flatten
   // flatten(): Err<TError> {

@@ -11,7 +11,6 @@ import {
   type ResultFromResults,
   type ResultFromSerialized,
   isAnyAsyncResult,
-  isAnySyncResult,
 } from './types';
 
 /** Utility function to create an `Ok<TValue>` result */
@@ -124,7 +123,7 @@ export function resultFromResults<
   type Return = ResultFromResults<[TFirstResult, TSecondResult, ...TResultTail]>;
 
   const results = [firstResult, secondResult, ...restResults];
-  const firstErrorIndex = results.findIndex((result) => isAnySyncResult(result) && result.isErr);
+  const firstErrorIndex = results.findIndex((result) => result.isErr);
   const firstAsyncIndex = results.findIndex((result) => isAnyAsyncResult(result));
 
   // All results are ok & sync

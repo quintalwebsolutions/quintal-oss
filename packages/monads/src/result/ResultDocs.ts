@@ -1,4 +1,4 @@
-import type { AsyncNone, AsyncResult, AsyncSome, None, Some } from '..';
+import type { AnyOption, AsyncNone, AsyncResult, AsyncSome, None, Some } from '..';
 import type { MaybePromise } from '../util';
 import type { Err } from './Err';
 import type { Ok } from './Ok';
@@ -289,24 +289,48 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
       async: ResultTernary<TValue, AsyncNone, AsyncSome<ValueFromErr<TValue>>>;
     }
   >;
-  // TODO transpose and flatten + async examples
-  // /**
-  //  * Transposes a `Result` of an `Option` into an `Option` of a `Result`
-  //  *
-  //  * @example
-  //  * ok(none).transpose(); // none
-  //  * ok(some('value')).transpose(); // some(ok('value'))
-  //  * ok('value').transpose(); // some(ok('value'))
-  //  * err(none).transpose(); // some(err(none))
-  //  * err(some('value')).transpose(); // some(err(some('value')))
-  //  * err('error').transpose(); // some(err('error'))
-  //  */
-  // transpose: () =>
-  //   EvaluateVariant<
-  //     TVariant,
-  //     TValue extends None ? TValue : Some<Ok<TValue extends Some<infer TSome> ? TSome : TValue>>,
-  //     Some<Err<TValue>>
-  //   >;
+  /**
+   * Transposes a `Result` of an `Option` into an `Option` of a `Result`
+   *
+   * @example
+   * ok(none).transpose(); // none
+   * ok(asyncNone).transpose(); // asyncNone
+   * ok(some('value')).transpose(); // some(ok('value'))
+   * ok(asyncSome('value')).transpose(); // asyncSome(ok('value'))
+   * ok('value').transpose(); // some(ok('value'))
+   * err(none).transpose(); // some(err(none))
+   * err(some('value')).transpose(); // some(err(some('value')))
+   * err('error').transpose(); // some(err('error'))
+   * asyncOk(none).transpose(); // asyncNone
+   * asyncOk(some('value')).transpose(); // asyncSome(ok('value'))
+   */
+  transpose: () => EvaluateResultVariant<
+    TResultVariant,
+    {
+      ok: TValue extends None | AsyncNone
+        ? TValue
+        : TValue extends Some<infer TSome>
+          ? Some<Ok<TSome>>
+          : TValue extends AsyncSome<infer TSome>
+            ? AsyncSome<Ok<TSome>>
+            : Some<Ok<TValue>>;
+      err: Some<Err<TValue>>;
+      async: ResultTernary<
+        TValue,
+        TValue extends Ok<infer TOption extends AnyOption>
+          ? TOption extends None | AsyncNone
+            ? AsyncNone
+            : TOption extends Some<infer TSome>
+              ? AsyncSome<Ok<TSome>>
+              : TOption extends AsyncSome<infer TSome>
+                ? AsyncSome<Ok<TSome>>
+                : never
+          : AsyncSome<Ok<ValueFromOk<TValue>>>,
+        AsyncSome<TValue>
+      >;
+    }
+  >;
+  // TODO flatten + async examples
   // /**
   //  * Flattens at most one level of `Result` nesting.
   //  *

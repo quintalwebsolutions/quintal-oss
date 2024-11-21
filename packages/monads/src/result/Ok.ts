@@ -1,4 +1,15 @@
-import { none, some } from '..';
+import {
+  type AnySyncOption,
+  type AsyncNone,
+  AsyncOption,
+  type AsyncSome,
+  type None,
+  type Some,
+  isAnyAsyncOption,
+  isAnySyncOption,
+  none,
+  some,
+} from '..';
 import type { MaybePromise } from '../util';
 import { AsyncResult } from './AsyncResult';
 import type { ResultDocs } from './ResultDocs';
@@ -70,22 +81,22 @@ export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
   }
 
   err() {
-    return none();
+    return none;
   }
 
-  // TODO transpose
-  // transpose(): TValue extends None
-  //   ? TValue
-  //   : Some<Ok<TValue extends Some<infer TSome> ? TSome : TValue>> {
-  //   type Cast = TValue extends None
-  //     ? TValue
-  //     : Some<Ok<TValue extends Some<infer TSome> ? TSome : TValue>>;
-
-  //   const v = this.value;
-  //   const isOption = isAnyOption(v);
-  //   if (isOption && v.isNone) return v as Cast;
-  //   return some(ok(isOption && v.isSome ? v.unwrap() : v)) as Cast;
-  // }
+  transpose() {
+    type Return = TValue extends None | AsyncNone
+      ? TValue
+      : TValue extends Some<infer TSome>
+        ? Some<Ok<TSome>>
+        : TValue extends AsyncSome<infer TSome>
+          ? AsyncSome<Ok<TSome>>
+          : Some<Ok<TValue>>;
+    const _transpose = (option: AnySyncOption) => (option.isNone ? option : some(ok(option.value)));
+    if (isAnySyncOption(this.value)) return _transpose(this.value) as Return;
+    if (isAnyAsyncOption(this.value)) return new AsyncOption(this.value.then(_transpose)) as Return;
+    return some(ok(this.value)) as Return;
+  }
 
   // TODO flatten
   // flatten(): TValue extends AnyResult ? TValue : Ok<TValue> {

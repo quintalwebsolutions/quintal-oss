@@ -17,7 +17,7 @@ A collection of monads (Result, Option) for TypeScript, inspired by [the Rust pr
 ## Features
 
 - 🛡️ Easy type-safe error- and empty-value handling,
-- 🦀 Implements all relevant utility methods from Rust,
+- 🦀 Implements all relevant stable utility methods from Rust,
 - ✅ CommonJS and ES Modules support,
 - 📖 Extensive documentation,
 - ⚖️ Super lightweight (only ~1kb gzipped),
@@ -77,7 +77,7 @@ The type `Result<T, E>` is used for returning and propagating errors. It has the
 - `ok(value: T)`, representing success;
 - `err(error: E)`, representing error.
 
-Functions return `Result` whenever errors are expected and recoverable. It signifies that the absence of a return value is due to an error or an exceptional situation that the caller needs to handle specifically. For cases where having no value is expected, have a look at [the `Option` monad](#option).
+Functions return `Result` whenever errors are expected and recoverable. It signifies that the absence of a return value is due to an error or an exceptional situation that the caller needs to handle specifically (e.g. database, network, or filesystem calls). For cases where having no value is expected, have a look at [the `Option` monad](#option).
 
 A simple function returning `Result` might be defined and used like so:
 
@@ -210,7 +210,7 @@ There are a few ways to initialize a `Result`, each with a different set of use 
 
 ### Method Overview
 
-`Result` comes with a wide variety of convenience methods that make working with it more succinct.
+`Result` provides a wide variety of convenience methods that make working with it more succinct.
 
 #### Querying the contained value
 
@@ -266,7 +266,7 @@ A TypeScript optional value handling paradigm using an `Option` monad.
 The type `Option<T>` represents an optional value. It has the following variants:
 
 - `some(value: T)`, representing the presence of a value;
-- `none()`, representing the absence of a value.
+- `none`, representing the absence of a value.
 
 Functions return `Option` whenever the absence of a value is a normal, expected part of the function's behaviour (e.g. initial values, optional function parameters, return values for functions that are not defined over their entire input range). It signifies that having no value is a routine possibility, not necessarily a problem or error. For those cases, have a look at [the `Result` monad](#result).
 
@@ -278,7 +278,7 @@ import { type Option, some, none } from '@quintal/monads';
 // `Option` is an explicit part of the function declaration, making it clear to the
 // consumer that this function may return nothing.
 function safeDivide(numerator: number, denominator: number): Option<number> {
-  if (denominator === 0) return none();
+  if (denominator === 0) return none;
   return some(numerator / denominator);
 }
 
@@ -291,7 +291,7 @@ const message = safeDivide(10, 0).match({
 
 ### Method Overview
 
-`Option` comes with a wide variety of convenience methods that make working with it more succinct.
+`Option` provides a wide variety of convenience methods that make working with it more succinct.
 
 #### Querying the contained value
 

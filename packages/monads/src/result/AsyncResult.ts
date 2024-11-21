@@ -1,8 +1,19 @@
-import { type AnySyncOption, type AsyncNone, AsyncOption, type AsyncSome } from '../option';
+import {
+  type AnyOption,
+  type AnySyncOption,
+  type AsyncNone,
+  AsyncOption,
+  type AsyncSome,
+  type None,
+  type Some,
+  isAnyOption,
+  some,
+} from '../option';
 import type { MaybePromise } from '../util';
 import type { Err } from './Err';
 import type { Ok } from './Ok';
 import type { ResultDocs } from './ResultDocs';
+import { ok } from './constructors';
 import type {
   AnyResult,
   AnySyncResult,
@@ -107,10 +118,32 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
     return new AsyncOption(promise) as Return;
   }
 
-  // TODO transpose
-  // transpose(): Promise<ReturnType<TResult['transpose']>> {
-  //   return this.then((res) => res.transpose());
-  // }
+  transpose() {
+    type Return = ResultTernary<
+      TResult,
+      TResult extends Ok<infer TOption extends AnyOption>
+        ? TOption extends None | AsyncNone
+          ? AsyncNone
+          : TOption extends Some<infer TSome>
+            ? AsyncSome<Ok<TSome>>
+            : TOption extends AsyncSome<infer TSome>
+              ? AsyncSome<Ok<TSome>>
+              : never
+        : AsyncSome<Ok<ValueFromOk<TResult>>>,
+      AsyncSome<TResult>
+    >;
+    return new AsyncOption(
+      this.then(async (res) => {
+        if (res.isOk && isAnyOption(res.value)) {
+          const option = await res.value;
+          if (option.isNone) return option;
+          return some(ok(option.value));
+        }
+
+        return some(res);
+      }),
+    ) as Return;
+  }
 
   // TODO flatten
   // flatten(): AsyncResult<

@@ -4,7 +4,6 @@
   "compilerOptions": {
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    "allowImportingTsExtensions": true,
     "exactOptionalPropertyTypes": false,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
@@ -14,39 +13,32 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strict": true,
+
+    "allowImportingTsExtensions": true,
     "baseUrl": "${configDir}",
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "paths": {
       "@": ["${configDir}/src"],
       "@/*": ["${configDir}/src/*"]
     },
     "resolveJsonModule": true,
     "rootDir": "${configDir}",
-    "declaration": true,
-    "declarationMap": true,
-    "downlevelIteration": true,
-    "importHelpers": false,
-    "newLine": "lf",
-    "noEmit": false,
+
     "emitDeclarationOnly": true,
     "outDir": "${configDir}/.dist",
-    "removeComments": false,
-    "sourceMap": true,
-    "allowJs": false,
-    "checkJs": false,
+
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
+
     "jsx": "react-jsx",
-    "lib": ["DOM", "ES6"],
-    "target": "ES6",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "useDefineForClassFields": true,
-    "composite": false,
+
     "noErrorTruncation": true,
-    "skipLibCheck": true,
-    "preserveWatchOutput": true
+    "skipLibCheck": true
   },
   "include": ["${configDir}/**/*.ts", "${configDir}/**/*.tsx"],
   "exclude": [

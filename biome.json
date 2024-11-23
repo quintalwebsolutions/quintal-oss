@@ -2,15 +2,7 @@
   "$schema": "node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
     "include": ["*"],
-    "ignore": [
-      "node_modules",
-      ".coverage",
-      ".coverage-ts",
-      ".dist",
-      ".turbo",
-      "package.json",
-      "vite.config.mjs"
-    ]
+    "ignore": [".coverage", ".coverage-ts", ".dist", ".turbo", "node_modules", "package.json"]
   },
   "organizeImports": {
     "enabled": true
@@ -28,6 +20,12 @@
     "enabled": true,
     "rules": {
       "all": true,
+      "correctness": {
+        "noNodejsModules": "off"
+      },
+      "performance": {
+        "noBarrelFile": "off"
+      },
       "style": {
         "useBlockStatements": "off",
         "useNamingConvention": {
@@ -47,13 +45,6 @@
             ]
           }
         }
-      },
-      "performance": {
-        "noBarrelFile": "off",
-        "noReExportAll": "off"
-      },
-      "correctness": {
-        "noNodejsModules": "off"
       }
     }
   },
@@ -91,7 +82,7 @@
   },
   "overrides": [
     {
-      "include": [],
+      "include": ["vite.config.mjs"],
       "linter": {
         "rules": {
           "style": {

@@ -30,13 +30,13 @@
     "clean": "shx rm -rf .turbo node_modules"
   },
   "dependencies": {
-    "@codecov/vite-plugin": "0.0.1-beta.10",
-    "@vitejs/plugin-react": "4.3.1",
-    "next": "14.2.7",
+    "@codecov/vite-plugin": "1.4.0",
+    "@vitejs/plugin-react": "4.3.3",
+    "next": "15.0.3",
     "react": "18.3.1",
     "shx": "0.3.4",
-    "vite": "5.4.2",
-    "vite-plugin-dts": "4.1.0",
+    "vite": "5.4.11",
+    "vite-plugin-dts": "4.3.0",
     "vite-plugin-externalize-deps": "0.8.0"
   }
 }

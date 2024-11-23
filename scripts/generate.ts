@@ -358,17 +358,7 @@ async function makePackageViteConfig(packageName: string, packageDir: string): P
 async function makePackageTsConfig(packageDir: string): Promise<void> {
   await writeFile(
     [packageDir, 'tsconfig.json'],
-    [
-      '{',
-      '  "extends": "@quintal/config/tsconfig/base.json",',
-      '  "compilerOptions": {',
-      '    "rootDir": "."',
-      '  },',
-      '  "include": ["**/*.ts", "**/*.tsx"],',
-      `  "exclude": [${ignoreDirs.map((d) => `"${d}"`).join(', ')}]`,
-      '}',
-      '',
-    ],
+    ['{', '  "extends": "@quintal/config/tsconfig/base.json"', '}', ''],
   );
 }
 

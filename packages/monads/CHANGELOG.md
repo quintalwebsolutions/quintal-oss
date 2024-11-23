@@ -1,5 +1,17 @@
 # @quintal/monads
 
+## 0.4.0
+
+### Minor Changes
+
+- fee979b: Improve docs for AsyncResult and constructor utility functions
+- fee979b: Allow to pass a promise to andThen and orElse to create an AsyncResult
+- f8809ad: Add "resultFromResults" utility function for merging multiple results into one
+
+### Patch Changes
+
+- 2bbc6fe: Expose serialized result types
+
 ## 0.3.2
 
 ### Patch Changes

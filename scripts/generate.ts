@@ -358,7 +358,14 @@ async function makePackageViteConfig(packageName: string, packageDir: string): P
 async function makePackageTsConfig(packageDir: string): Promise<void> {
   await writeFile(
     [packageDir, 'tsconfig.json'],
-    ['{', '  "extends": "@quintal/config/tsconfig/base.json"', '}', ''],
+    [
+      '{',
+      '  "extends": "@quintal/config/tsconfig/base.json",',
+      // TODO while @microsoft/api-extractor does not support the tsconfig configDir template literal, we need to add this line
+      '  "include": ["**/*.ts", "**/*.tsx"]',
+      '}',
+      '',
+    ],
   );
 }
 

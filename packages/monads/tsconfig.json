@@ -1,3 +1,4 @@
 {
-  "extends": "@quintal/config/tsconfig/base.json"
+  "extends": "@quintal/config/tsconfig/base.json",
+  "include": ["**/*.ts", "**/*.tsx"]
 }

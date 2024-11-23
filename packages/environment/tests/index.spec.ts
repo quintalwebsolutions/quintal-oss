@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import { z } from 'zod';
-import { createEnvironment } from '../src';
+import { createEnvironment } from '../src/index.ts';
 
 describe('environment', () => {
   it('returns a strongly-typed environment object', () => {

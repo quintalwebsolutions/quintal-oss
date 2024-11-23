@@ -4,6 +4,7 @@
   "compilerOptions": {
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
+    "allowImportingTsExtensions": true,
     "exactOptionalPropertyTypes": false,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
@@ -32,6 +33,7 @@
     "importHelpers": false,
     "newLine": "lf",
     "noEmit": false,
+    "emitDeclarationOnly": true,
     "outDir": "${configDir}/.dist",
     "removeComments": false,
     "sourceMap": true,

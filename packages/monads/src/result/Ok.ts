@@ -6,6 +6,7 @@ import {
   type None,
   type Some,
   isAnyAsyncOption,
+  isAnyResult,
   isAnySyncOption,
   none,
   some,
@@ -98,14 +99,10 @@ export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
     return some(ok(this.value)) as Return;
   }
 
-  // TODO flatten
-  // flatten(): TValue extends AnyResult ? TValue : Ok<TValue> {
-  //   type Cast = TValue extends AnyResult ? TValue : Ok<TValue>;
-
-  //   const v = this.value;
-  //   if (isAnyResult(v)) return v as Cast;
-  //   return ok(v) as Cast;
-  // }
+  flatten() {
+    type Return = TValue extends AnyResult ? TValue : Ok<TValue>;
+    return (isAnyResult(this.value) ? this.value : this) as Return;
+  }
 
   map<TMappedValue>(fn: (value: TValue) => TMappedValue) {
     type Return = TMappedValue extends Promise<infer TAwaitedMappedValue>

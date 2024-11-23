@@ -110,9 +110,6 @@ export const workspace: Workspace = {
       ],
       roadmap: [
         { checked: true, text: 'Serialize and deserialize monads for API usage' },
-        {
-          text: 'Cross-check with Rust to see if any new methods have been added since the start of this project (must be done before v1)',
-        },
         { text: 'Fully implement the Option monad (must be done before v1)' },
         {
           text: "Find a nice way to emulate [Rust's question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-)",

@@ -290,7 +290,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     }
   >;
   /**
-   * Transposes a `Result` of an `Option` into an `Option` of a `Result`
+   * Transposes a `Result` of an `Option` into an `Option` of a `Result`.
    *
    * @example
    * ok(none).transpose(); // none
@@ -330,22 +330,37 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
       >;
     }
   >;
-  // TODO flatten + async examples
-  // /**
-  //  * Flattens at most one level of `Result` nesting.
-  //  *
-  //  * @example
-  //  * ok('value').flatten(); // ok('value')
-  //  * err('error').flatten(); // err('error')
-  //  * ok(ok('value')).flatten(); // ok('value')
-  //  * ok(err('error')).flatten(); // err('error')
-  //  * err(ok('value')).flatten(); // err(ok('value'))
-  //  * err(err('error)).flatten(); // err(err('error'))
-  //  * ok(ok(ok('value'))).flatten(); // ok(ok('value'))
-  //  * ok(ok(ok('value'))).flatten().flatten(); // ok('value')
-  //  */
-  // flatten: () =>
-  //   EvaluateVariant<TVariant, TValue extends AnyResult ? TValue : Ok<TValue>, Err<TValue>>;
+  /**
+   * Flattens at most one level of `Result` nesting.
+   *
+   * @example
+   * ok('value').flatten(); // ok('value')
+   * err('error').flatten(); // err('error')
+   * ok(ok('value')).flatten(); // ok('value')
+   * ok(err('error')).flatten(); // err('error')
+   * asyncOk(ok('value')).flatten(); // asyncOk('value')
+   * asyncErr(ok('value')).flatten(); // asyncErr(ok('value'))
+   * err(ok('value')).flatten(); // err(ok('value'))
+   * err(err('error')).flatten(); // err(err('error'))
+   * ok(ok(ok('value'))).flatten(); // ok(ok('value'))
+   * ok(ok(ok('value'))).flatten().flatten(); // ok('value')
+   */
+  flatten: () => EvaluateResultVariant<
+    TResultVariant,
+    {
+      ok: TValue extends AnyResult ? TValue : Ok<TValue>;
+      err: Err<TValue>;
+      async: ResultTernary<
+        TValue,
+        ValueFromOk<TValue> extends AnySyncResult
+          ? AsyncResult<ValueFromOk<TValue>>
+          : ValueFromOk<TValue> extends AnyResult
+            ? ValueFromOk<TValue>
+            : AsyncResult<Ok<ValueFromOk<TValue>>>,
+        AsyncResult<Err<ValueFromErr<TValue>>>
+      >;
+    }
+  >;
   /**
    * Maps a `Result<T, E>` to a `Result<U, E>` by applying a function to a contained `ok` value, leaving an `err` value untouched.
    *

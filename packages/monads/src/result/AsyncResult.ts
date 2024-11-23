@@ -145,16 +145,18 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
     ) as Return;
   }
 
-  // TODO flatten
-  // flatten(): AsyncResult<
-  //   IsOk<
-  //     TResult,
-  //     Value<TResult> extends AnyResult ? Value<TResult> : Ok<Value<TResult>>,
-  //     Err<Error<TResult>>
-  //   >
-  // > {
-  //   return new AsyncResult(this.then((res) => res.flatten()));
-  // }
+  flatten() {
+    type Return = ResultTernary<
+      TResult,
+      ValueFromOk<TResult> extends AnySyncResult
+        ? AsyncResult<ValueFromOk<TResult>>
+        : ValueFromOk<TResult> extends AnyResult
+          ? ValueFromOk<TResult>
+          : AsyncResult<Ok<ValueFromOk<TResult>>>,
+      AsyncResult<Err<ValueFromErr<TResult>>>
+    >;
+    return new AsyncResult(this.then((res) => res.flatten())) as Return;
+  }
 
   map<TMappedValue>(fn: (value: ValueFromOk<TResult>) => TMappedValue) {
     type Return = ResultTernary<

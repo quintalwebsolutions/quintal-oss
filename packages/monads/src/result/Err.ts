@@ -77,10 +77,9 @@ export class Err<TError> implements ResultDocs<TError, 'err'> {
     return some(this);
   }
 
-  // TODO flatten
-  // flatten(): Err<TError> {
-  //   return this;
-  // }
+  flatten() {
+    return this;
+  }
 
   map<TMappedValue>(_fn: (value: never) => TMappedValue) {
     return this;

@@ -30,13 +30,13 @@
   },
   "settings": {
     "search.exclude": {
-      "pnpm-lock.yaml": true,
-      "**/node_modules": true,
       "**/.coverage": true,
       "**/.coverage-ts": true,
       "**/.dist": true,
       "**/.next": true,
-      "**/.turbo": true
+      "**/.turbo": true,
+      "**/node_modules": true,
+      "pnpm-lock.yaml": true
     },
     "editor.defaultFormatter": "biomejs.biome",
     "editor.codeActionsOnSave": {

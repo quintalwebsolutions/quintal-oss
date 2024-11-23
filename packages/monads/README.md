@@ -17,7 +17,7 @@ A collection of monads (Result, Option) for TypeScript, inspired by [the Rust pr
 ## Features
 
 - 🛡️ Easy type-safe error- and empty-value handling,
-- 🦀 Implements all relevant utility methods from Rust,
+- 🦀 Implements all relevant stable utility methods from Rust,
 - ✅ CommonJS and ES Modules support,
 - 📖 Extensive documentation,
 - ⚖️ Super lightweight (only ~1kb gzipped),
@@ -29,6 +29,7 @@ A collection of monads (Result, Option) for TypeScript, inspired by [the Rust pr
 The following features are planned for future releases:
 
 - [x] Serialize and deserialize monads for API usage
+- [ ] Fully implement the Option monad (must be done before v1)
 - [ ] Find a nice way to emulate [Rust's question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-)
 - [ ] Write docs on [Rust's must-use property](https://doc.rust-lang.org/std/result/#results-must-be-used)
 
@@ -75,7 +76,7 @@ The type `Result<T, E>` is used for returning and propagating errors. It has the
 - `ok(value: T)`, representing success;
 - `err(error: E)`, representing error.
 
-Functions return `Result` whenever errors are expected and recoverable. It signifies that the absence of a return value is due to an error or an exceptional situation that the caller needs to handle specifically. For cases where having no value is expected, have a look at the `Option` type.
+Functions return `Result` whenever errors are expected and recoverable. It signifies that the absence of a return value is due to an error or an exceptional situation that the caller needs to handle specifically (e.g. database, network, or filesystem calls). For cases where having no value is expected, have a look at [the `Option` monad](#option).
 
 A simple function returning `Result` might be defined and used like so:
 
@@ -120,9 +121,9 @@ async function authenticateUser(
   username: string,
   password: string,
   // AsyncResult allows to handle async functions in a Result context
-): AsyncResult<User, AuthenticateUserError> {
+): AsyncResult<Result<User, AuthenticateUserError>> {
   // Wrap the dangerous db call with `asyncResult` to catch the error if it's thrown.
-  // `usersResult` is of type `AsyncResult<User[], unknown>`.
+  // `usersResult` is of type `AsyncResult<Result<User[], unknown>>`.
   const usersResult = asyncResult(() =>
     db
       .select()
@@ -132,7 +133,7 @@ async function authenticateUser(
 
   // If there was an error, log it and replace with our own error type.
   // If it was a success, this fuction will not run.
-  // `usersDbResult` is of type `AsyncResult<User[], AuthenticateUserError>`.
+  // `usersDbResult` is of type `AsyncResult<Result<User[], AuthenticateUserError>>`.
   const usersDbResult = usersResult.mapErr((error) => {
     console.error(error);
     // You can differentiate between different kinds of DB errors here
@@ -141,7 +142,7 @@ async function authenticateUser(
 
   // If it was a success, extract the unique user from the returned list of users.
   // If there was an error, this function will not run.
-  // `userResult` is of type `AsyncResult<User, AuthenticateUserError>`.
+  // `userResult` is of type `AsyncResult<Result<User, AuthenticateUserError>>`.
   const userResult = usersResult.andThen(getUniqueItem).mapErr((error) => {
     if (error === 'no-items') return AuthenticateUserError.UNKNOWN_USERNAME;
     if (error === 'too-many-items') return AuthenticateUserError.USER_NOT_UNIQUE;
@@ -174,7 +175,7 @@ enum AuthenticateUserError {
 async function authenticateUser(
   username: string,
   password: string,
-): AsyncResult<User, AuthenticateUserError> {
+): AsyncResult<Result<User, AuthenticateUserError>> {
   return asyncResult(() =>
       db.select().from(users).where({ username: eq(users.username, username) })
   )
@@ -201,13 +202,14 @@ async function authenticateUser(
 There are a few ways to initialize a `Result`, each with a different set of use cases:
 
 - The examples above use the `ok(value)` and `err(error)` utilities, which are aliases for the object instantiations `new Ok(value)` and `new Err(error)`. These functions are used in the cases when you know what the result is when creating it.
-- The same use case counts for the `asyncOk(value)` and `asyncErr(error)` utilities, which are `ok(value)` and `err(error)`'s async counterparts, acting as aliases for easily creating `AsyncResult` objects.
-- If you are unsure that an external function you're using might throw an error, you can use the `resultFromThrowable(() => value)` or `asyncResultFromThrowable(() => Promise.resolve(value))` functions. These functions return a `Result` with as value type the return type of the function, and as error type `unknown`, in case it unexpectedly throws an error.
+- The same use case counts for the `asyncOk(value)` and `asyncErr(error)` utilities, which are `ok(value)` and `err(error)`'s async counterparts, acting as aliases for easily creating `AsyncResult` instances.
+- If you are unsure that an external function you're using might throw an error, you can use the `resultFromThrowable(() => value)` or `asyncResultFromThrowable(async () => value)` functions. These functions return a `Result` with the return type of the function as value, and `unknown` as the error type, just in case it unexpectedly throws an error while executing.
 - If you have serialized a `Result` and want to deserialize it, you can use `resultFromSerialized` or `asyncResultFromSerialized`.
+- If you have a set of results you'd like to combine into one, use the `resultFromResults(resultA, resultB, ...)` utility function. This either returns a result with an array of all given result values, or the first encountered error.
 
 ### Method Overview
 
-`Result` comes with a wide variety of convenience methods that make working with it more succinct.
+`Result` provides a wide variety of convenience methods that make working with it more succinct.
 
 #### Querying the contained value
 
@@ -252,7 +254,7 @@ These methods treat the `Result` as a boolean value, where `ok` acts like `true`
 Because we are not actually working with Rust, we are missing some essential syntax to work with the `Result` monad. These methods attempt to emulate some of this syntax.
 
 - `match` allows you to pattern match on both variants of a `Result`.
-- `serialize` reduces the `Result` class to a simple object literal.
+- `serialize` reduces the `Result` object to a simple, type-safe object literal.
 
 > If you have an idea on how to approach emulating Rust's [question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-), [if let syntax](https://doc.rust-lang.org/rust-by-example/flow_control/if_let.html), or other Rust language features that are not easily achieved in Typescript, feel free to [open an issue](https://github.com/quintalwebsolutions/quintal-oss/issues/new).
 
@@ -265,7 +267,7 @@ The type `Option<T>` represents an optional value. It has the following variants
 - `some(value: T)`, representing the presence of a value;
 - `none`, representing the absence of a value.
 
-Functions return `Option` whenever the absence of a value is a normal, expected part of the function's behaviour (e.g. initial values, optional function parameters, return values for functions that are not defined over their entire input range). It signifies that having no value is a routine possibility, not necessarily a problem or error. For those cases, have a look at the `Result` type.
+Functions return `Option` whenever the absence of a value is a normal, expected part of the function's behaviour (e.g. initial values, optional function parameters, return values for functions that are not defined over their entire input range). It signifies that having no value is a routine possibility, not necessarily a problem or error. For those cases, have a look at [the `Result` monad](#result).
 
 A simple function returning `Option` might be defined like so:
 
@@ -288,7 +290,7 @@ const message = safeDivide(10, 0).match({
 
 ### Method Overview
 
-`Option` comes with a wide variety of convenience methods that make working with it more succinct.
+`Option` provides a wide variety of convenience methods that make working with it more succinct.
 
 #### Querying the contained value
 
@@ -331,9 +333,10 @@ These methods treat the `Option` as a boolean value, where `some` acts like `tru
 Because we are not actually working with Rust, we are missing some essential syntax to work with the `Option` monad. These methods attempt to emulate some of this syntax.
 
 - `match` allows you to pattern match on both variants of an `Option`.
+- `serialize` reduces the `Option` object to a simple, type-safe object literal.
 
 > If you have an idea on how to approach emulating Rust's [question mark syntax](https://doc.rust-lang.org/std/option/#the-question-mark-operator-), [if let syntax](https://doc.rust-lang.org/rust-by-example/flow_control/if_let.html), or other Rust language features that are not easily achieved in Typescript, feel free to [open an issue](https://github.com/quintalwebsolutions/quintal-oss/issues/new).
 
 ## Acknowledgement
 
-Though this is not a fork, my implementation draws prior work from [Sniptt's `monads` package](https://github.com/sniptt-official/monads/) and [Supermacro's `neverthrow` package](https://github.com/supermacro/neverthrow/). I was very inspired by their work and the issues the community filed to these repositories.
+Though it is not a fork, this implementation draws prior work from [Sniptt's `monads` package](https://github.com/sniptt-official/monads/) and [Supermacro's `neverthrow` package](https://github.com/supermacro/neverthrow/). I was very inspired by their work and the issues the community filed to these repositories.

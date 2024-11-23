@@ -1,7 +1,7 @@
-export type Ternary<TCondition extends boolean, TTrue, TFalse> = TCondition extends true
+export type Ternary<TPredicate extends boolean, TTrue, TFalse> = TPredicate extends true
   ? TTrue
   : TFalse;
 
 export type MaybePromise<TValue> = TValue | Promise<TValue>;
 
-export type InferredValue = string | number | boolean;
+export type SimpleValue = string | number | boolean;

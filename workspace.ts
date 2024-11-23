@@ -101,7 +101,7 @@ export const workspace: Workspace = {
       keywords: ['monads', 'monad', 'result', 'option', 'error', 'null'],
       features: [
         { icon: '🛡️', text: 'Easy type-safe error- and empty-value handling' },
-        { icon: '🦀', text: 'Implements all relevant utility methods from Rust' },
+        { icon: '🦀', text: 'Implements all relevant stable utility methods from Rust' },
         { icon: '✅', text: 'CommonJS and ES Modules support' },
         { icon: '📖', text: 'Extensive documentation' },
         { icon: '⚖️', text: 'Super lightweight (only ~1kb gzipped)' },
@@ -110,6 +110,7 @@ export const workspace: Workspace = {
       ],
       roadmap: [
         { checked: true, text: 'Serialize and deserialize monads for API usage' },
+        { text: 'Fully implement the Option monad (must be done before v1)' },
         {
           text: "Find a nice way to emulate [Rust's question mark syntax](https://doc.rust-lang.org/std/result/#the-question-mark-operator-)",
         },

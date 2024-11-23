@@ -18,12 +18,8 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "paths": {
-      "@": [
-        "${configDir}/src"
-      ],
-      "@/*": [
-        "${configDir}/src/*"
-      ]
+      "@": ["${configDir}/src"],
+      "@/*": ["${configDir}/src/*"]
     },
     "resolveJsonModule": true,
     "rootDir": "${configDir}",
@@ -44,10 +40,7 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "lib": [
-      "DOM",
-      "ES6"
-    ],
+    "lib": ["DOM", "ES6"],
     "target": "ES6",
     "useDefineForClassFields": true,
     "composite": false,
@@ -55,16 +48,13 @@
     "skipLibCheck": true,
     "preserveWatchOutput": true
   },
-  "include": [
-    "${configDir}/**/*.ts",
-    "${configDir}/**/*.tsx",
-  ],
+  "include": ["${configDir}/**/*.ts", "${configDir}/**/*.tsx"],
   "exclude": [
     "${configDir}/.coverage",
     "${configDir}/.coverage-ts",
     "${configDir}/.dist",
     "${configDir}/.turbo",
     "${configDir}/dist",
-    "${configDir}/node_modules",
+    "${configDir}/node_modules"
   ]
 }

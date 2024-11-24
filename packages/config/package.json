@@ -1,6 +1,6 @@
 {
   "name": "@quintal/config",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "license": "MIT",
   "description": "The solution to the infamous [Node.JS Config Hell Problem](https://deno.com/blog/node-config-hell)",
   "keywords": [

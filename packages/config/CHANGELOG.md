@@ -1,5 +1,15 @@
 # @quintal/config
 
+## 0.3.0
+
+### Minor Changes
+
+- e290a5c: Add nextjs.ts config file
+
+### Patch Changes
+
+- e290a5c: Chore: bump dependencies and update config files
+
 ## 0.2.2
 
 ### Patch Changes

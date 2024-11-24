@@ -18,6 +18,7 @@
     "baseUrl": "${configDir}",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "target": "ESNext",
     "paths": {
       "@": ["${configDir}/src"],
       "@/*": ["${configDir}/src/*"]

@@ -83,7 +83,7 @@
   },
   "overrides": [
     {
-      "include": ["vite.config.mjs", "nextjs.ts"],
+      "include": ["vite.config.mjs"],
       "linter": {
         "rules": {
           "style": {

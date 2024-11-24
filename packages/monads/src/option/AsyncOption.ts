@@ -1,5 +1,5 @@
-import type { OptionDocs } from './OptionDocs';
-import type { AnySyncOption, OptionTernary, ValueFromSome } from './types';
+import type { OptionDocs } from './OptionDocs.ts';
+import type { AnySyncOption, OptionTernary, ValueFromSome } from './types.ts';
 
 export class AsyncOption<TOption extends AnySyncOption> implements OptionDocs<TOption, 'async'> {
   protected _promise: Promise<TOption>;

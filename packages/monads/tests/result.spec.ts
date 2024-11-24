@@ -28,9 +28,9 @@ import {
   resultFromSerialized,
   resultFromThrowable,
   some,
-} from '../src';
-import type { Ternary } from '../src/util';
-import type { And, Equal } from './util';
+} from '../src/index.ts';
+import type { Ternary } from '../src/util.ts';
+import type { And, Equal } from './util.ts';
 
 const error = new Error('error');
 
@@ -106,7 +106,9 @@ function eu<TResult extends AnyResult>(result: TResult) {
       >,
       unwrappedValue: TUnwrap | TUnwrapErr,
     ) => {
+      // biome-ignore lint/suspicious/noMisplacedAssertion: this is a nested assertion
       if (isOk) expect(result.unwrap()).toStrictEqual(unwrappedValue);
+      // biome-ignore lint/suspicious/noMisplacedAssertion: this is a nested assertion
       else expect(result.unwrapErr()).toStrictEqual(unwrappedValue);
     },
   };
@@ -126,7 +128,9 @@ function eua<TResult extends AnyResult>(result: TResult) {
       >,
       unwrappedValue: Awaited<TUnwrap | TUnwrapErr>,
     ) => {
+      // biome-ignore lint/suspicious/noMisplacedAssertion: this is a nested assertion
       if (isOk) await expect(result.unwrap()).resolves.toStrictEqual(unwrappedValue);
+      // biome-ignore lint/suspicious/noMisplacedAssertion: this is a nested assertion
       else await expect(result.unwrapErr()).resolves.toStrictEqual(unwrappedValue);
     },
   };

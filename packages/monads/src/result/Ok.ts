@@ -6,16 +6,22 @@ import {
   type None,
   type Some,
   isAnyAsyncOption,
-  isAnyResult,
   isAnySyncOption,
   none,
   some,
-} from '..';
-import type { MaybePromise } from '../util';
-import { AsyncResult } from './AsyncResult';
-import type { ResultDocs } from './ResultDocs';
-import { ok } from './constructors';
-import type { AnyResult, AnySyncResult, AsyncOk, ResultMatch, SerializedOk } from './types';
+} from '../option/index.ts';
+import type { MaybePromise } from '../util.ts';
+import { AsyncResult } from './AsyncResult.ts';
+import type { ResultDocs } from './ResultDocs.ts';
+import { ok } from './constructors.ts';
+import {
+  type AnyResult,
+  type AnySyncResult,
+  type AsyncOk,
+  type ResultMatch,
+  type SerializedOk,
+  isAnyResult,
+} from './types.ts';
 
 export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
   private _value: TValue;

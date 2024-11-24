@@ -1,9 +1,9 @@
-import { none, some } from '..';
-import type { MaybePromise } from '../util';
-import { AsyncResult } from './AsyncResult';
-import type { ResultDocs } from './ResultDocs';
-import { err } from './constructors';
-import type { AnyResult, AnySyncResult, AsyncErr, ResultMatch, SerializedErr } from './types';
+import { none, some } from '../option/index.ts';
+import type { MaybePromise } from '../util.ts';
+import { AsyncResult } from './AsyncResult.ts';
+import type { ResultDocs } from './ResultDocs.ts';
+import { err } from './constructors.ts';
+import type { AnyResult, AnySyncResult, AsyncErr, ResultMatch, SerializedErr } from './types.ts';
 
 export class Err<TError> implements ResultDocs<TError, 'err'> {
   private _error: TError;

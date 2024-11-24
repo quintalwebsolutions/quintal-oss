@@ -26,6 +26,7 @@
     "rootDir": "${configDir}",
 
     "emitDeclarationOnly": true,
+    "declaration": true,
     "outDir": "${configDir}/.dist",
 
     "allowSyntheticDefaultImports": true,

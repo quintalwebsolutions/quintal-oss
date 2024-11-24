@@ -1,6 +1,6 @@
-import { AsyncOption } from './AsyncOption';
-import { None } from './None';
-import { Some } from './Some';
+import { AsyncOption } from './AsyncOption.ts';
+import { None } from './None.ts';
+import { Some } from './Some.ts';
 
 export type Option<TValue> = Some<TValue> | None;
 export type AsyncSome<TValue> = AsyncOption<Some<TValue>>;

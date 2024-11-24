@@ -1,7 +1,7 @@
-export { AsyncOption } from './AsyncOption';
-export { asyncNone, asyncSome, none, some } from './constructors';
-export { None } from './None';
-export { Some } from './Some';
+export { AsyncOption } from './AsyncOption.ts';
+export { asyncNone, asyncSome, none, some } from './constructors.ts';
+export { None } from './None.ts';
+export { Some } from './Some.ts';
 export type {
   AnyAsyncOption,
   AnyAsyncSome,
@@ -16,5 +16,5 @@ export type {
   SerializedOption,
   SerializedSome,
   ValueFromSome,
-} from './types';
-export { isAnyAsyncOption, isAnyOption, isAnySyncOption } from './types';
+} from './types.ts';
+export { isAnyAsyncOption, isAnyOption, isAnySyncOption } from './types.ts';

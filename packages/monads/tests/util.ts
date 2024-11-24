@@ -1,4 +1,4 @@
-import type { Ternary } from '../src/util';
+import type { Ternary } from '../src/util.ts';
 
 // Source https://www.totaltypescript.com/how-to-test-your-types
 export type Equal<TValue1, TValue2> = (<TValue>() => TValue extends TValue1 ? 1 : 2) extends <

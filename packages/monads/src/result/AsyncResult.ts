@@ -8,12 +8,12 @@ import {
   type Some,
   isAnyOption,
   some,
-} from '../option';
-import type { MaybePromise } from '../util';
-import type { Err } from './Err';
-import type { Ok } from './Ok';
-import type { ResultDocs } from './ResultDocs';
-import { ok } from './constructors';
+} from '../option/index.ts';
+import type { MaybePromise } from '../util.ts';
+import type { Err } from './Err.ts';
+import type { Ok } from './Ok.ts';
+import type { ResultDocs } from './ResultDocs.ts';
+import { ok } from './constructors.ts';
 import type {
   AnyResult,
   AnySyncResult,
@@ -25,7 +25,7 @@ import type {
   SerializedOk,
   ValueFromErr,
   ValueFromOk,
-} from './types';
+} from './types.ts';
 
 export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TResult, 'async'> {
   private _promise: Promise<TResult>;

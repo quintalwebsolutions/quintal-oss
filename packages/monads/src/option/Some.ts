@@ -1,4 +1,4 @@
-import type { OptionDocs } from './OptionDocs';
+import type { OptionDocs } from './OptionDocs.ts';
 
 export class Some<TValue> implements OptionDocs<TValue, 'some'> {
   protected _value: TValue;

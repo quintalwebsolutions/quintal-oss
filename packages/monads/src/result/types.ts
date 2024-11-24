@@ -1,7 +1,7 @@
-import type { Ternary } from '../util';
-import { AsyncResult } from './AsyncResult';
-import { Err } from './Err';
-import { Ok } from './Ok';
+import type { Ternary } from '../util.ts';
+import { AsyncResult } from './AsyncResult.ts';
+import { Err } from './Err.ts';
+import { Ok } from './Ok.ts';
 
 export type Result<TValue, TError> = Ok<TValue> | Err<TError>;
 export type AsyncOk<TValue> = AsyncResult<Ok<TValue>>;

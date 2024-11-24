@@ -21,7 +21,8 @@
     "rules": {
       "all": true,
       "correctness": {
-        "noNodejsModules": "off"
+        "noNodejsModules": "off",
+        "noUndeclaredDependencies": "off"
       },
       "performance": {
         "noBarrelFile": "off"
@@ -82,7 +83,7 @@
   },
   "overrides": [
     {
-      "include": ["vite.config.mjs"],
+      "include": ["vite.config.mjs", "nextjs.ts"],
       "linter": {
         "rules": {
           "style": {

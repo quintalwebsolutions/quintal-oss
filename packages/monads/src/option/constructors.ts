@@ -1,7 +1,7 @@
-import { AsyncOption } from './AsyncOption';
-import { None } from './None';
-import { Some } from './Some';
-import type { AsyncSome } from './types';
+import { AsyncOption } from './AsyncOption.ts';
+import { None } from './None.ts';
+import { Some } from './Some.ts';
+import type { AsyncSome } from './types.ts';
 
 type InferredOptionValue = string | number | boolean;
 

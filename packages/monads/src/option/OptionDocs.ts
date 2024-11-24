@@ -1,4 +1,4 @@
-import type { OptionTernary, ValueFromSome } from './types';
+import type { OptionTernary, ValueFromSome } from './types.ts';
 
 type OptionVariant = 'some' | 'none' | 'async';
 

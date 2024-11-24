@@ -1,7 +1,7 @@
-import type { SimpleValue } from '../util';
-import { AsyncResult } from './AsyncResult';
-import { Err } from './Err';
-import { Ok } from './Ok';
+import type { SimpleValue } from '../util.ts';
+import { AsyncResult } from './AsyncResult.ts';
+import { Err } from './Err.ts';
+import { Ok } from './Ok.ts';
 import {
   type AnyResult,
   type AnySerializedResult,
@@ -11,7 +11,7 @@ import {
   type ResultFromResults,
   type ResultFromSerialized,
   isAnyAsyncResult,
-} from './types';
+} from './types.ts';
 
 /** Utility function to create an `Ok<TValue>` result */
 export function ok<TValue extends SimpleValue>(value: TValue): Ok<TValue>;

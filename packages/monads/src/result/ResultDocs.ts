@@ -1,7 +1,8 @@
-import type { AnyOption, AsyncNone, AsyncResult, AsyncSome, None, Some } from '..';
-import type { MaybePromise } from '../util';
-import type { Err } from './Err';
-import type { Ok } from './Ok';
+import type { AnyOption, AsyncNone, AsyncSome, None, Some } from '../option/index.ts';
+import type { MaybePromise } from '../util.ts';
+import type { AsyncResult } from './AsyncResult.ts';
+import type { Err } from './Err.ts';
+import type { Ok } from './Ok.ts';
 import type {
   AnyResult,
   AnySyncResult,
@@ -13,7 +14,7 @@ import type {
   SerializedOk,
   ValueFromErr,
   ValueFromOk,
-} from './types';
+} from './types.ts';
 
 type ResultVariant = 'ok' | 'err' | 'async';
 

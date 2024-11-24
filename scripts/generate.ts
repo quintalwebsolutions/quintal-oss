@@ -361,11 +361,8 @@ async function makePackageTsConfig(packageDir: string): Promise<void> {
     [
       '{',
       '  "extends": "@quintal/config/tsconfig/base.json",',
-      '  "compilerOptions": {',
-      '    "rootDir": "."',
-      '  },',
-      '  "include": ["**/*.ts", "**/*.tsx"],',
-      `  "exclude": [${ignoreDirs.map((d) => `"${d}"`).join(', ')}]`,
+      // TODO while @microsoft/api-extractor does not support the tsconfig configDir template literal, we need to add this line
+      '  "include": ["**/*.ts", "**/*.tsx"]',
       '}',
       '',
     ],

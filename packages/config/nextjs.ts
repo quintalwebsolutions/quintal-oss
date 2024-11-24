@@ -1,9 +1,6 @@
-// @ts-check
+import type { NextConfig } from 'next';
 
-/**
- * @type {import('next').NextConfig}
- */
-const nextConfig = {
+export const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [
@@ -18,5 +15,3 @@ const nextConfig = {
     ],
   },
 };
-
-module.exports = nextConfig;

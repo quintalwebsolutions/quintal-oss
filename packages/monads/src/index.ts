@@ -22,7 +22,7 @@ export {
   isAnySyncOption,
   none,
   some,
-} from './option';
+} from './option/index.ts';
 export {
   type AnyAsyncErr,
   type AnyAsyncOk,
@@ -55,4 +55,4 @@ export {
   resultFromResults,
   resultFromSerialized,
   resultFromThrowable,
-} from './result';
+} from './result/index.ts';

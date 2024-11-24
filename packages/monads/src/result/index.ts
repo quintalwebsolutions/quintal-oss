@@ -1,4 +1,4 @@
-export { AsyncResult } from './AsyncResult';
+export { AsyncResult } from './AsyncResult.ts';
 export {
   asyncErr,
   asyncOk,
@@ -9,9 +9,9 @@ export {
   resultFromResults,
   resultFromSerialized,
   resultFromThrowable,
-} from './constructors';
-export { Err } from './Err';
-export { Ok } from './Ok';
+} from './constructors.ts';
+export { Err } from './Err.ts';
+export { Ok } from './Ok.ts';
 export type {
   AnyAsyncErr,
   AnyAsyncOk,
@@ -29,5 +29,5 @@ export type {
   SerializedResult,
   ValueFromErr,
   ValueFromOk,
-} from './types';
-export { isAnyAsyncResult, isAnyResult, isAnySyncResult } from './types';
+} from './types.ts';
+export { isAnyAsyncResult, isAnyResult, isAnySyncResult } from './types.ts';

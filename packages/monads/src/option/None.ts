@@ -1,4 +1,4 @@
-import type { OptionDocs } from './OptionDocs';
+import type { OptionDocs } from './OptionDocs.ts';
 
 export class None implements OptionDocs<never, 'none'> {
   get isSome() {

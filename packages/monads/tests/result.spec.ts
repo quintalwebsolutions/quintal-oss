@@ -28,9 +28,9 @@ import {
   resultFromSerialized,
   resultFromThrowable,
   some,
-} from '../src';
-import type { Ternary } from '../src/util';
-import type { And, Equal } from './util';
+} from '../src/index.ts';
+import type { Ternary } from '../src/util.ts';
+import type { And, Equal } from './util.ts';
 
 const error = new Error('error');
 
@@ -106,7 +106,9 @@ function eu<TResult extends AnyResult>(result: TResult) {
       >,
       unwrappedValue: TUnwrap | TUnwrapErr,
     ) => {
+      // biome-ignore lint/suspicious/noMisplacedAssertion: this is a nested assertion
       if (isOk) expect(result.unwrap()).toStrictEqual(unwrappedValue);
+      // biome-ignore lint/suspicious/noMisplacedAssertion: this is a nested assertion
       else expect(result.unwrapErr()).toStrictEqual(unwrappedValue);
     },
   };
@@ -126,7 +128,9 @@ function eua<TResult extends AnyResult>(result: TResult) {
       >,
       unwrappedValue: Awaited<TUnwrap | TUnwrapErr>,
     ) => {
+      // biome-ignore lint/suspicious/noMisplacedAssertion: this is a nested assertion
       if (isOk) await expect(result.unwrap()).resolves.toStrictEqual(unwrappedValue);
+      // biome-ignore lint/suspicious/noMisplacedAssertion: this is a nested assertion
       else await expect(result.unwrapErr()).resolves.toStrictEqual(unwrappedValue);
     },
   };
@@ -393,7 +397,7 @@ describe('Result', () => {
     >(false, 'e1');
   });
 
-  test('isOk', () => {
+  test('isOk', async () => {
     expectTypeOf(okVal.isOk).toEqualTypeOf<true>();
     expect(okVal.isOk).toBe(true);
 
@@ -406,20 +410,20 @@ describe('Result', () => {
     expectTypeOf(errResVal.isOk).toEqualTypeOf<boolean>();
     expect(errResVal.isOk).toBe(false);
 
-    expectTypeOf(asyncOkVal.isOk).toEqualTypeOf<Promise<true>>();
-    expect(asyncOkVal.isOk).resolves.toBe(true);
+    expectTypeOf(asyncOkVal.isOk).toEqualTypeOf<P<true>>();
+    await expect(asyncOkVal.isOk).resolves.toBe(true);
 
-    expectTypeOf(asyncErrVal.isOk).toEqualTypeOf<Promise<false>>();
-    expect(asyncErrVal.isOk).resolves.toBe(false);
+    expectTypeOf(asyncErrVal.isOk).toEqualTypeOf<P<false>>();
+    await expect(asyncErrVal.isOk).resolves.toBe(false);
 
-    expectTypeOf(asyncOkResVal.isOk).toEqualTypeOf<Promise<boolean>>();
-    expect(asyncOkResVal.isOk).resolves.toBe(true);
+    expectTypeOf(asyncOkResVal.isOk).toEqualTypeOf<P<boolean>>();
+    await expect(asyncOkResVal.isOk).resolves.toBe(true);
 
-    expectTypeOf(asyncErrResVal.isOk).toEqualTypeOf<Promise<boolean>>();
-    expect(asyncErrResVal.isOk).resolves.toBe(false);
+    expectTypeOf(asyncErrResVal.isOk).toEqualTypeOf<P<boolean>>();
+    await expect(asyncErrResVal.isOk).resolves.toBe(false);
   });
 
-  test('isErr', () => {
+  test('isErr', async () => {
     expectTypeOf(okVal.isErr).toEqualTypeOf<false>();
     expect(okVal.isErr).toBe(false);
 
@@ -432,17 +436,17 @@ describe('Result', () => {
     expectTypeOf(errResVal.isErr).toEqualTypeOf<boolean>();
     expect(errResVal.isErr).toBe(true);
 
-    expectTypeOf(asyncOkVal.isErr).toEqualTypeOf<Promise<false>>();
-    expect(asyncOkVal.isErr).resolves.toBe(false);
+    expectTypeOf(asyncOkVal.isErr).toEqualTypeOf<P<false>>();
+    await expect(asyncOkVal.isErr).resolves.toBe(false);
 
-    expectTypeOf(asyncErrVal.isErr).toEqualTypeOf<Promise<true>>();
-    expect(asyncErrVal.isErr).resolves.toBe(true);
+    expectTypeOf(asyncErrVal.isErr).toEqualTypeOf<P<true>>();
+    await expect(asyncErrVal.isErr).resolves.toBe(true);
 
-    expectTypeOf(asyncOkResVal.isErr).toEqualTypeOf<Promise<boolean>>();
-    expect(asyncOkResVal.isErr).resolves.toBe(false);
+    expectTypeOf(asyncOkResVal.isErr).toEqualTypeOf<P<boolean>>();
+    await expect(asyncOkResVal.isErr).resolves.toBe(false);
 
-    expectTypeOf(asyncErrResVal.isErr).toEqualTypeOf<Promise<boolean>>();
-    expect(asyncErrResVal.isErr).resolves.toBe(true);
+    expectTypeOf(asyncErrResVal.isErr).toEqualTypeOf<P<boolean>>();
+    await expect(asyncErrResVal.isErr).resolves.toBe(true);
   });
 
   test('isOkAnd', async () => {
@@ -450,9 +454,9 @@ describe('Result', () => {
     expect(okVal.isOkAnd(pTrue)).toBe(true);
     expectTypeOf(okVal.isOkAnd(pFalse)).toEqualTypeOf<false>();
     expect(okVal.isOkAnd(pFalse)).toBe(false);
-    expectTypeOf(okVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<Promise<true>>();
+    expectTypeOf(okVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<P<true>>();
     await expect(okVal.isOkAnd(pAsyncTrue)).resolves.toBe(true);
-    expectTypeOf(okVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(okVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<P<false>>();
     await expect(okVal.isOkAnd(pAsyncFalse)).resolves.toBe(false);
 
     expectTypeOf(errVal.isOkAnd(pTrue)).toEqualTypeOf<false>();
@@ -468,54 +472,54 @@ describe('Result', () => {
     expect(okResVal.isOkAnd(pTrue)).toBe(true);
     expectTypeOf(okResVal.isOkAnd(pFalse)).toEqualTypeOf<false>();
     expect(okResVal.isOkAnd(pFalse)).toBe(false);
-    expectTypeOf(okResVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<false | Promise<true>>();
+    expectTypeOf(okResVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<false | P<true>>();
     await expect(okResVal.isOkAnd(pAsyncTrue)).resolves.toBe(true);
-    expectTypeOf(okResVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<false | Promise<false>>();
+    expectTypeOf(okResVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<false | P<false>>();
     await expect(okResVal.isOkAnd(pAsyncFalse)).resolves.toBe(false);
 
     expectTypeOf(errResVal.isOkAnd(pTrue)).toEqualTypeOf<boolean>();
     expect(errResVal.isOkAnd(pTrue)).toBe(false);
     expectTypeOf(errResVal.isOkAnd(pFalse)).toEqualTypeOf<false>();
     expect(errResVal.isOkAnd(pFalse)).toBe(false);
-    expectTypeOf(errResVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<false | Promise<true>>();
+    expectTypeOf(errResVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<false | P<true>>();
     expect(errResVal.isOkAnd(pAsyncTrue)).toBe(false);
-    expectTypeOf(errResVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<false | Promise<false>>();
+    expectTypeOf(errResVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<false | P<false>>();
     expect(errResVal.isOkAnd(pAsyncFalse)).toBe(false);
 
-    expectTypeOf(asyncOkVal.isOkAnd(pTrue)).toEqualTypeOf<Promise<true>>();
+    expectTypeOf(asyncOkVal.isOkAnd(pTrue)).toEqualTypeOf<P<true>>();
     await expect(asyncOkVal.isOkAnd(pTrue)).resolves.toBe(true);
-    expectTypeOf(asyncOkVal.isOkAnd(pFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncOkVal.isOkAnd(pFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncOkVal.isOkAnd(pFalse)).resolves.toBe(false);
-    expectTypeOf(asyncOkVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<Promise<true>>();
+    expectTypeOf(asyncOkVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<P<true>>();
     await expect(asyncOkVal.isOkAnd(pAsyncTrue)).resolves.toBe(true);
-    expectTypeOf(asyncOkVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncOkVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncOkVal.isOkAnd(pAsyncFalse)).resolves.toBe(false);
 
-    expectTypeOf(asyncErrVal.isOkAnd(pTrue)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncErrVal.isOkAnd(pTrue)).toEqualTypeOf<P<false>>();
     await expect(asyncErrVal.isOkAnd(pTrue)).resolves.toBe(false);
-    expectTypeOf(asyncErrVal.isOkAnd(pFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncErrVal.isOkAnd(pFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncErrVal.isOkAnd(pFalse)).resolves.toBe(false);
-    expectTypeOf(asyncErrVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncErrVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<P<false>>();
     await expect(asyncErrVal.isOkAnd(pAsyncTrue)).resolves.toBe(false);
-    expectTypeOf(asyncErrVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncErrVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncErrVal.isOkAnd(pAsyncFalse)).resolves.toBe(false);
 
-    expectTypeOf(asyncOkResVal.isOkAnd(pTrue)).toEqualTypeOf<Promise<boolean>>();
+    expectTypeOf(asyncOkResVal.isOkAnd(pTrue)).toEqualTypeOf<P<boolean>>();
     await expect(asyncOkResVal.isOkAnd(pTrue)).resolves.toBe(true);
-    expectTypeOf(asyncOkResVal.isOkAnd(pFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncOkResVal.isOkAnd(pFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncOkResVal.isOkAnd(pFalse)).resolves.toBe(false);
-    expectTypeOf(asyncOkResVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<Promise<boolean>>();
+    expectTypeOf(asyncOkResVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<P<boolean>>();
     await expect(asyncOkResVal.isOkAnd(pAsyncTrue)).resolves.toBe(true);
-    expectTypeOf(asyncOkResVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncOkResVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncOkResVal.isOkAnd(pAsyncFalse)).resolves.toBe(false);
 
-    expectTypeOf(asyncErrResVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<Promise<boolean>>();
+    expectTypeOf(asyncErrResVal.isOkAnd(pAsyncTrue)).toEqualTypeOf<P<boolean>>();
     await expect(asyncErrResVal.isOkAnd(pAsyncTrue)).resolves.toBe(false);
-    expectTypeOf(asyncErrResVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncErrResVal.isOkAnd(pAsyncFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncErrResVal.isOkAnd(pAsyncFalse)).resolves.toBe(false);
-    expectTypeOf(asyncErrResVal.isOkAnd(pTrue)).toEqualTypeOf<Promise<boolean>>();
+    expectTypeOf(asyncErrResVal.isOkAnd(pTrue)).toEqualTypeOf<P<boolean>>();
     await expect(asyncErrResVal.isOkAnd(pTrue)).resolves.toBe(false);
-    expectTypeOf(asyncErrResVal.isOkAnd(pFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncErrResVal.isOkAnd(pFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncErrResVal.isOkAnd(pFalse)).resolves.toBe(false);
   });
 
@@ -533,63 +537,63 @@ describe('Result', () => {
     expect(errVal.isErrAnd(pTrue)).toBe(true);
     expectTypeOf(errVal.isErrAnd(pFalse)).toEqualTypeOf<false>();
     expect(errVal.isErrAnd(pFalse)).toBe(false);
-    expectTypeOf(errVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<Promise<true>>();
+    expectTypeOf(errVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<P<true>>();
     await expect(errVal.isErrAnd(pAsyncTrue)).resolves.toBe(true);
-    expectTypeOf(errVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(errVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<P<false>>();
     await expect(errVal.isErrAnd(pAsyncFalse)).resolves.toBe(false);
 
     expectTypeOf(okResVal.isErrAnd(pTrue)).toEqualTypeOf<boolean>();
     expect(okResVal.isErrAnd(pTrue)).toBe(false);
     expectTypeOf(okResVal.isErrAnd(pFalse)).toEqualTypeOf<false>();
     expect(okResVal.isErrAnd(pFalse)).toBe(false);
-    expectTypeOf(okResVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<false | Promise<true>>();
+    expectTypeOf(okResVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<false | P<true>>();
     expect(okResVal.isErrAnd(pAsyncTrue)).toBe(false);
-    expectTypeOf(okResVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<false | Promise<false>>();
+    expectTypeOf(okResVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<false | P<false>>();
     expect(okResVal.isErrAnd(pAsyncFalse)).toBe(false);
 
     expectTypeOf(errResVal.isErrAnd(pTrue)).toEqualTypeOf<boolean>();
     expect(errResVal.isErrAnd(pTrue)).toBe(true);
     expectTypeOf(errResVal.isErrAnd(pFalse)).toEqualTypeOf<false>();
     expect(errResVal.isErrAnd(pFalse)).toBe(false);
-    expectTypeOf(errResVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<false | Promise<true>>();
+    expectTypeOf(errResVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<false | P<true>>();
     await expect(errResVal.isErrAnd(pAsyncTrue)).resolves.toBe(true);
-    expectTypeOf(errResVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<false | Promise<false>>();
+    expectTypeOf(errResVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<false | P<false>>();
     await expect(errResVal.isErrAnd(pAsyncFalse)).resolves.toBe(false);
 
-    expectTypeOf(asyncOkVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncOkVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<P<false>>();
     await expect(asyncOkVal.isErrAnd(pAsyncTrue)).resolves.toBe(false);
-    expectTypeOf(asyncOkVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncOkVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncOkVal.isErrAnd(pAsyncFalse)).resolves.toBe(false);
-    expectTypeOf(asyncOkVal.isErrAnd(pTrue)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncOkVal.isErrAnd(pTrue)).toEqualTypeOf<P<false>>();
     await expect(asyncOkVal.isErrAnd(pTrue)).resolves.toBe(false);
-    expectTypeOf(asyncOkVal.isErrAnd(pFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncOkVal.isErrAnd(pFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncOkVal.isErrAnd(pFalse)).resolves.toBe(false);
 
-    expectTypeOf(asyncErrVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<Promise<true>>();
+    expectTypeOf(asyncErrVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<P<true>>();
     await expect(asyncErrVal.isErrAnd(pAsyncTrue)).resolves.toBe(true);
-    expectTypeOf(asyncErrVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncErrVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncErrVal.isErrAnd(pAsyncFalse)).resolves.toBe(false);
-    expectTypeOf(asyncErrVal.isErrAnd(pTrue)).toEqualTypeOf<Promise<true>>();
+    expectTypeOf(asyncErrVal.isErrAnd(pTrue)).toEqualTypeOf<P<true>>();
     await expect(asyncErrVal.isErrAnd(pTrue)).resolves.toBe(true);
-    expectTypeOf(asyncErrVal.isErrAnd(pFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncErrVal.isErrAnd(pFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncErrVal.isErrAnd(pFalse)).resolves.toBe(false);
 
-    expectTypeOf(asyncOkResVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<Promise<boolean>>();
+    expectTypeOf(asyncOkResVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<P<boolean>>();
     await expect(asyncOkResVal.isErrAnd(pAsyncTrue)).resolves.toBe(false);
-    expectTypeOf(asyncOkResVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncOkResVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncOkResVal.isErrAnd(pAsyncFalse)).resolves.toBe(false);
-    expectTypeOf(asyncOkResVal.isErrAnd(pTrue)).toEqualTypeOf<Promise<boolean>>();
+    expectTypeOf(asyncOkResVal.isErrAnd(pTrue)).toEqualTypeOf<P<boolean>>();
     await expect(asyncOkResVal.isErrAnd(pTrue)).resolves.toBe(false);
-    expectTypeOf(asyncOkResVal.isErrAnd(pFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncOkResVal.isErrAnd(pFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncOkResVal.isErrAnd(pFalse)).resolves.toBe(false);
 
-    expectTypeOf(asyncErrResVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<Promise<boolean>>();
+    expectTypeOf(asyncErrResVal.isErrAnd(pAsyncTrue)).toEqualTypeOf<P<boolean>>();
     await expect(asyncErrResVal.isErrAnd(pAsyncTrue)).resolves.toBe(true);
-    expectTypeOf(asyncErrResVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncErrResVal.isErrAnd(pAsyncFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncErrResVal.isErrAnd(pAsyncFalse)).resolves.toBe(false);
-    expectTypeOf(asyncErrResVal.isErrAnd(pTrue)).toEqualTypeOf<Promise<boolean>>();
+    expectTypeOf(asyncErrResVal.isErrAnd(pTrue)).toEqualTypeOf<P<boolean>>();
     await expect(asyncErrResVal.isErrAnd(pTrue)).resolves.toBe(true);
-    expectTypeOf(asyncErrResVal.isErrAnd(pFalse)).toEqualTypeOf<Promise<false>>();
+    expectTypeOf(asyncErrResVal.isErrAnd(pFalse)).toEqualTypeOf<P<false>>();
     await expect(asyncErrResVal.isErrAnd(pFalse)).resolves.toBe(false);
   });
 
@@ -1031,7 +1035,7 @@ describe('Result', () => {
     expect(okResUnwrapOr).toBe('value');
 
     const okResUnwrapOrAsync = okResVal.unwrapOr(asyncDefaultValue);
-    expectTypeOf(okResUnwrapOrAsync).toEqualTypeOf<'value' | Promise<'default'>>();
+    expectTypeOf(okResUnwrapOrAsync).toEqualTypeOf<'value' | P<'default'>>();
     expect(okResUnwrapOrAsync).toBe('value');
 
     const errResUnwrapOr = errResVal.unwrapOr(defaultValue);
@@ -1039,7 +1043,7 @@ describe('Result', () => {
     expect(errResUnwrapOr).toBe('default');
 
     const errResUnwrapOrAsync = errResVal.unwrapOr(asyncDefaultValue);
-    expectTypeOf(errResUnwrapOrAsync).toEqualTypeOf<'value' | Promise<'default'>>();
+    expectTypeOf(errResUnwrapOrAsync).toEqualTypeOf<'value' | P<'default'>>();
     await expect(errResUnwrapOrAsync).resolves.toBe('default');
 
     const asyncOkUnwrapOr = asyncOkVal.unwrapOr(defaultValue);
@@ -1097,7 +1101,7 @@ describe('Result', () => {
     expect(okResUnwrapOrElse).toBe('value');
 
     const okResUnwrapOrElseAsync = okResVal.unwrapOrElse(asyncDefaultFn);
-    expectTypeOf(okResUnwrapOrElseAsync).toEqualTypeOf<'value' | Promise<'default'>>();
+    expectTypeOf(okResUnwrapOrElseAsync).toEqualTypeOf<'value' | P<'default'>>();
     expect(okResUnwrapOrElseAsync).toBe('value');
 
     const errResUnwrapOrElse = errResVal.unwrapOrElse(defaultFn);
@@ -1105,7 +1109,7 @@ describe('Result', () => {
     expect(errResUnwrapOrElse).toBe('default');
 
     const errResUnwrapOrElseAsync = errResVal.unwrapOrElse(asyncDefaultFn);
-    expectTypeOf(errResUnwrapOrElseAsync).toEqualTypeOf<'value' | Promise<'default'>>();
+    expectTypeOf(errResUnwrapOrElseAsync).toEqualTypeOf<'value' | P<'default'>>();
     await expect(errResUnwrapOrElseAsync).resolves.toBe('default');
 
     const asyncOkUnwrapOrElse = asyncOkVal.unwrapOrElse(defaultFn);
@@ -1410,7 +1414,7 @@ describe('Result', () => {
     await eua(asyncOk(asyncErrVal).flatten()).toBe<P<never>, P<'error'>>(false, 'error');
     await eua(asyncOk(okResVal).flatten()).toBe<P<'value'>, P<unknown>>(true, 'value');
     await eua(asyncOk(errResVal).flatten()).toBe<P<'value'>, P<unknown>>(false, error);
-    await eua(asyncOk(asyncOkResVal).flatten()).toBe<P<'value'>, Promise<unknown>>(true, 'value');
+    await eua(asyncOk(asyncOkResVal).flatten()).toBe<P<'value'>, P<unknown>>(true, 'value');
     await eua(asyncOk(asyncErrResVal).flatten()).toBe<P<'value'>, P<unknown>>(false, error);
 
     await eua(asyncErr(okVal).flatten()).toBe<P<never>, P<Ok<'value'>>>(false, okVal);

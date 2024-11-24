@@ -1,5 +1,15 @@
 # @quintal/environment
 
+## 1.1.0
+
+### Minor Changes
+
+- e290a5c: Add configDir template variable to typescript configs
+
+### Patch Changes
+
+- e290a5c: Chore: bump dependencies and update config files
+
 ## 1.0.1
 
 ### Patch Changes

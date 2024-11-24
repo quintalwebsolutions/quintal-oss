@@ -1,6 +1,6 @@
 {
   "name": "@quintal/table-engine-react",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "description": "A headless, declarative, lightweight, type-safe table engine for React apps.",
   "keywords": [

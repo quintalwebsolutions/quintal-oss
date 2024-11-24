@@ -1,5 +1,11 @@
 # @quintal/monads
 
+## 0.4.1
+
+### Patch Changes
+
+- e290a5c: Chore: bump dependencies and update config files
+
 ## 0.4.0
 
 ### Minor Changes

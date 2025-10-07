@@ -1,5 +1,5 @@
-import type { ColumnInputFromPlugins, ColumnMapInputFromPlugins, Plugins } from './plugins';
-import type { Row } from './util';
+import type { ColumnInputFromPlugins, ColumnMapInputFromPlugins, Plugins } from './plugins.ts';
+import type { Row } from './util.ts';
 
 /** User input object for a single column configuration */
 export type ColumnBase<TRow extends Row, TValue> = {

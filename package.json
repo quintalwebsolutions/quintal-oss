@@ -9,14 +9,14 @@
   },
   "packageManager": "pnpm@9.7.1+sha512.faf344af2d6ca65c4c5c8c2224ea77a81a5e8859cbc4e06b1511ddce2f0151512431dd19e6aff31f2c6a8f5f2aced9bd2273e1fed7dd4de1868984059d2c4247",
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "@changesets/cli": "2.27.10",
-    "@types/node": "22.9.3",
-    "sherif": "1.0.2",
-    "shx": "0.3.4",
-    "syncpack": "13.0.0",
-    "tsx": "4.19.2",
-    "turbo": "2.3.1",
-    "typescript": "5.7.2"
+    "@biomejs/biome": "2.2.5",
+    "@changesets/cli": "2.29.7",
+    "@types/node": "24.7.0",
+    "sherif": "1.6.1",
+    "shx": "0.4.0",
+    "syncpack": "13.0.4",
+    "tsx": "4.20.6",
+    "turbo": "2.5.8",
+    "typescript": "5.9.3"
   }
 }

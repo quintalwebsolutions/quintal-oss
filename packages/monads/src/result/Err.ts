@@ -1,12 +1,12 @@
 import { none, some } from '../option/index.ts';
 import type { MaybePromise } from '../util.ts';
 import { AsyncResult } from './AsyncResult.ts';
+import { err } from './constructors/err.ts';
 import type { ResultDocs } from './ResultDocs.ts';
-import { err } from './constructors.ts';
 import type { AnyResult, AnySyncResult, AsyncErr, ResultMatch, SerializedErr } from './types.ts';
 
 export class Err<TError> implements ResultDocs<TError, 'err'> {
-  private _error: TError;
+  private readonly _error: TError;
 
   constructor(error: TError) {
     this._error = error;

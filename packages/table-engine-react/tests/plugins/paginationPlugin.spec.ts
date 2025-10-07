@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { P, PaginationPlugin } from '../../src';
-import { makeTable, paginationPlugin } from '../../src';
+
+import type { P, PaginationPlugin } from '../../src/index.ts';
+import { makeTable, paginationPlugin } from '../../src/index.ts';
 
 type Row = { count: number };
 type Plugin = P<PaginationPlugin<Row>>;

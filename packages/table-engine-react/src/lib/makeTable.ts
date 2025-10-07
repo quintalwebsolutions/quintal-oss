@@ -8,10 +8,10 @@ import type {
   SetStateFromPlugins,
   StateFromPlugins,
   Table,
-} from '../types';
-import { makeBody } from './makeBody';
-import { makeHead } from './makeHead';
-import { applyPlugins } from './util';
+} from '../types/index.ts';
+import { makeBody } from './makeBody.ts';
+import { makeHead } from './makeHead.ts';
+import { applyPlugins } from './util.ts';
 
 export function makeTable<TRow extends Row, TPlugins extends Plugins>(
   id: string,

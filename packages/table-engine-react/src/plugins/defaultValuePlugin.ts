@@ -1,4 +1,10 @@
-import type { DefinePluginArgs, GlobalInputFromPlugins, Plugin, PluginObject, Row } from '../types';
+import type {
+  DefinePluginArgs,
+  GlobalInputFromPlugins,
+  Plugin,
+  PluginObject,
+  Row,
+} from '../types/index.ts';
 
 type DefaultValue<TRow extends Row, TValue> = TValue | ((row: TRow) => TValue);
 

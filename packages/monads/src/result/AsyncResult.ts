@@ -10,10 +10,10 @@ import {
   some,
 } from '../option/index.ts';
 import type { MaybePromise } from '../util.ts';
+import { ok } from './constructors/ok.ts';
 import type { Err } from './Err.ts';
 import type { Ok } from './Ok.ts';
 import type { ResultDocs } from './ResultDocs.ts';
-import { ok } from './constructors.ts';
 import type {
   AnyResult,
   AnySyncResult,
@@ -28,7 +28,7 @@ import type {
 } from './types.ts';
 
 export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TResult, 'async'> {
-  private _promise: Promise<TResult>;
+  private readonly _promise: Promise<TResult>;
 
   constructor(promise: Promise<TResult>) {
     this._promise = promise;
@@ -67,11 +67,13 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
   }
 
   inspect(fn: (value: ValueFromOk<TResult>) => MaybePromise<void>) {
+    // biome-ignore lint/nursery/noFloatingPromises: Handled asynchronously
     this.then((res) => res.inspect(fn));
     return this;
   }
 
   inspectErr(fn: (error: ValueFromErr<TResult>) => MaybePromise<void>) {
+    // biome-ignore lint/nursery/noFloatingPromises: Handled asynchronously
     this.then((res) => res.inspectErr(fn));
     return this;
   }

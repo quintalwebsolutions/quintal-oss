@@ -7,8 +7,8 @@ import type {
   HeadRowOutputFromPlugins,
   Plugins,
   TableOutputFromPlugins,
-} from './plugins';
-import type { Id, Row } from './util';
+} from './plugins.ts';
+import type { Id, Row } from './util.ts';
 
 // BodyCell
 export type BodyValue<TValue> = {

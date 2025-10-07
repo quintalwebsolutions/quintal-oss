@@ -1,4 +1,4 @@
-import type { Column } from './inputs';
+import type { Column } from './inputs.ts';
 import type {
   Body,
   BodyBase,
@@ -14,8 +14,8 @@ import type {
   HeadRowBase,
   Table,
   TableBase,
-} from './outputs';
-import type { Row } from './util';
+} from './outputs.ts';
+import type { Row } from './util.ts';
 
 export type PluginArgs<TRow extends Row> = {
   input?: {

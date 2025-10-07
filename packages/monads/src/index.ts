@@ -1,3 +1,4 @@
+// biome-ignore lint/performance/noBarrelFile: // TODO investigate if we can get rid of this main entrypoint
 export {
   type AnyAsyncOption,
   type AnyAsyncSome,
@@ -36,9 +37,6 @@ export {
   type AsyncOk,
   AsyncResult,
   Err,
-  isAnyAsyncResult,
-  isAnyResult,
-  isAnySyncResult,
   Ok,
   type Result,
   type SerializedErr,
@@ -51,6 +49,9 @@ export {
   asyncResultFromSerialized,
   asyncResultFromThrowable,
   err,
+  isAnyAsyncResult,
+  isAnyResult,
+  isAnySyncResult,
   ok,
   resultFromResults,
   resultFromSerialized,

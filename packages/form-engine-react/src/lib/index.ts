@@ -1,3 +1,3 @@
-export * from './plugin';
-export * from './props';
-export * from './values';
+export * from './plugin.ts';
+export * from './props.ts';
+export * from './values.ts';

@@ -1,4 +1,5 @@
 import { describe, expect, expectTypeOf, it, test, vi } from 'vitest';
+
 import {
   type AnyResult,
   type AsyncErr,
@@ -225,7 +226,7 @@ describe('Result', () => {
   });
 
   it('merges multiple results into one', async () => {
-    // biome-ignore lint/correctness/noConstantCondition: allow for test
+    // biome-ignore lint/correctness/noConstantCondition lint/nursery/noUnnecessaryConditions: allow for test
     if (false) {
       // @ts-expect-error
       resultFromResults();
@@ -1428,81 +1429,81 @@ describe('Result', () => {
   });
 
   test('map', async () => {
-    const okValMapped = okVal.map((value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okValMapped = okVal.map((v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     eu(okValMapped).toBe<Mapped, never>(true, mappedValue);
 
-    const okValAsyncMapped = okVal.map(async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okValAsyncMapped = okVal.map(async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     await eua(okValAsyncMapped).toBe<P<Mapped>, P<never>>(true, mappedValue);
 
-    const errValMapped = errVal.map((value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const errValMapped = errVal.map((v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return mappedValue;
     });
     eu(errValMapped).toBe<never, 'error'>(false, 'error');
 
-    const errValAsyncMapped = errVal.map(async (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const errValAsyncMapped = errVal.map(async (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return await asyncMappedValue;
     });
     eu(errValAsyncMapped).toBe<never, 'error'>(false, 'error');
 
-    const okResValMapped = okResVal.map((value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okResValMapped = okResVal.map((v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     eu(okResValMapped).toBe<Mapped, unknown>(true, mappedValue);
 
-    const okResValAsyncMapped = okResVal.map(async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okResValAsyncMapped = okResVal.map(async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     await eua(okResValAsyncMapped).toBe<P<Mapped>, unknown>(true, mappedValue);
 
-    const errResValMapped = errResVal.map((value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const errResValMapped = errResVal.map((v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     eu(errResValMapped).toBe<Mapped, unknown>(false, error);
 
-    const errResValAsyncMapped = errResVal.map(async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const errResValAsyncMapped = errResVal.map(async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     eu(errResValAsyncMapped).toBe<P<Mapped>, unknown>(false, error);
 
-    const asyncOkValMapped = asyncOkVal.map((value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkValMapped = asyncOkVal.map((v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     await eua(asyncOkValMapped).toBe<P<Mapped>, P<never>>(true, mappedValue);
 
-    const asyncOkValAsyncMapped = asyncOkVal.map(async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkValAsyncMapped = asyncOkVal.map(async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     await eua(asyncOkValAsyncMapped).toBe<P<Mapped>, P<never>>(true, mappedValue);
 
-    const asyncErrValMapped = asyncErrVal.map((value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const asyncErrValMapped = asyncErrVal.map((v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return mappedValue;
     });
     await eua(asyncErrValMapped).toBe<P<never>, P<'error'>>(false, 'error');
 
-    const asyncErrValAsyncMapped = asyncErrVal.map(async (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const asyncErrValAsyncMapped = asyncErrVal.map(async (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return await asyncMappedValue;
     });
     await eua(asyncErrValAsyncMapped).toBe<P<never>, P<'error'>>(false, 'error');
 
     // TODO Why doesn't this simplify? `P<never> | P<string>` => `P<never | string>` => `P<string>`
-    const asyncOkResValMapped = asyncOkResVal.map((value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkResValMapped = asyncOkResVal.map((v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     await eua(asyncOkResValMapped).toBe<P<never> | P<Mapped>, P<never> | P<unknown>>(
@@ -1510,8 +1511,8 @@ describe('Result', () => {
       mappedValue,
     );
 
-    const asyncOkResValAsyncMapped = asyncOkResVal.map(async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkResValAsyncMapped = asyncOkResVal.map(async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     await eua(asyncOkResValAsyncMapped).toBe<P<never> | P<Mapped>, P<never> | P<unknown>>(
@@ -1519,14 +1520,14 @@ describe('Result', () => {
       mappedValue,
     );
 
-    const asyncErrResValMapped = asyncErrResVal.map((value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncErrResValMapped = asyncErrResVal.map((v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     await eua(asyncErrResValMapped).toBe<P<never> | P<Mapped>, P<never> | P<unknown>>(false, error);
 
-    const asyncErrResValAsyncMapped = asyncErrResVal.map(async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncErrResValAsyncMapped = asyncErrResVal.map(async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     await eua(asyncErrResValAsyncMapped).toBe<P<never> | P<Mapped>, P<never> | P<unknown>>(
@@ -1536,80 +1537,80 @@ describe('Result', () => {
   });
 
   test('mapErr', async () => {
-    const okValMappedErr = okVal.mapErr((err) => {
-      expectTypeOf(err).toEqualTypeOf<never>();
+    const okValMappedErr = okVal.mapErr((e) => {
+      expectTypeOf(e).toEqualTypeOf<never>();
       return mappedValue;
     });
     eu(okValMappedErr).toBe<'value', never>(true, 'value');
 
-    const okValAsyncMappedErr = okVal.mapErr(async (err) => {
-      expectTypeOf(err).toEqualTypeOf<never>();
+    const okValAsyncMappedErr = okVal.mapErr(async (e) => {
+      expectTypeOf(e).toEqualTypeOf<never>();
       return await asyncMappedValue;
     });
     eu(okValAsyncMappedErr).toBe<'value', never>(true, 'value');
 
-    const errValMappedErr = errVal.mapErr((err) => {
-      expectTypeOf(err).toEqualTypeOf<'error'>();
+    const errValMappedErr = errVal.mapErr((e) => {
+      expectTypeOf(e).toEqualTypeOf<'error'>();
       return mappedValue;
     });
     eu(errValMappedErr).toBe<never, Mapped>(false, mappedValue);
 
-    const errValAsyncMappedErr = errVal.mapErr(async (err) => {
-      expectTypeOf(err).toEqualTypeOf<'error'>();
+    const errValAsyncMappedErr = errVal.mapErr(async (e) => {
+      expectTypeOf(e).toEqualTypeOf<'error'>();
       return await asyncMappedValue;
     });
     await eua(errValAsyncMappedErr).toBe<P<never>, P<Mapped>>(false, mappedValue);
 
-    const okResValMappedErr = okResVal.mapErr((err) => {
-      expectTypeOf(err).toEqualTypeOf<unknown>();
+    const okResValMappedErr = okResVal.mapErr((e) => {
+      expectTypeOf(e).toEqualTypeOf<unknown>();
       return mappedValue;
     });
     eu(okResValMappedErr).toBe<'value', Mapped>(true, 'value');
 
-    const okResValAsyncMappedErr = okResVal.mapErr(async (err) => {
-      expectTypeOf(err).toEqualTypeOf<unknown>();
+    const okResValAsyncMappedErr = okResVal.mapErr(async (e) => {
+      expectTypeOf(e).toEqualTypeOf<unknown>();
       return await asyncMappedValue;
     });
     eu(okResValAsyncMappedErr).toBe<'value' | P<never>, P<Mapped>>(true, 'value');
 
-    const errResValMappedErr = errResVal.mapErr((err) => {
-      expectTypeOf(err).toEqualTypeOf<unknown>();
+    const errResValMappedErr = errResVal.mapErr((e) => {
+      expectTypeOf(e).toEqualTypeOf<unknown>();
       return mappedValue;
     });
     eu(errResValMappedErr).toBe<'value', Mapped>(false, mappedValue);
 
-    const errResValAsyncMappedErr = errResVal.mapErr(async (err) => {
-      expectTypeOf(err).toEqualTypeOf<unknown>();
+    const errResValAsyncMappedErr = errResVal.mapErr(async (e) => {
+      expectTypeOf(e).toEqualTypeOf<unknown>();
       return await asyncMappedValue;
     });
     await eua(errResValAsyncMappedErr).toBe<'value' | P<never>, P<Mapped>>(false, mappedValue);
 
-    const asyncOkValMappedErr = asyncOkVal.mapErr((err) => {
-      expectTypeOf(err).toEqualTypeOf<never>();
+    const asyncOkValMappedErr = asyncOkVal.mapErr((e) => {
+      expectTypeOf(e).toEqualTypeOf<never>();
       return mappedValue;
     });
     await eua(asyncOkValMappedErr).toBe<P<'value'>, P<never>>(true, 'value');
 
-    const asyncOkValAsyncMappedErr = asyncOkVal.mapErr(async (err) => {
-      expectTypeOf(err).toEqualTypeOf<never>();
+    const asyncOkValAsyncMappedErr = asyncOkVal.mapErr(async (e) => {
+      expectTypeOf(e).toEqualTypeOf<never>();
       return await asyncMappedValue;
     });
     await eua(asyncOkValAsyncMappedErr).toBe<P<'value'>, P<never>>(true, 'value');
 
-    const asyncErrValMappedErr = asyncErrVal.mapErr((err) => {
-      expectTypeOf(err).toEqualTypeOf<'error'>();
+    const asyncErrValMappedErr = asyncErrVal.mapErr((e) => {
+      expectTypeOf(e).toEqualTypeOf<'error'>();
       return mappedValue;
     });
     await eua(asyncErrValMappedErr).toBe<P<never>, P<Mapped>>(false, mappedValue);
 
-    const asyncErrValAsyncMappedErr = asyncErrVal.mapErr(async (err) => {
-      expectTypeOf(err).toEqualTypeOf<'error'>();
+    const asyncErrValAsyncMappedErr = asyncErrVal.mapErr(async (e) => {
+      expectTypeOf(e).toEqualTypeOf<'error'>();
       return await asyncMappedValue;
     });
     await eua(asyncErrValAsyncMappedErr).toBe<P<never>, P<Mapped>>(false, mappedValue);
 
-    const asyncOkResValMappedErr = asyncOkResVal.mapErr((err) => {
-      expectTypeOf(err).toEqualTypeOf<unknown>();
+    const asyncOkResValMappedErr = asyncOkResVal.mapErr((e) => {
+      expectTypeOf(e).toEqualTypeOf<unknown>();
       return mappedValue;
     });
     await eua(asyncOkResValMappedErr).toBe<P<'value'> | P<never>, P<Mapped> | P<never>>(
@@ -1617,8 +1618,8 @@ describe('Result', () => {
       'value',
     );
 
-    const asyncOkResValAsyncMappedErr = asyncOkResVal.mapErr(async (err) => {
-      expectTypeOf(err).toEqualTypeOf<unknown>();
+    const asyncOkResValAsyncMappedErr = asyncOkResVal.mapErr(async (e) => {
+      expectTypeOf(e).toEqualTypeOf<unknown>();
       return await asyncMappedValue;
     });
     await eua(asyncOkResValAsyncMappedErr).toBe<P<'value'> | P<never>, P<Mapped> | P<never>>(
@@ -1626,8 +1627,8 @@ describe('Result', () => {
       'value',
     );
 
-    const asyncErrResValMappedErr = asyncErrResVal.mapErr((err) => {
-      expectTypeOf(err).toEqualTypeOf<unknown>();
+    const asyncErrResValMappedErr = asyncErrResVal.mapErr((e) => {
+      expectTypeOf(e).toEqualTypeOf<unknown>();
       return mappedValue;
     });
     await eua(asyncErrResValMappedErr).toBe<P<'value'> | P<never>, P<Mapped> | P<never>>(
@@ -1635,8 +1636,8 @@ describe('Result', () => {
       mappedValue,
     );
 
-    const asyncErrResValAsyncMappedErr = asyncErrResVal.mapErr(async (err) => {
-      expectTypeOf(err).toEqualTypeOf<unknown>();
+    const asyncErrResValAsyncMappedErr = asyncErrResVal.mapErr(async (e) => {
+      expectTypeOf(e).toEqualTypeOf<unknown>();
       return await asyncMappedValue;
     });
     await eua(asyncErrResValAsyncMappedErr).toBe<P<'value'> | P<never>, P<Mapped> | P<never>>(
@@ -1646,169 +1647,169 @@ describe('Result', () => {
   });
 
   test('mapOr', async () => {
-    const okValMappedOr = okVal.mapOr(defaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okValMappedOr = okVal.mapOr(defaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(okValMappedOr).toEqualTypeOf<Mapped>();
     expect(okValMappedOr).toBe(mappedValue);
 
-    const okValAsyncMappedOr = okVal.mapOr(asyncDefaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okValAsyncMappedOr = okVal.mapOr(asyncDefaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(okValAsyncMappedOr).toEqualTypeOf<Mapped>();
     expect(okValAsyncMappedOr).toBe(mappedValue);
 
-    const okValMappedOrAsync = okVal.mapOr(defaultValue, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okValMappedOrAsync = okVal.mapOr(defaultValue, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     expectTypeOf(okValMappedOrAsync).resolves.toEqualTypeOf<Mapped>();
     await expect(okValMappedOrAsync).resolves.toBe(mappedValue);
 
-    const errValMappedOr = errVal.mapOr(defaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const errValMappedOr = errVal.mapOr(defaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return mappedValue;
     });
     expectTypeOf(errValMappedOr).toEqualTypeOf<'default'>();
     expect(errValMappedOr).toBe('default');
 
-    const errValAsyncMappedOr = errVal.mapOr(asyncDefaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const errValAsyncMappedOr = errVal.mapOr(asyncDefaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return mappedValue;
     });
     expectTypeOf(errValAsyncMappedOr).resolves.toEqualTypeOf<'default'>();
     await expect(errValAsyncMappedOr).resolves.toBe('default');
 
-    const errValMappedOrAsync = errVal.mapOr(defaultValue, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const errValMappedOrAsync = errVal.mapOr(defaultValue, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return await asyncMappedValue;
     });
     expectTypeOf(errValMappedOrAsync).toEqualTypeOf<'default'>();
     expect(errValMappedOrAsync).toBe('default');
 
-    const okResValMappedOr = okResVal.mapOr(defaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okResValMappedOr = okResVal.mapOr(defaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(okResValMappedOr).toEqualTypeOf<Mapped | 'default'>();
     expect(okResValMappedOr).toBe(mappedValue);
 
-    const okResValAsyncMappedOr = okResVal.mapOr(asyncDefaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okResValAsyncMappedOr = okResVal.mapOr(asyncDefaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(okResValAsyncMappedOr).toEqualTypeOf<Mapped | P<'default'>>();
     expect(okResValAsyncMappedOr).toBe(mappedValue);
 
-    const okResValMappedOrAsync = okResVal.mapOr(defaultValue, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okResValMappedOrAsync = okResVal.mapOr(defaultValue, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     expectTypeOf(okResValMappedOrAsync).toEqualTypeOf<P<Mapped> | 'default'>();
     await expect(okResValMappedOrAsync).resolves.toBe(mappedValue);
 
-    const errResValMappedOr = errResVal.mapOr(defaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const errResValMappedOr = errResVal.mapOr(defaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(errResValMappedOr).toEqualTypeOf<Mapped | 'default'>();
     expect(errResValMappedOr).toBe('default');
 
-    const errResValAsyncMappedOr = errResVal.mapOr(asyncDefaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const errResValAsyncMappedOr = errResVal.mapOr(asyncDefaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(errResValAsyncMappedOr).toEqualTypeOf<Mapped | P<'default'>>();
     await expect(errResValAsyncMappedOr).resolves.toBe('default');
 
-    const errResValMappedOrAsync = errResVal.mapOr(defaultValue, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const errResValMappedOrAsync = errResVal.mapOr(defaultValue, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     expectTypeOf(errResValMappedOrAsync).toEqualTypeOf<P<Mapped> | 'default'>();
     expect(errResValMappedOrAsync).toBe('default');
 
-    const asyncOkValMappedOr = asyncOkVal.mapOr(defaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkValMappedOr = asyncOkVal.mapOr(defaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(asyncOkValMappedOr).resolves.toEqualTypeOf<Mapped>();
     await expect(asyncOkValMappedOr).resolves.toBe(mappedValue);
 
-    const asyncOkValAsyncMappedOr = asyncOkVal.mapOr(asyncDefaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkValAsyncMappedOr = asyncOkVal.mapOr(asyncDefaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(asyncOkValAsyncMappedOr).resolves.toEqualTypeOf<Mapped>();
     await expect(asyncOkValAsyncMappedOr).resolves.toBe(mappedValue);
 
-    const asyncOkValMappedOrAsync = asyncOkVal.mapOr(defaultValue, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkValMappedOrAsync = asyncOkVal.mapOr(defaultValue, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     expectTypeOf(asyncOkValMappedOrAsync).resolves.toEqualTypeOf<Mapped>();
     await expect(asyncOkValMappedOrAsync).resolves.toBe(mappedValue);
 
-    const asyncErrValMappedOr = asyncErrVal.mapOr(defaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const asyncErrValMappedOr = asyncErrVal.mapOr(defaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return mappedValue;
     });
     expectTypeOf(asyncErrValMappedOr).resolves.toEqualTypeOf<'default'>();
     await expect(asyncErrValMappedOr).resolves.toBe('default');
 
-    const asyncErrValAsyncMappedOr = asyncErrVal.mapOr(asyncDefaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const asyncErrValAsyncMappedOr = asyncErrVal.mapOr(asyncDefaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return mappedValue;
     });
     expectTypeOf(asyncErrValAsyncMappedOr).resolves.toEqualTypeOf<'default'>();
     await expect(asyncErrValAsyncMappedOr).resolves.toBe('default');
 
-    const asyncErrValMappedOrAsync = asyncErrVal.mapOr(defaultValue, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const asyncErrValMappedOrAsync = asyncErrVal.mapOr(defaultValue, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return await asyncMappedValue;
     });
     expectTypeOf(asyncErrValMappedOrAsync).resolves.toEqualTypeOf<'default'>();
     await expect(asyncErrValMappedOrAsync).resolves.toBe('default');
 
-    const asyncOkResValMappedOr = asyncOkResVal.mapOr(defaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkResValMappedOr = asyncOkResVal.mapOr(defaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(asyncOkResValMappedOr).resolves.toEqualTypeOf<Mapped | 'default'>();
     await expect(asyncOkResValMappedOr).resolves.toBe(mappedValue);
 
-    const asyncOkResValAsyncMappedOr = asyncOkResVal.mapOr(asyncDefaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkResValAsyncMappedOr = asyncOkResVal.mapOr(asyncDefaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(asyncOkResValAsyncMappedOr).resolves.toEqualTypeOf<Mapped | 'default'>();
     await expect(asyncOkResValAsyncMappedOr).resolves.toBe(mappedValue);
 
-    const asyncOkResValMappedOrAsync = asyncOkResVal.mapOr(defaultValue, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkResValMappedOrAsync = asyncOkResVal.mapOr(defaultValue, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     expectTypeOf(asyncOkResValMappedOrAsync).resolves.toEqualTypeOf<Mapped | 'default'>();
     await expect(asyncOkResValMappedOrAsync).resolves.toBe(mappedValue);
 
-    const asyncErrResValMappedOr = asyncErrResVal.mapOr(defaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncErrResValMappedOr = asyncErrResVal.mapOr(defaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(asyncErrResValMappedOr).resolves.toEqualTypeOf<Mapped | 'default'>();
     await expect(asyncErrResValMappedOr).resolves.toBe('default');
 
-    const asyncErrResValAsyncMappedOr = asyncErrResVal.mapOr(asyncDefaultValue, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncErrResValAsyncMappedOr = asyncErrResVal.mapOr(asyncDefaultValue, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(asyncErrResValAsyncMappedOr).resolves.toEqualTypeOf<Mapped | 'default'>();
     await expect(asyncErrResValAsyncMappedOr).resolves.toBe('default');
 
-    const asyncErrResValMappedOrAsync = asyncErrResVal.mapOr(defaultValue, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncErrResValMappedOrAsync = asyncErrResVal.mapOr(defaultValue, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     expectTypeOf(asyncErrResValMappedOrAsync).resolves.toEqualTypeOf<Mapped | 'default'>();
@@ -1816,169 +1817,169 @@ describe('Result', () => {
   });
 
   test('mapOrElse', async () => {
-    const okValMappedOrElse = okVal.mapOrElse(defaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okValMappedOrElse = okVal.mapOrElse(defaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(okValMappedOrElse).toEqualTypeOf<Mapped>();
     expect(okValMappedOrElse).toBe(mappedValue);
 
-    const okValAsyncMappedOrElse = okVal.mapOrElse(asyncDefaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okValAsyncMappedOrElse = okVal.mapOrElse(asyncDefaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(okValAsyncMappedOrElse).toEqualTypeOf<Mapped>();
     expect(okValAsyncMappedOrElse).toBe(mappedValue);
 
-    const okValMappedOrElseAsync = okVal.mapOrElse(defaultFn, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okValMappedOrElseAsync = okVal.mapOrElse(defaultFn, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     expectTypeOf(okValMappedOrElseAsync).resolves.toEqualTypeOf<Mapped>();
     await expect(okValMappedOrElseAsync).resolves.toBe(mappedValue);
 
-    const errValMappedOrElse = errVal.mapOrElse(defaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const errValMappedOrElse = errVal.mapOrElse(defaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return mappedValue;
     });
     expectTypeOf(errValMappedOrElse).toEqualTypeOf<'default'>();
     expect(errValMappedOrElse).toBe('default');
 
-    const errValAsyncMappedOrElse = errVal.mapOrElse(asyncDefaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const errValAsyncMappedOrElse = errVal.mapOrElse(asyncDefaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return mappedValue;
     });
     expectTypeOf(errValAsyncMappedOrElse).resolves.toEqualTypeOf<'default'>();
     await expect(errValAsyncMappedOrElse).resolves.toBe('default');
 
-    const errValMappedOrElseAsync = errVal.mapOrElse(defaultFn, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const errValMappedOrElseAsync = errVal.mapOrElse(defaultFn, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return await asyncMappedValue;
     });
     expectTypeOf(errValMappedOrElseAsync).toEqualTypeOf<'default'>();
     expect(errValMappedOrElseAsync).toBe('default');
 
-    const okResValMappedOrElse = okResVal.mapOrElse(defaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okResValMappedOrElse = okResVal.mapOrElse(defaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(okResValMappedOrElse).toEqualTypeOf<Mapped | 'default'>();
     expect(okResValMappedOrElse).toBe(mappedValue);
 
-    const okResValAsyncMappedOrElse = okResVal.mapOrElse(asyncDefaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okResValAsyncMappedOrElse = okResVal.mapOrElse(asyncDefaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(okResValAsyncMappedOrElse).toEqualTypeOf<Mapped | P<'default'>>();
     expect(okResValAsyncMappedOrElse).toBe(mappedValue);
 
-    const okResValMappedOrElseAsync = okResVal.mapOrElse(defaultFn, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const okResValMappedOrElseAsync = okResVal.mapOrElse(defaultFn, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     expectTypeOf(okResValMappedOrElseAsync).toEqualTypeOf<P<Mapped> | 'default'>();
     await expect(okResValMappedOrElseAsync).resolves.toBe(mappedValue);
 
-    const errResValMappedOrElse = errResVal.mapOrElse(defaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const errResValMappedOrElse = errResVal.mapOrElse(defaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(errResValMappedOrElse).toEqualTypeOf<Mapped | 'default'>();
     expect(errResValMappedOrElse).toBe('default');
 
-    const errResValAsyncMappedOrElse = errResVal.mapOrElse(asyncDefaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const errResValAsyncMappedOrElse = errResVal.mapOrElse(asyncDefaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(errResValAsyncMappedOrElse).toEqualTypeOf<Mapped | P<'default'>>();
     await expect(errResValAsyncMappedOrElse).resolves.toBe('default');
 
-    const errResValMappedOrElseAsync = errResVal.mapOrElse(defaultFn, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const errResValMappedOrElseAsync = errResVal.mapOrElse(defaultFn, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     expectTypeOf(errResValMappedOrElseAsync).toEqualTypeOf<P<Mapped> | 'default'>();
     expect(errResValMappedOrElseAsync).toBe('default');
 
-    const asyncOkValMappedOrElse = asyncOkVal.mapOrElse(defaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkValMappedOrElse = asyncOkVal.mapOrElse(defaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(asyncOkValMappedOrElse).resolves.toEqualTypeOf<Mapped>();
     await expect(asyncOkValMappedOrElse).resolves.toBe(mappedValue);
 
-    const asyncOkValAsyncMappedOrElse = asyncOkVal.mapOrElse(asyncDefaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkValAsyncMappedOrElse = asyncOkVal.mapOrElse(asyncDefaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(asyncOkValAsyncMappedOrElse).resolves.toEqualTypeOf<Mapped>();
     await expect(asyncOkValAsyncMappedOrElse).resolves.toBe(mappedValue);
 
-    const asyncOkValMappedOrElseAsync = asyncOkVal.mapOrElse(defaultFn, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkValMappedOrElseAsync = asyncOkVal.mapOrElse(defaultFn, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     expectTypeOf(asyncOkValMappedOrElseAsync).resolves.toEqualTypeOf<Mapped>();
     await expect(asyncOkValMappedOrElseAsync).resolves.toBe(mappedValue);
 
-    const asyncErrValMappedOrElse = asyncErrVal.mapOrElse(defaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const asyncErrValMappedOrElse = asyncErrVal.mapOrElse(defaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return mappedValue;
     });
     expectTypeOf(asyncErrValMappedOrElse).resolves.toEqualTypeOf<'default'>();
     await expect(asyncErrValMappedOrElse).resolves.toBe('default');
 
-    const asyncErrValAsyncMappedOrElse = asyncErrVal.mapOrElse(asyncDefaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const asyncErrValAsyncMappedOrElse = asyncErrVal.mapOrElse(asyncDefaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return mappedValue;
     });
     expectTypeOf(asyncErrValAsyncMappedOrElse).resolves.toEqualTypeOf<'default'>();
     await expect(asyncErrValAsyncMappedOrElse).resolves.toBe('default');
 
-    const asyncErrValMappedOrElseAsync = asyncErrVal.mapOrElse(defaultFn, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<never>();
+    const asyncErrValMappedOrElseAsync = asyncErrVal.mapOrElse(defaultFn, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<never>();
       return await asyncMappedValue;
     });
     expectTypeOf(asyncErrValMappedOrElseAsync).resolves.toEqualTypeOf<'default'>();
     await expect(asyncErrValMappedOrElseAsync).resolves.toBe('default');
 
-    const asyncOkResValMappedOrElse = asyncOkResVal.mapOrElse(defaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkResValMappedOrElse = asyncOkResVal.mapOrElse(defaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(asyncOkResValMappedOrElse).resolves.toEqualTypeOf<Mapped | 'default'>();
     await expect(asyncOkResValMappedOrElse).resolves.toBe(mappedValue);
 
-    const asyncOkResValAsyncMappedOrElse = asyncOkResVal.mapOrElse(asyncDefaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkResValAsyncMappedOrElse = asyncOkResVal.mapOrElse(asyncDefaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(asyncOkResValAsyncMappedOrElse).resolves.toEqualTypeOf<Mapped | 'default'>();
     await expect(asyncOkResValAsyncMappedOrElse).resolves.toBe(mappedValue);
 
-    const asyncOkResValMappedOrElseAsync = asyncOkResVal.mapOrElse(defaultFn, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncOkResValMappedOrElseAsync = asyncOkResVal.mapOrElse(defaultFn, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     expectTypeOf(asyncOkResValMappedOrElseAsync).resolves.toEqualTypeOf<Mapped | 'default'>();
     await expect(asyncOkResValMappedOrElseAsync).resolves.toBe(mappedValue);
 
-    const asyncErrResValMappedOrElse = asyncErrResVal.mapOrElse(defaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncErrResValMappedOrElse = asyncErrResVal.mapOrElse(defaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(asyncErrResValMappedOrElse).resolves.toEqualTypeOf<Mapped | 'default'>();
     await expect(asyncErrResValMappedOrElse).resolves.toBe('default');
 
-    const asyncErrResValAsyncMappedOrElse = asyncErrResVal.mapOrElse(asyncDefaultFn, (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncErrResValAsyncMappedOrElse = asyncErrResVal.mapOrElse(asyncDefaultFn, (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
     expectTypeOf(asyncErrResValAsyncMappedOrElse).resolves.toEqualTypeOf<Mapped | 'default'>();
     await expect(asyncErrResValAsyncMappedOrElse).resolves.toBe('default');
 
-    const asyncErrResValMappedOrElseAsync = asyncErrResVal.mapOrElse(defaultFn, async (value) => {
-      expectTypeOf(value).toEqualTypeOf<'value'>();
+    const asyncErrResValMappedOrElseAsync = asyncErrResVal.mapOrElse(defaultFn, async (v) => {
+      expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
     expectTypeOf(asyncErrResValMappedOrElseAsync).resolves.toEqualTypeOf<Mapped | 'default'>();
@@ -2654,17 +2655,17 @@ describe('Result', () => {
 
     const okValMock = vi.fn();
     const okMatch = okVal.match({
-      ok: (value) => {
-        expectTypeOf(value).toEqualTypeOf<'value'>();
-        expect(value).toBe('value');
-        okValMock(value);
-        return value;
+      ok: (v) => {
+        expectTypeOf(v).toEqualTypeOf<'value'>();
+        expect(v).toBe('value');
+        okValMock(v);
+        return v;
       },
-      err: (error) => {
-        expectTypeOf(error).toEqualTypeOf<never>();
+      err: (e) => {
+        expectTypeOf(e).toEqualTypeOf<never>();
         expect(false).toBe(true);
-        okValMock(error);
-        return error;
+        okValMock(e);
+        return e;
       },
     });
     expect(okValMock).toHaveBeenCalledTimes(1);
@@ -2674,17 +2675,17 @@ describe('Result', () => {
 
     const errValMock = vi.fn();
     const errMatch = errVal.match({
-      ok: (value) => {
-        expectTypeOf(value).toEqualTypeOf<never>();
+      ok: (v) => {
+        expectTypeOf(v).toEqualTypeOf<never>();
         expect(false).toBe(true);
-        errValMock(value);
-        return value;
+        errValMock(v);
+        return v;
       },
-      err: (error) => {
-        expectTypeOf(error).toEqualTypeOf<'error'>();
-        expect(error).toBe('error');
-        errValMock(error);
-        return error;
+      err: (e) => {
+        expectTypeOf(e).toEqualTypeOf<'error'>();
+        expect(e).toBe('error');
+        errValMock(e);
+        return e;
       },
     });
     expect(errValMock).toHaveBeenCalledTimes(1);
@@ -2694,17 +2695,17 @@ describe('Result', () => {
 
     const asyncOkValMock = vi.fn();
     const asyncOkMatch = asyncOkVal.match({
-      ok: (value) => {
-        expectTypeOf(value).toEqualTypeOf<'value'>();
-        expect(value).toBe('value');
-        asyncOkValMock(value);
-        return value;
+      ok: (v) => {
+        expectTypeOf(v).toEqualTypeOf<'value'>();
+        expect(v).toBe('value');
+        asyncOkValMock(v);
+        return v;
       },
-      err: (error) => {
-        expectTypeOf(error).toEqualTypeOf<never>();
+      err: (e) => {
+        expectTypeOf(e).toEqualTypeOf<never>();
         expect(false).toBe(true);
-        asyncOkValMock(error);
-        return error;
+        asyncOkValMock(e);
+        return e;
       },
     });
     await expect(asyncOkMatch).resolves.toBe('value');
@@ -2714,17 +2715,17 @@ describe('Result', () => {
 
     const asyncErrValMock = vi.fn();
     const asyncErrMatch = asyncErrVal.match({
-      ok: (value) => {
-        expectTypeOf(value).toEqualTypeOf<never>();
+      ok: (v) => {
+        expectTypeOf(v).toEqualTypeOf<never>();
         expect(false).toBe(true);
-        asyncErrValMock(value);
-        return value;
+        asyncErrValMock(v);
+        return v;
       },
-      err: (error) => {
-        expectTypeOf(error).toEqualTypeOf<'error'>();
-        expect(error).toBe('error');
-        asyncErrValMock(error);
-        return error;
+      err: (e) => {
+        expectTypeOf(e).toEqualTypeOf<'error'>();
+        expect(e).toBe('error');
+        asyncErrValMock(e);
+        return e;
       },
     });
     await expect(asyncErrMatch).resolves.toBe('error');
@@ -2734,17 +2735,17 @@ describe('Result', () => {
 
     const okResValMock = vi.fn();
     const okResMatch = okResVal.match({
-      ok: (value) => {
-        expectTypeOf(value).toEqualTypeOf<'value'>();
-        expect(value).toBe('value');
-        okResValMock(value);
-        return value;
+      ok: (v) => {
+        expectTypeOf(v).toEqualTypeOf<'value'>();
+        expect(v).toBe('value');
+        okResValMock(v);
+        return v;
       },
-      err: (error) => {
-        expectTypeOf(error).toEqualTypeOf<unknown>();
+      err: (e) => {
+        expectTypeOf(e).toEqualTypeOf<unknown>();
         expect(false).toBe(true);
-        okResValMock(error);
-        return error;
+        okResValMock(e);
+        return e;
       },
     });
     expect(okResValMock).toHaveBeenCalledTimes(1);
@@ -2754,17 +2755,17 @@ describe('Result', () => {
 
     const errResValMock = vi.fn();
     const errResMatch = errResVal.match({
-      ok: (value) => {
-        expectTypeOf(value).toEqualTypeOf<'value'>();
+      ok: (v) => {
+        expectTypeOf(v).toEqualTypeOf<'value'>();
         expect(false).toBe(true);
-        errResValMock(value);
-        return value;
+        errResValMock(v);
+        return v;
       },
-      err: (error) => {
-        expectTypeOf(error).toEqualTypeOf<unknown>();
-        expect(error).toBe(error);
-        errResValMock(error);
-        return error;
+      err: (e) => {
+        expectTypeOf(e).toEqualTypeOf<unknown>();
+        expect(e).toBe(error);
+        errResValMock(e);
+        return e;
       },
     });
     expect(errResValMock).toHaveBeenCalledTimes(1);
@@ -2774,17 +2775,17 @@ describe('Result', () => {
 
     const asyncOkResValMock = vi.fn();
     const asyncOkResMatch = asyncOkResVal.match({
-      ok: (value) => {
-        expectTypeOf(value).toEqualTypeOf<'value'>();
-        expect(value).toBe('value');
-        asyncOkResValMock(value);
-        return value;
+      ok: (v) => {
+        expectTypeOf(v).toEqualTypeOf<'value'>();
+        expect(v).toBe('value');
+        asyncOkResValMock(v);
+        return v;
       },
-      err: (error) => {
-        expectTypeOf(error).toEqualTypeOf<unknown>();
+      err: (e) => {
+        expectTypeOf(e).toEqualTypeOf<unknown>();
         expect(false).toBe(true);
-        asyncOkResValMock(error);
-        return error;
+        asyncOkResValMock(e);
+        return e;
       },
     });
     await expect(asyncOkResMatch).resolves.toBe('value');
@@ -2794,17 +2795,17 @@ describe('Result', () => {
 
     const asyncErrResValMock = vi.fn();
     const asyncErrResMatch = asyncErrResVal.match({
-      ok: (value) => {
-        expectTypeOf(value).toEqualTypeOf<'value'>();
+      ok: (v) => {
+        expectTypeOf(v).toEqualTypeOf<'value'>();
         expect(false).toBe(true);
-        asyncErrResValMock(value);
-        return value;
+        asyncErrResValMock(v);
+        return v;
       },
-      err: (error) => {
-        expectTypeOf(error).toEqualTypeOf<unknown>();
-        expect(error).toBe(error);
-        asyncErrResValMock(error);
-        return error;
+      err: (e) => {
+        expectTypeOf(e).toEqualTypeOf<unknown>();
+        expect(e).toBe(error);
+        asyncErrResValMock(e);
+        return e;
       },
     });
     await expect(asyncErrResMatch).resolves.toBe(error);

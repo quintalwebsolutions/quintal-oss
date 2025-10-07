@@ -1,6 +1,7 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
-import type { BodyValue, Columns, PluginArray, Plugins } from '../src';
-import { makeBody } from '../src';
+
+import type { BodyValue, Columns, PluginArray, Plugins } from '../src/index.ts';
+import { makeBody } from '../src/index.ts';
 
 describe('makeBody', () => {
   it('correctly makes a basic body', () => {

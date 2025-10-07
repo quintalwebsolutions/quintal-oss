@@ -12,8 +12,8 @@ import {
 } from '../option/index.ts';
 import type { MaybePromise } from '../util.ts';
 import { AsyncResult } from './AsyncResult.ts';
+import { ok } from './constructors/ok.ts';
 import type { ResultDocs } from './ResultDocs.ts';
-import { ok } from './constructors.ts';
 import {
   type AnyResult,
   type AnySyncResult,
@@ -24,7 +24,7 @@ import {
 } from './types.ts';
 
 export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
-  private _value: TValue;
+  private readonly _value: TValue;
 
   constructor(value: TValue) {
     this._value = value;

@@ -15,8 +15,8 @@ import type {
   SetStateFromPlugins,
   StateFromPlugins,
   TableBase,
-} from '../types';
-import { applyPlugins, getEntries, serializeValue } from './util';
+} from '../types/index.ts';
+import { applyPlugins, getEntries, serializeValue } from './util.ts';
 
 export function makeBody<TRow extends Row, TPlugins extends Plugins>(
   tableId: string,

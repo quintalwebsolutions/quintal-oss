@@ -58,7 +58,7 @@ type CreateEnvironmentOptions<TEnvValues extends EnvValues> = {
   values: TEnvValues;
 };
 
-function makeValues(values: EnvValues): Record<string, unknown> {
+function makeValues(values: EnvValues) {
   return Object.entries(values).reduce(
     (prev, [name, obj]) => {
       if (typeof obj === 'string' || typeof obj === 'undefined') prev[name] = obj;
@@ -94,7 +94,6 @@ function createProxy<TEnvValues extends EnvValues>(
   prefix?: string,
 ): UnwrapEnvValues<TEnvValues> {
   return new Proxy(values, {
-    // biome-ignore lint/nursery/useExplicitType: We infer the param and return type
     get(target, prop: string) {
       const targetValue = originalValues[prop];
       if (!targetValue) return;
@@ -125,13 +124,13 @@ export function createEnvironment<TEnvValues extends EnvValues>(
 
   const onValidationError =
     opts.onValidationError ??
-    ((error: ZodError): never => {
+    ((error) => {
       throw new Error(`❌ Invalid environment variables:\n${z.prettifyError(error)}`);
     });
 
   const onAccessError =
     opts.onAccessError ??
-    ((variableName: string): never => {
+    ((variableName) => {
       throw new Error(
         `❌ Attempted to access server-side environment variable '${variableName}' on the client`,
       );

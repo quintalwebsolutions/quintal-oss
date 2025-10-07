@@ -1,3 +1,4 @@
+// biome-ignore lint/performance/noBarrelFile: Entrypoint for Option monad
 export { AsyncOption } from './AsyncOption.ts';
 export { asyncNone, asyncSome, none, some } from './constructors.ts';
 export { None } from './None.ts';

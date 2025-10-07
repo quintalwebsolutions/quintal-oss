@@ -1,3 +1,4 @@
+// biome-ignore lint/performance/noBarrelFile: Entrypoint for Result monad
 export { AsyncResult } from './AsyncResult.ts';
 export {
   asyncErr,

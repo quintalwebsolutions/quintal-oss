@@ -1,5 +1,15 @@
 # @quintal/environment
 
+## 2.0.0
+
+### Major Changes
+
+- dbddcd3: Bump Zod dependency to v4
+
+### Patch Changes
+
+- e290a5c: Chore: bump dependencies and update config files
+
 ## 1.0.1
 
 ### Patch Changes

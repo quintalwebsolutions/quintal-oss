@@ -1,5 +1,11 @@
 # @quintal/table-engine-react
 
+## 0.0.4
+
+### Patch Changes
+
+- e290a5c: Chore: bump dependencies and update config files
+
 ## 0.0.3
 
 ### Patch Changes

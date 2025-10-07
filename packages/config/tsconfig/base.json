@@ -18,28 +18,38 @@
     "baseUrl": "${configDir}",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "target": "ESNext",
+    "noUncheckedSideEffectImports": true,
     "paths": {
-      "@": ["${configDir}/src"],
-      "@/*": ["${configDir}/src/*"]
+      "~": ["${configDir}/src"],
+      "~/*": ["${configDir}/src/*"]
     },
     "resolveJsonModule": true,
     "rootDir": "${configDir}",
 
     "emitDeclarationOnly": true,
     "declaration": true,
-    "outDir": "${configDir}/.dist",
+    "outDir": "${configDir}/dist",
+
+    "allowJs": false,
 
     "allowSyntheticDefaultImports": true,
+    "erasableSyntaxOnly": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "isolatedDeclarations": false,
     "isolatedModules": true,
+    "verbatimModuleSyntax": true,
 
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "target": "ESNext",
     "useDefineForClassFields": true,
 
+    "composite": true,
+    "incremental": true,
+
     "noErrorTruncation": true,
+
     "skipLibCheck": true
   },
   "include": ["${configDir}/**/*.ts", "${configDir}/**/*.tsx"],

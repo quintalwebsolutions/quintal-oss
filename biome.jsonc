@@ -150,7 +150,7 @@
       "nursery": {
         "noDeprecatedImports": "warn",
         "noFloatingPromises": "warn",
-        "noImportCycles": "warn",
+        "noImportCycles": "off", // TODO turn on
         "noJsxLiterals": "warn",
         "noMisusedPromises": "warn",
         "noNextAsyncClientComponent": "warn",

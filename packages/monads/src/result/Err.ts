@@ -1,7 +1,7 @@
 import { none, some } from '../option/index.ts';
 import type { MaybePromise } from '../util.ts';
 import { AsyncResult } from './AsyncResult.ts';
-import { err } from './constructors.ts';
+import { err } from './constructors/err.ts';
 import type { ResultDocs } from './ResultDocs.ts';
 import type { AnyResult, AnySyncResult, AsyncErr, ResultMatch, SerializedErr } from './types.ts';
 

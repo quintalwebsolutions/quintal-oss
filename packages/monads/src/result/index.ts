@@ -1,16 +1,10 @@
 // biome-ignore lint/performance/noBarrelFile: Entrypoint for Result monad
 export { AsyncResult } from './AsyncResult.ts';
-export {
-  asyncErr,
-  asyncOk,
-  asyncResultFromSerialized,
-  asyncResultFromThrowable,
-  err,
-  ok,
-  resultFromResults,
-  resultFromSerialized,
-  resultFromThrowable,
-} from './constructors.ts';
+export { asyncErr, err } from './constructors/err.ts';
+export { resultFromResults } from './constructors/from-results.ts';
+export { asyncResultFromSerialized, resultFromSerialized } from './constructors/from-serialized.ts';
+export { asyncResultFromThrowable, resultFromThrowable } from './constructors/from-throwable.ts';
+export { asyncOk, ok } from './constructors/ok.ts';
 export { Err } from './Err.ts';
 export { Ok } from './Ok.ts';
 export type {
@@ -25,6 +19,9 @@ export type {
   AsyncErr,
   AsyncOk,
   Result,
+  ResultFromResults,
+  ResultFromSerialized,
+  ResultMatch,
   SerializedErr,
   SerializedOk,
   SerializedResult,

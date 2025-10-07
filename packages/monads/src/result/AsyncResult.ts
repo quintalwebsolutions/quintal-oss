@@ -10,7 +10,7 @@ import {
   some,
 } from '../option/index.ts';
 import type { MaybePromise } from '../util.ts';
-import { ok } from './constructors.ts';
+import { ok } from './constructors/ok.ts';
 import type { Err } from './Err.ts';
 import type { Ok } from './Ok.ts';
 import type { ResultDocs } from './ResultDocs.ts';
@@ -67,11 +67,13 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
   }
 
   inspect(fn: (value: ValueFromOk<TResult>) => MaybePromise<void>) {
+    // biome-ignore lint/nursery/noFloatingPromises: Handled asynchronously
     this.then((res) => res.inspect(fn));
     return this;
   }
 
   inspectErr(fn: (error: ValueFromErr<TResult>) => MaybePromise<void>) {
+    // biome-ignore lint/nursery/noFloatingPromises: Handled asynchronously
     this.then((res) => res.inspectErr(fn));
     return this;
   }
@@ -194,14 +196,18 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
     return this.then(async (res) => await res.mapOrElse(defaultFn, fn)) as Return;
   }
 
-  and<TResultB extends AnyResult | Promise<AnySyncResult>>(resultB: TResultB): AsyncResult<ResultTernary<TResult, Awaited<TResultB>, Err<ValueFromErr<TResult>>>> {
+  and<TResultB extends AnyResult | Promise<AnySyncResult>>(
+    resultB: TResultB,
+  ): AsyncResult<ResultTernary<TResult, Awaited<TResultB>, Err<ValueFromErr<TResult>>>> {
     type Return = AsyncResult<
       ResultTernary<TResult, Awaited<TResultB>, Err<ValueFromErr<TResult>>>
     >;
     return new AsyncResult(this.then((res) => res.and(resultB))) as Return;
   }
 
-  or<TResultB extends AnyResult | Promise<AnySyncResult>>(resultB: TResultB): AsyncResult<ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Awaited<TResultB>>> {
+  or<TResultB extends AnyResult | Promise<AnySyncResult>>(
+    resultB: TResultB,
+  ): AsyncResult<ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Awaited<TResultB>>> {
     type Return = AsyncResult<ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Awaited<TResultB>>>;
     return new AsyncResult(this.then((res) => res.or(resultB))) as Return;
   }

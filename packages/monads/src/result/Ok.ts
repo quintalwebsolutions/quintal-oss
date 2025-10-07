@@ -12,7 +12,7 @@ import {
 } from '../option/index.ts';
 import type { MaybePromise } from '../util.ts';
 import { AsyncResult } from './AsyncResult.ts';
-import { ok } from './constructors.ts';
+import { ok } from './constructors/ok.ts';
 import type { ResultDocs } from './ResultDocs.ts';
 import {
   type AnyResult,

@@ -181,7 +181,7 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
   mapOr<TDefaultValue, TMappedValue>(
     defaultValue: TDefaultValue,
     fn: (value: ValueFromOk<TResult>) => TMappedValue,
-  ) {
+  ): Promise<Awaited<ResultTernary<TResult, TMappedValue, TDefaultValue>>> {
     type Return = Promise<Awaited<ResultTernary<TResult, TMappedValue, TDefaultValue>>>;
     return this.then(async (res) => await res.mapOr(defaultValue, fn)) as Return;
   }
@@ -189,26 +189,26 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
   mapOrElse<TDefaultValue, TMappedValue>(
     defaultFn: (error: ValueFromErr<TResult>) => TDefaultValue,
     fn: (value: ValueFromOk<TResult>) => TMappedValue,
-  ) {
+  ): Promise<Awaited<ResultTernary<TResult, TMappedValue, TDefaultValue>>> {
     type Return = Promise<Awaited<ResultTernary<TResult, TMappedValue, TDefaultValue>>>;
     return this.then(async (res) => await res.mapOrElse(defaultFn, fn)) as Return;
   }
 
-  and<TResultB extends AnyResult | Promise<AnySyncResult>>(resultB: TResultB) {
+  and<TResultB extends AnyResult | Promise<AnySyncResult>>(resultB: TResultB): AsyncResult<ResultTernary<TResult, Awaited<TResultB>, Err<ValueFromErr<TResult>>>> {
     type Return = AsyncResult<
       ResultTernary<TResult, Awaited<TResultB>, Err<ValueFromErr<TResult>>>
     >;
     return new AsyncResult(this.then((res) => res.and(resultB))) as Return;
   }
 
-  or<TResultB extends AnyResult | Promise<AnySyncResult>>(resultB: TResultB) {
+  or<TResultB extends AnyResult | Promise<AnySyncResult>>(resultB: TResultB): AsyncResult<ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Awaited<TResultB>>> {
     type Return = AsyncResult<ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Awaited<TResultB>>>;
     return new AsyncResult(this.then((res) => res.or(resultB))) as Return;
   }
 
   andThen<TResultB extends AnyResult | Promise<AnySyncResult>>(
     fn: (value: ValueFromOk<TResult>) => TResultB,
-  ) {
+  ): AsyncResult<ResultTernary<TResult, Awaited<TResultB>, Err<ValueFromErr<TResult>>>> {
     type Return = AsyncResult<
       ResultTernary<TResult, Awaited<TResultB>, Err<ValueFromErr<TResult>>>
     >;
@@ -217,7 +217,7 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
 
   orElse<TResultB extends AnyResult | Promise<AnySyncResult>>(
     fn: (error: ValueFromErr<TResult>) => TResultB,
-  ) {
+  ): AsyncResult<ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Awaited<TResultB>>> {
     type Return = AsyncResult<ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Awaited<TResultB>>>;
     return new AsyncResult(this.then((res) => res.orElse(fn))) as Return;
   }

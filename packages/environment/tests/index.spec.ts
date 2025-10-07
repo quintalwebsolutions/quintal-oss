@@ -1,5 +1,7 @@
+/** biome-ignore-all lint/style/noProcessEnv: This package reads from the env global */
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import { z } from 'zod';
+
 import { createEnvironment } from '../src/index.ts';
 
 describe('environment', () => {

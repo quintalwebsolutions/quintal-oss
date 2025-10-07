@@ -1,5 +1,4 @@
-import { z } from 'zod';
-import type { ZodError, ZodType } from 'zod';
+import { type ZodError, type ZodType, z } from 'zod';
 
 type EnvValue = {
   /**
@@ -86,6 +85,7 @@ function makeSchema(values: EnvValues, isServer: boolean): ZodType {
   return z.object(o);
 }
 
+// biome-ignore lint/nursery/useMaxParams: Internal function
 function createProxy<TEnvValues extends EnvValues>(
   values: UnwrapEnvValues<TEnvValues>,
   originalValues: EnvValues,
@@ -94,9 +94,10 @@ function createProxy<TEnvValues extends EnvValues>(
   prefix?: string,
 ): UnwrapEnvValues<TEnvValues> {
   return new Proxy(values, {
+    // biome-ignore lint/nursery/useExplicitType: We infer the param and return type
     get(target, prop: string) {
       const targetValue = originalValues[prop];
-      if (!targetValue) return undefined;
+      if (!targetValue) return;
       if (typeof targetValue === 'string') return targetValue;
 
       const variableName = prefix ? `${prefix}.${prop}` : prop;
@@ -124,15 +125,13 @@ export function createEnvironment<TEnvValues extends EnvValues>(
 
   const onValidationError =
     opts.onValidationError ??
-    ((error: ZodError) => {
-      throw new Error(
-        `❌ Invalid environment variables:\n${z.prettifyError(error)}`,
-      );
+    ((error: ZodError): never => {
+      throw new Error(`❌ Invalid environment variables:\n${z.prettifyError(error)}`);
     });
 
   const onAccessError =
     opts.onAccessError ??
-    ((variableName: string) => {
+    ((variableName: string): never => {
       throw new Error(
         `❌ Attempted to access server-side environment variable '${variableName}' on the client`,
       );

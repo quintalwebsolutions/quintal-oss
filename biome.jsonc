@@ -1,0 +1,112 @@
+{
+  "$schema": "node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "includes": ["**"],
+    "ignoreUnknown": true
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
+  "linter": {
+    "rules": {
+      "a11y": "warn",
+      "complexity": "warn",
+      "correctness": "warn",
+      "nursery": "warn",
+      "performance": "warn",
+      "security": "warn",
+      "style": "warn",
+      "suspicious": "warn"
+    }
+  },
+
+  // "linter": {
+  //   "rules": {
+  //     "all": true,
+  //     "correctness": {
+  //       "noNodejsModules": "off",
+  //       "noUndeclaredDependencies": "off"
+  //     },
+  //     "performance": {
+  //       "noBarrelFile": "off"
+  //     },
+  //     "style": {
+  //       "useBlockStatements": "off",
+  //       "useNamingConvention": {
+  //         "level": "warn",
+  //         "options": {
+  //           "strictCase": true,
+  //           "requireAscii": true,
+  //           "enumMemberCase": "CONSTANT_CASE",
+  //           "conventions": [
+  //             {
+  //               "selector": {
+  //                 "kind": "typeParameter"
+  //               },
+  //               "match": "T(.+)",
+  //               "formats": ["PascalCase"]
+  //             }
+  //           ]
+  //         }
+  //       }
+  //     }
+  //   }
+  // },
+
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "identifierOrder": "lexicographic",
+            "groups": [
+              ":NODE:",
+              ":BLANK_LINE:",
+              ":PACKAGE:",
+              ":BLANK_LINE:",
+              ":ALIAS:",
+              ":BLANK_LINE:",
+              ":PATH:",
+              ":BLANK_LINE:"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "lineWidth": 100
+  },
+  "javascript": {
+    "parser": {
+      "jsxEverywhere": false
+    },
+    "formatter": {
+      "quoteStyle": "single",
+      "quoteProperties": "preserve"
+    }
+  },
+  "json": {
+    "parser": {
+      "allowComments": true,
+      "allowTrailingCommas": true
+    }
+  },
+  "overrides": [
+    {
+      "includes": [],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    }
+  ]
+}

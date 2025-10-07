@@ -1,5 +1,5 @@
 import { describe, expectTypeOf, it } from 'vitest';
-import type { CheckPlugin, NumberPlugin, PluginObject, TextPlugin } from '../src';
+import type { CheckPlugin, NumberPlugin, PluginObject, TextPlugin } from '../../src';
 
 describe('plugin', () => {
   it('Allows the user to create a plugin with an internal value type, and optionally the serialized value type and empty type', () => {

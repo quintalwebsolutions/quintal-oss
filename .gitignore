@@ -14,3 +14,7 @@ junit.xml
 
 # Turbo
 .turbo
+
+# Visual Studio Code
+.vscode/**
+!.vscode/quintal-oss.code-workspace

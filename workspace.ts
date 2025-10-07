@@ -1,4 +1,4 @@
-import type { Workspace } from './scripts';
+import type { Workspace } from './scripts/index.ts';
 
 export const workspace: Workspace = {
   labels: [
@@ -93,6 +93,15 @@ export const workspace: Workspace = {
       description:
         'A headless, declarative, lightweight form engine for React apps with first-class TypeScript support.',
       keywords: ['react', 'form', 'hook', 'validation', 'headless', 'typescript'],
+      roadmap: [
+        { level: 1, text: 'Add support for popular schema validation libraries:' },
+        { level: 2, text: '[Zod](https://zod.dev)' },
+        { level: 2, text: '[Valibot](https://github.com/fabian-hiller/valibot)' },
+        { level: 2, text: '[Ajv.JS](https://ajv.js.org/)' },
+        { level: 2, text: '[Joi](https://joi.dev/)' },
+        { level: 2, text: '[Yup](https://github.com/jquense/yup)' },
+        { level: 2, text: 'Others?' },
+      ],
     },
     monads: {
       title: 'Quintal Monads',

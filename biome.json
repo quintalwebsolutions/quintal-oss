@@ -27,6 +27,9 @@
       "performance": {
         "noBarrelFile": "off"
       },
+      "suspicious": {
+        "noReactSpecificProps": "off"
+      },
       "style": {
         "useBlockStatements": "off",
         "useNamingConvention": {

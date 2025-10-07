@@ -126,9 +126,7 @@ export function createEnvironment<TEnvValues extends EnvValues>(
     opts.onValidationError ??
     ((error: ZodError) => {
       throw new Error(
-        `❌ Invalid environment variables: ${error.issues
-          .map(({ path, message }) => `${path.join('.')}: ${message}`)
-          .join(', ')}`,
+        `❌ Invalid environment variables:\n${z.prettifyError(error)}`,
       );
     });
 

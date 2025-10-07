@@ -24,17 +24,17 @@ describe('environment', () => {
           baseUrl: {
             self: {
               value: process.env.NEXT_PUBLIC_BASE_URL_SELF,
-              schema: z.string().url().default('http://localhost:3000'),
+              schema: z.url().default('http://localhost:3000'),
             },
             api: {
               value: process.env.NEXT_PUBLIC_BASE_URL_API,
-              schema: z.string().url().default('http://localhost:4000'),
+              schema: z.url().default('http://localhost:4000'),
             },
           },
           database: {
             url: {
               value: process.env.DATABASE_URL,
-              schema: z.string().url(),
+              schema: z.url(),
               isServerOnly: true,
             },
             token: {
@@ -81,7 +81,17 @@ describe('environment', () => {
         },
       }),
     ).toThrowErrorMatchingInlineSnapshot(
-      '[Error: ❌ Invalid environment variables: undefined: Required, nestedUndefined.undefined: Required, emptyString: Required, emptyStringToNumber: Required]',
+      `
+      [Error: ❌ Invalid environment variables:
+      ✖ Invalid input: expected string, received undefined
+        → at undefined
+      ✖ Invalid input: expected string, received undefined
+        → at emptyString
+      ✖ Invalid input: expected number, received undefined
+        → at emptyStringToNumber
+      ✖ Invalid input: expected string, received undefined
+        → at nestedUndefined.undefined]
+    `,
     );
   });
 

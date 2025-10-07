@@ -1,5 +1,15 @@
 # @quintal/monads
 
+## 0.5.0
+
+### Minor Changes
+
+- 294bbde: Expose ResultFromResults, ResultFromSerialized, and ResultMatch internal types
+
+### Patch Changes
+
+- e290a5c: Chore: bump dependencies and update config files
+
 ## 0.4.0
 
 ### Minor Changes

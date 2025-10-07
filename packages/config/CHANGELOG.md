@@ -1,5 +1,17 @@
 # @quintal/config
 
+## 0.3.0
+
+### Minor Changes
+
+- 463a5bd: Add noUncheckedSideEffectImports, erasableSyntaxOnly, and incremental. Rename the home path to ~, and the out dir to dist to follow newer convetions.
+- e290a5c: Add configDir template variable to typescript configs
+- e290a5c: Add nextjs.ts config file
+
+### Patch Changes
+
+- e290a5c: Chore: bump dependencies and update config files
+
 ## 0.2.2
 
 ### Patch Changes

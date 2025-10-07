@@ -1,4 +1,4 @@
-import type { PluginObject, Plugins, Row, TransformFn } from '../types';
+import type { PluginObject, Plugins, Row, TransformFn } from '../types/index.ts';
 
 export function serializeValue<TRow extends Row>(
   value: TRow[keyof TRow],

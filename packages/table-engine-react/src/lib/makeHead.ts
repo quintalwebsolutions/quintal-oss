@@ -13,8 +13,8 @@ import type {
   SetStateFromPlugins,
   StateFromPlugins,
   TableBase,
-} from '../types';
-import { applyPlugins, getEntries } from './util';
+} from '../types/index.ts';
+import { applyPlugins, getEntries } from './util.ts';
 
 export function makeHead<TRow extends Row, TPlugins extends Plugins>(
   tableId: string,

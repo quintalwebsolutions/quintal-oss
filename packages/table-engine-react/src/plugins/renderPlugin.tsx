@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react';
+
 import type {
   Body,
   BodyBase,
@@ -20,7 +21,7 @@ import type {
   Row,
   Table,
   TableBase,
-} from '../types';
+} from '../types/index.ts';
 
 type RenderFunc<Props extends object> = (props: Props) => ReactElement | null;
 

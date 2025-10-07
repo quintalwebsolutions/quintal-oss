@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { Plugins } from '../src';
-import { makeTable } from '../src';
+
+import type { Plugins } from '../src/index.ts';
+import { makeTable } from '../src/index.ts';
 
 describe('makeTable', () => {
   it('works', () => {

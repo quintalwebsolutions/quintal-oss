@@ -1,6 +1,7 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
-import type { BodyValue, Columns, PluginArray, Plugins } from '../src';
-import { makeBody } from '../src';
+
+import type { BodyValue, Columns, PluginArray, Plugins } from '../src/index.ts';
+import { makeBody } from '../src/index.ts';
 
 describe('makeBody', () => {
   it('correctly makes a basic body', () => {
@@ -57,14 +58,14 @@ describe('makeBody', () => {
       [
         {
           language: 'JavaScript',
-          jobs: { amount: 24000, salary: 118000 },
+          jobs: { amount: 24_000, salary: 118_000 },
           isStronglyTyped: null,
           undefined,
           unserialized: { value: 'hello' },
         },
         {
           language: 'Java',
-          jobs: { amount: 29000, salary: 104000 },
+          jobs: { amount: 29_000, salary: 104_000 },
           isStronglyTyped: true,
           undefined,
           unserialized: { value: 'world' },

@@ -1,5 +1,6 @@
 import { describe, expectTypeOf, it } from 'vitest';
-import type { Many, Optional, UnwrapValue, UnwrapValues, Value } from '../src';
+
+import type { Many, Optional, UnwrapValue, UnwrapValues, Value } from '../src/index.ts';
 
 type Ser = 'serialized';
 type Opt = 'optional';

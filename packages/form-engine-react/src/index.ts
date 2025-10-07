@@ -1,3 +1,3 @@
-export * from './lib';
-export * from './hooks';
-export * from './plugins';
+export * from './hooks/index.ts';
+export * from './lib/index.ts';
+export * from './plugins/index.ts';

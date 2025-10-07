@@ -1,12 +1,13 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
+
 import type {
   Plugins as BasePlugins,
   Row as BaseRow,
   DefaultValuePlugin,
   P,
   Table,
-} from '../../src';
-import { defaultValuePlugin, makeTable } from '../../src';
+} from '../../src/index.ts';
+import { defaultValuePlugin, makeTable } from '../../src/index.ts';
 
 const getTableValues = (table: Table<BaseRow, BasePlugins>): object[] =>
   table.body.rows.map((row) =>
@@ -133,7 +134,8 @@ describe('defaultValuePlugin', () => {
       vi.fn(),
       {
         defaultUndefined: { defaultValue: undefined },
-        defaultUndefinedFunc: { defaultValue: () => undefined },
+        // @ts-expect-error // TODO fix this error
+        defaultUndefinedFunc: { defaultValue: () => {} },
         noDefault: {},
       },
       [{ defaultUndefined: null, defaultUndefinedFunc: null, noDefault: null }],

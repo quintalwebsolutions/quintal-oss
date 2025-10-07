@@ -1,4 +1,4 @@
-import type { Value } from './values';
+import type { Value } from './values.ts';
 
 type PluginArgs = {
   /** Optional: What the internal value serializes to. Default: TInternalValue */

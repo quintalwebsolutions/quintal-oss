@@ -1,3 +1,3 @@
-export * from './makeBody';
-export * from './makeHead';
-export * from './makeTable';
+export * from './makeBody.ts';
+export * from './makeHead.ts';
+export * from './makeTable.ts';

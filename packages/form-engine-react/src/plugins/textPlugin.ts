@@ -1,4 +1,4 @@
-import type { Plugin, PluginObject, PluginValue } from '../lib';
+import type { Plugin, PluginObject, PluginValue } from '../lib/index.ts';
 
 export type TextPlugin = Plugin<string>;
 

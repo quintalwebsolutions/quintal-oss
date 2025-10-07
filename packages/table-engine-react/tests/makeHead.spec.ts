@@ -1,6 +1,7 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
-import type { PluginArray, Plugins } from '../src';
-import { makeHead } from '../src';
+
+import type { PluginArray, Plugins } from '../src/index.ts';
+import { makeHead } from '../src/index.ts';
 
 describe('makeHead', () => {
   it('correctly makes a basic head row', () => {

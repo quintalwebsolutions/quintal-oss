@@ -156,7 +156,7 @@
         "noNextAsyncClientComponent": "warn",
         "noNonNullAssertedOptionalChain": "warn",
         "noReactForwardRef": "warn",
-        "noSecrets": {"level": "error", "options": {"entropyThreshold": 55}},
+        "noSecrets": { "level": "error", "options": { "entropyThreshold": 55 } },
         "noShadow": "warn",
         "noUnnecessaryConditions": "warn",
         "noUnresolvedImports": "warn",
@@ -171,7 +171,7 @@
         "useConsistentArrowReturn": "warn",
         "useConsistentTypeDefinitions": {
           "level": "warn",
-          "options": {"style": "type"}
+          "options": { "style": "type" }
         },
         "useExhaustiveSwitchCases": "warn",
         "useExplicitType": "off",
@@ -268,7 +268,7 @@
         "useNodeAssertStrict": "warn",
         "useNodejsImportProtocol": "warn",
         "useNumberNamespace": "warn",
-        "useNumericSeparators": "warn",
+        "useNumericSeparators": "off",
         "useObjectSpread": "warn",
         "useReadonlyClassProperties": "warn",
         "useSelfClosingElements": "warn",

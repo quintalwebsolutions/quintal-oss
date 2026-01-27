@@ -39,7 +39,7 @@ type UnwrapEnvValues<TEnvValues extends EnvValues> = {
 type CreateEnvironmentOptions<TEnvValues extends EnvValues> = {
   /**
    * Whether or not the environment variable validation should be disabled.
-   * Enabling this option will make `createEnvironment` return `null`.
+   * Enabling this option will make `createEnvironment` return the unparsed, unvalidated environment variables.
    * @defaultValue false
    */
   isDisabled?: boolean;
@@ -126,8 +126,7 @@ function createProxy<TEnvValues extends EnvValues>(
 export function createEnvironment<TEnvValues extends EnvValues>(
   opts: CreateEnvironmentOptions<TEnvValues>,
 ): UnwrapEnvValues<TEnvValues> {
-  // If disabled, return null against the expected type
-  if (opts.isDisabled) return null as unknown as UnwrapEnvValues<TEnvValues>;
+  const isDisabled = opts.isDisabled ?? false;
 
   const isServer = opts.isServer ?? typeof window === 'undefined';
 
@@ -145,10 +144,10 @@ export function createEnvironment<TEnvValues extends EnvValues>(
       );
     });
 
-  const schema = makeSchema(opts.values, isServer);
   const values = makeValues(opts.values);
+  if (isDisabled) return values as UnwrapEnvValues<TEnvValues>;
 
-  const parsed = schema.safeParse(values);
+  const parsed = makeSchema(opts.values, isServer).safeParse(values);
   if (!parsed.success) return onValidationError(parsed.error);
 
   return createProxy(

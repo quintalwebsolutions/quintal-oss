@@ -171,15 +171,46 @@ describe('environment', () => {
   it('can be disabled entirely for use with external tools', () => {
     const values = {
       string: { value: 'value', schema: z.string().includes('not') },
+      number: { value: '42', schema: z.coerce.number().int().min(100) },
+      boolean: { value: 'true', schema: z.enum(['true', 'false']).transform((s) => s === 'true') },
+      undefined: { value: undefined, schema: z.string() },
+      nested: {
+        string: { value: 'nested value', schema: z.string().includes('not') },
+        number: { value: '4242', schema: z.coerce.number().int().max(100) },
+        boolean: {
+          value: 'false',
+          schema: z.enum(['true', 'false']).transform((s) => s === 'true'),
+        },
+        undefined: { value: undefined, schema: z.string() },
+      },
     };
 
-    expect(createEnvironment({ isDisabled: true, values })).toBeNull();
+    const environment = createEnvironment({ isDisabled: true, values });
+    expect(environment.string).toBe('value');
+    expect(environment.number).toBe('42');
+    expect(environment.boolean).toBe('true');
+    expect(environment.undefined).toBe(undefined);
+    expect(environment.nested.string).toBe('nested value');
+    expect(environment.nested.number).toBe('4242');
+    expect(environment.nested.boolean).toBe('false');
+    expect(environment.nested.undefined).toBe(undefined);
+
     expect(() =>
       createEnvironment({ isDisabled: false, values }),
     ).toThrowErrorMatchingInlineSnapshot(`
       [Error: ❌ Invalid environment variables:
       ✖ Invalid string: must include "not"
-        → at string]
+        → at string
+      ✖ Too small: expected number to be >=100
+        → at number
+      ✖ Invalid input: expected string, received undefined
+        → at undefined
+      ✖ Invalid string: must include "not"
+        → at nested.string
+      ✖ Too big: expected number to be <=100
+        → at nested.number
+      ✖ Invalid input: expected string, received undefined
+        → at nested.undefined]
     `);
   });
 });

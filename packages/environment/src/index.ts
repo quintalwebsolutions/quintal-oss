@@ -38,6 +38,12 @@ type UnwrapEnvValues<TEnvValues extends EnvValues> = {
 
 type CreateEnvironmentOptions<TEnvValues extends EnvValues> = {
   /**
+   * Whether or not the environment variable validation should be disabled.
+   * Enabling this option will make `createEnvironment` return `null`.
+   * @defaultValue false
+   */
+  isDisabled?: boolean;
+  /**
    * Whether or not the application is running on the server.
    * @defaultValue typeof window === 'undefined'
    */
@@ -92,7 +98,7 @@ function createProxy<TEnvValues extends EnvValues>(
   isServer: boolean,
   onAccessError: (variableName: string) => never,
   prefix?: string,
-): UnwrapEnvValues<TEnvValues> {
+) {
   return new Proxy(values, {
     get(target, prop: string) {
       const targetValue = originalValues[prop];
@@ -120,6 +126,9 @@ function createProxy<TEnvValues extends EnvValues>(
 export function createEnvironment<TEnvValues extends EnvValues>(
   opts: CreateEnvironmentOptions<TEnvValues>,
 ): UnwrapEnvValues<TEnvValues> {
+  // If disabled, return null against the expected type
+  if (opts.isDisabled) return null as unknown as UnwrapEnvValues<TEnvValues>;
+
   const isServer = opts.isServer ?? typeof window === 'undefined';
 
   const onValidationError =

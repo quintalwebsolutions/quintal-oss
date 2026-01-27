@@ -1,6 +1,6 @@
 {
   "name": "@quintal/environment",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "license": "MIT",
   "description": "Framework-agnostic environment variable validation for TypeScript powered by Zod",
   "keywords": [

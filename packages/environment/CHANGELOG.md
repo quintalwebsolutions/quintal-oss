@@ -1,5 +1,11 @@
 # @quintal/environment
 
+## 2.1.1
+
+### Patch Changes
+
+- baa470a: Tweak `isDisabled` implementation to pass the source object through, instead of just returning `null`
+
 ## 2.1.0
 
 ### Minor Changes

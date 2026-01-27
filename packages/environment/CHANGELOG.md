@@ -1,5 +1,11 @@
 # @quintal/environment
 
+## 2.1.0
+
+### Minor Changes
+
+- ac94488: Add `isDisabled` property to fully disable the environment variable validation
+
 ## 2.0.0
 
 ### Major Changes

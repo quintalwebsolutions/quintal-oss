@@ -8,6 +8,7 @@ junit.xml
 
 # Generated output
 .dist
+*.tsbuildinfo
 
 # Logs
 *.log*

@@ -2875,4 +2875,35 @@ describe('Result', () => {
     await expect(res.isErr).resolves.toBe(true);
     await expect(res.unwrapErr()).resolves.toBe(error);
   });
+
+  test('resultFromThrowable maps the caught error with `mapError`', () => {
+    const mapError = (e: unknown) => ({ type: 'custom' as const, cause: e });
+
+    const okMapped = resultFromThrowable(returns, mapError);
+    expectTypeOf(okMapped).toEqualTypeOf<Result<'value', { type: 'custom'; cause: unknown }>>();
+    expect(okMapped.unwrap()).toBe('value');
+
+    const errMapped = resultFromThrowable(throws, mapError);
+    expectTypeOf(errMapped).toEqualTypeOf<Result<'value', { type: 'custom'; cause: unknown }>>();
+    expect(errMapped.unwrapErr()).toEqual({ type: 'custom', cause: error });
+  });
+
+  test('asyncResultFromThrowable maps the caught error with `mapError`', async () => {
+    const mapError = (e: unknown) => ({ type: 'custom' as const, cause: e });
+    const syncThrowingFn = (() => {
+      throw error;
+    }) as () => Promise<'value'>;
+
+    const okMapped = asyncResultFromThrowable(returnsAsync, mapError);
+    expectTypeOf(okMapped).toEqualTypeOf<
+      AsyncResult<Result<'value', { type: 'custom'; cause: unknown }>>
+    >();
+    await expect(okMapped.unwrap()).resolves.toBe('value');
+
+    const errMapped = asyncResultFromThrowable(throwsAsync, mapError);
+    await expect(errMapped.unwrapErr()).resolves.toEqual({ type: 'custom', cause: error });
+
+    const syncErrMapped = asyncResultFromThrowable(syncThrowingFn, mapError);
+    await expect(syncErrMapped.unwrapErr()).resolves.toEqual({ type: 'custom', cause: error });
+  });
 });

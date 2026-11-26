@@ -11,12 +11,26 @@ import { ok } from './ok.ts';
  *  if (Math.random() > 0.5) return true;
  *  throw new Error('failure');
  * }); // `result` is of type `Result<boolean, unknown>`
+ *
+ * @example
+ * const result = resultFromThrowable(
+ *  () => JSON.parse(input),
+ *  (e) => ({ type: 'invalid-json', cause: e }),
+ * ); // `result` is of type `Result<any, { type: string; cause: unknown }>`
  */
-export function resultFromThrowable<TValue>(fn: () => TValue): Result<TValue, unknown> {
+export function resultFromThrowable<TValue>(fn: () => TValue): Result<TValue, unknown>;
+export function resultFromThrowable<TValue, TError>(
+  fn: () => TValue,
+  mapError: (error: unknown) => TError,
+): Result<TValue, TError>;
+export function resultFromThrowable<TValue>(
+  fn: () => TValue,
+  mapError: (error: unknown) => unknown = (e) => e,
+): Result<TValue, unknown> {
   try {
     return ok(fn());
   } catch (e) {
-    return err(e);
+    return err(mapError(e));
   }
 }
 
@@ -28,14 +42,28 @@ export function resultFromThrowable<TValue>(fn: () => TValue): Result<TValue, un
  *  if (await Promise.resolve(Math.random()) > 0.5) return true;
  *  throw new Error('failure');
  * }); // `result` is of type `AsyncResult<Result<boolean, unknown>>`
+ *
+ * @example
+ * const result = asyncResultFromThrowable(
+ *  () => fetch(url),
+ *  (e) => ({ type: 'unreachable', cause: e }),
+ * ); // `result` is of type `AsyncResult<Result<Response, { type: string; cause: unknown }>>`
  */
 export function asyncResultFromThrowable<TValue>(
   fn: () => Promise<TValue>,
+): AsyncResult<Result<TValue, unknown>>;
+export function asyncResultFromThrowable<TValue, TError>(
+  fn: () => Promise<TValue>,
+  mapError: (error: unknown) => TError,
+): AsyncResult<Result<TValue, TError>>;
+export function asyncResultFromThrowable<TValue>(
+  fn: () => Promise<TValue>,
+  mapError: (error: unknown) => unknown = (e) => e,
 ): AsyncResult<Result<TValue, unknown>> {
   return new AsyncResult(
     // Wrapping in a promise executor also catches synchronous throws from `fn`
     new Promise<TValue>((resolve) => resolve(fn()))
       .then((value) => ok(value))
-      .catch((error) => err(error)),
+      .catch((error) => err(mapError(error))),
   );
 }

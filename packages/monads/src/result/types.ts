@@ -4,6 +4,7 @@ import { Err } from './Err.ts';
 import { Ok } from './Ok.ts';
 
 export type Result<TValue, TError> = Ok<TValue> | Err<TError>;
+export type AsyncResultOf<TValue, TError> = AsyncResult<Result<TValue, TError>>;
 export type AsyncOk<TValue> = AsyncResult<Ok<TValue>>;
 export type AsyncErr<TError> = AsyncResult<Err<TError>>;
 

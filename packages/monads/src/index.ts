@@ -36,6 +36,7 @@ export {
   type AsyncErr,
   type AsyncOk,
   AsyncResult,
+  type AsyncResultOf,
   Err,
   Ok,
   type Result,

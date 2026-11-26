@@ -6,6 +6,7 @@ import {
   type AsyncNone,
   type AsyncOk,
   type AsyncResult,
+  type AsyncResultOf,
   type AsyncSome,
   type Err,
   type None,
@@ -2905,5 +2906,15 @@ describe('Result', () => {
 
     const syncErrMapped = asyncResultFromThrowable(syncThrowingFn, mapError);
     await expect(syncErrMapped.unwrapErr()).resolves.toEqual({ type: 'custom', cause: error });
+  });
+
+  test('async result alias expands to an async Result', async () => {
+    expectTypeOf<AsyncResultOf<'v', 'e'>>().toEqualTypeOf<AsyncResult<Result<'v', 'e'>>>();
+
+    // Usable as a function return type, with both variants assignable to it
+    const fromOk = (): AsyncResultOf<'value', 'error'> => asyncOk('value');
+    const fromErr = (): AsyncResultOf<'value', 'error'> => asyncErr('error');
+    await expect(fromOk().unwrap()).resolves.toBe('value');
+    await expect(fromErr().unwrapErr()).resolves.toBe('error');
   });
 });

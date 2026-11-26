@@ -1,5 +1,18 @@
 # @quintal/monads
 
+## 0.6.0
+
+### Minor Changes
+
+- 9fa5552: Add an optional `mapError` argument to `resultFromThrowable` and `asyncResultFromThrowable`, so the caught error can be mapped to a typed error instead of `unknown`
+- aa3f1f9: `inspect` and `inspectErr` now never let a failing callback affect the result: errors thrown (or rejected) inside the callback are silently swallowed. `inspect` and `inspectErr` now also follow the same pattern as `map` and `mapErr` for async callbacks: if the callback returns a promise, the result becomes an `AsyncResult` that resolves once the callback has finished. For example `ok(1).inspect(async () => {})` is now an `AsyncOk<number>` instead of an `Ok<number>`.
+- 1b6e491: Add the `AsyncResultOf<TValue, TError>` type alias as shorthand for `AsyncResult<Result<TValue, TError>>`
+
+### Patch Changes
+
+- d001f5e: Simplify the return types of `AsyncResult`'s `map`, `mapErr`, `inspect`, `inspectErr`, `ok`, `err`, `flatten` and `transpose` for results that can be either `ok` or `err`.
+- 24741f3: Fix `asyncResultFromThrowable` throwing instead of returning an `Err` when the given function throws synchronously (e.g. a non-async function, or before its first `await`)
+
 ## 0.5.0
 
 ### Minor Changes

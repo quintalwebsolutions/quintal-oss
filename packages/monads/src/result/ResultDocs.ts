@@ -1,4 +1,4 @@
-import type { AnyOption, AsyncNone, AsyncSome, None, Some } from '../option/index.ts';
+import type { AsyncNone, AsyncOption, AsyncSome, None, Some } from '../option/index.ts';
 import type { MaybePromise } from '../util.ts';
 import type { AsyncResult } from './AsyncResult.ts';
 import type { Err } from './Err.ts';
@@ -8,10 +8,12 @@ import type {
   AnySyncResult,
   AsyncErr,
   AsyncOk,
+  FlattenedResult,
   ResultMatch,
   ResultTernary,
   SerializedErr,
   SerializedOk,
+  TransposedOk,
   ValueFromErr,
   ValueFromOk,
 } from './types.ts';
@@ -136,7 +138,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: TReturn extends Promise<void> ? AsyncOk<TValue> : Ok<TValue>;
       err: Err<TValue>;
-      async: ResultTernary<TValue, AsyncOk<ValueFromOk<TValue>>, AsyncErr<ValueFromErr<TValue>>>;
+      async: AsyncResult<ResultTernary<TValue, Ok<ValueFromOk<TValue>>, Err<ValueFromErr<TValue>>>>;
     }
   >;
   /**
@@ -155,7 +157,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: Ok<TValue>;
       err: TReturn extends Promise<void> ? AsyncErr<TValue> : Err<TValue>;
-      async: ResultTernary<TValue, AsyncOk<ValueFromOk<TValue>>, AsyncErr<ValueFromErr<TValue>>>;
+      async: AsyncResult<ResultTernary<TValue, Ok<ValueFromOk<TValue>>, Err<ValueFromErr<TValue>>>>;
     }
   >;
   // #endregion
@@ -286,7 +288,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: Some<TValue>;
       err: None;
-      async: ResultTernary<TValue, AsyncSome<ValueFromOk<TValue>>, AsyncNone>;
+      async: AsyncOption<ResultTernary<TValue, Some<ValueFromOk<TValue>>, None>>;
     }
   >;
   /**
@@ -303,7 +305,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: None;
       err: Some<TValue>;
-      async: ResultTernary<TValue, AsyncNone, AsyncSome<ValueFromErr<TValue>>>;
+      async: AsyncOption<ResultTernary<TValue, None, Some<ValueFromErr<TValue>>>>;
     }
   >;
   /**
@@ -332,18 +334,8 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
             ? AsyncSome<Ok<TSome>>
             : Some<Ok<TValue>>;
       err: Some<Err<TValue>>;
-      async: ResultTernary<
-        TValue,
-        TValue extends Ok<infer TOption extends AnyOption>
-          ? TOption extends None | AsyncNone
-            ? AsyncNone
-            : TOption extends Some<infer TSome>
-              ? AsyncSome<Ok<TSome>>
-              : TOption extends AsyncSome<infer TSome>
-                ? AsyncSome<Ok<TSome>>
-                : never
-          : AsyncSome<Ok<ValueFromOk<TValue>>>,
-        AsyncSome<TValue>
+      async: AsyncOption<
+        ResultTernary<TValue, TransposedOk<ValueFromOk<TValue>>, Some<Err<ValueFromErr<TValue>>>>
       >;
     }
   >;
@@ -367,14 +359,8 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     {
       ok: TValue extends AnyResult ? TValue : Ok<TValue>;
       err: Err<TValue>;
-      async: ResultTernary<
-        TValue,
-        ValueFromOk<TValue> extends AnySyncResult
-          ? AsyncResult<ValueFromOk<TValue>>
-          : ValueFromOk<TValue> extends AnyResult
-            ? ValueFromOk<TValue>
-            : AsyncResult<Ok<ValueFromOk<TValue>>>,
-        AsyncResult<Err<ValueFromErr<TValue>>>
+      async: AsyncResult<
+        ResultTernary<TValue, FlattenedResult<ValueFromOk<TValue>>, Err<ValueFromErr<TValue>>>
       >;
     }
   >;
@@ -400,7 +386,9 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
         ? AsyncOk<TAwaitedMappedValue>
         : Ok<TMappedValue>;
       err: Err<TValue>;
-      async: ResultTernary<TValue, AsyncOk<Awaited<TMappedValue>>, AsyncErr<ValueFromErr<TValue>>>;
+      async: AsyncResult<
+        ResultTernary<TValue, Ok<Awaited<TMappedValue>>, Err<ValueFromErr<TValue>>>
+      >;
     }
   >;
   /**
@@ -425,7 +413,9 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
       err: TMappedError extends Promise<infer TAwaitedMappedError>
         ? AsyncErr<TAwaitedMappedError>
         : Err<TMappedError>;
-      async: ResultTernary<TValue, AsyncOk<ValueFromOk<TValue>>, AsyncErr<Awaited<TMappedError>>>;
+      async: AsyncResult<
+        ResultTernary<TValue, Ok<ValueFromOk<TValue>>, Err<Awaited<TMappedError>>>
+      >;
     }
   >;
   /**

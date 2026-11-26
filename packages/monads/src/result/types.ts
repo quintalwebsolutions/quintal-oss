@@ -1,3 +1,4 @@
+import type { AnyOption, AsyncNone, AsyncSome, None, Some } from '../option/index.ts';
 import type { Ternary } from '../util.ts';
 import { AsyncResult } from './AsyncResult.ts';
 import { Err } from './Err.ts';
@@ -82,6 +83,24 @@ export type ResultFromResults<
   : Ternary<TIsAsync, AsyncOk<TValues>, Ok<TValues>> | TErrors[number];
 
 export type ResultTernary<TResult, TIfOk, TIfErr> = TResult extends AnyOk ? TIfOk : TIfErr;
+
+/** The sync option that remains after transposing an `ok` result holding `TInner` */
+export type TransposedOk<TInner> = TInner extends AnyOption
+  ? TInner extends None | AsyncNone
+    ? None
+    : TInner extends Some<infer TSome>
+      ? Some<Ok<TSome>>
+      : TInner extends AsyncSome<infer TSome>
+        ? Some<Ok<TSome>>
+        : never
+  : Some<Ok<TInner>>;
+
+/** The sync result that remains after flattening a (possibly async) inner result */
+export type FlattenedResult<TInner> = TInner extends AsyncResult<infer TSyncResult>
+  ? TSyncResult
+  : TInner extends AnySyncResult
+    ? TInner
+    : Ok<TInner>;
 
 export type ValueFromOk<TOk> = TOk extends Ok<infer TValue> ? TValue : never;
 export type ValueFromErr<TErr> = TErr extends Err<infer TError> ? TError : never;

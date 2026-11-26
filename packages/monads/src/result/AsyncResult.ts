@@ -1,9 +1,6 @@
 import {
-  type AnyOption,
   type AnySyncOption,
-  type AsyncNone,
   AsyncOption,
-  type AsyncSome,
   type None,
   type Some,
   isAnyOption,
@@ -17,12 +14,12 @@ import type { ResultDocs } from './ResultDocs.ts';
 import type {
   AnyResult,
   AnySyncResult,
-  AsyncErr,
-  AsyncOk,
+  FlattenedResult,
   ResultMatch,
   ResultTernary,
   SerializedErr,
   SerializedOk,
+  TransposedOk,
   ValueFromErr,
   ValueFromOk,
 } from './types.ts';
@@ -67,10 +64,8 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
   }
 
   inspect<TReturn extends MaybePromise<void>>(fn: (value: ValueFromOk<TResult>) => TReturn) {
-    type Return = ResultTernary<
-      TResult,
-      AsyncOk<ValueFromOk<TResult>>,
-      AsyncErr<ValueFromErr<TResult>>
+    type Return = AsyncResult<
+      ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Err<ValueFromErr<TResult>>>
     >;
     const promise = this.then(async (res) => {
       await res.inspect(fn);
@@ -80,10 +75,8 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
   }
 
   inspectErr<TReturn extends MaybePromise<void>>(fn: (error: ValueFromErr<TResult>) => TReturn) {
-    type Return = ResultTernary<
-      TResult,
-      AsyncOk<ValueFromOk<TResult>>,
-      AsyncErr<ValueFromErr<TResult>>
+    type Return = AsyncResult<
+      ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Err<ValueFromErr<TResult>>>
     >;
     const promise = this.then(async (res) => {
       await res.inspectErr(fn);
@@ -123,30 +116,20 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
   }
 
   ok() {
-    type Return = ResultTernary<TResult, AsyncSome<ValueFromOk<TResult>>, AsyncNone>;
+    type Return = AsyncOption<ResultTernary<TResult, Some<ValueFromOk<TResult>>, None>>;
     const promise = this.then((res) => res.ok() as AnySyncOption);
     return new AsyncOption(promise) as Return;
   }
 
   err() {
-    type Return = ResultTernary<TResult, AsyncNone, AsyncSome<ValueFromErr<TResult>>>;
+    type Return = AsyncOption<ResultTernary<TResult, None, Some<ValueFromErr<TResult>>>>;
     const promise = this.then((res) => res.err() as AnySyncOption);
     return new AsyncOption(promise) as Return;
   }
 
   transpose() {
-    type Return = ResultTernary<
-      TResult,
-      TResult extends Ok<infer TOption extends AnyOption>
-        ? TOption extends None | AsyncNone
-          ? AsyncNone
-          : TOption extends Some<infer TSome>
-            ? AsyncSome<Ok<TSome>>
-            : TOption extends AsyncSome<infer TSome>
-              ? AsyncSome<Ok<TSome>>
-              : never
-        : AsyncSome<Ok<ValueFromOk<TResult>>>,
-      AsyncSome<TResult>
+    type Return = AsyncOption<
+      ResultTernary<TResult, TransposedOk<ValueFromOk<TResult>>, Some<Err<ValueFromErr<TResult>>>>
     >;
     return new AsyncOption(
       this.then(async (res) => {
@@ -162,33 +145,23 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
   }
 
   flatten() {
-    type Return = ResultTernary<
-      TResult,
-      ValueFromOk<TResult> extends AnySyncResult
-        ? AsyncResult<ValueFromOk<TResult>>
-        : ValueFromOk<TResult> extends AnyResult
-          ? ValueFromOk<TResult>
-          : AsyncResult<Ok<ValueFromOk<TResult>>>,
-      AsyncResult<Err<ValueFromErr<TResult>>>
+    type Return = AsyncResult<
+      ResultTernary<TResult, FlattenedResult<ValueFromOk<TResult>>, Err<ValueFromErr<TResult>>>
     >;
     return new AsyncResult(this.then((res) => res.flatten())) as Return;
   }
 
   map<TMappedValue>(fn: (value: ValueFromOk<TResult>) => TMappedValue) {
-    type Return = ResultTernary<
-      TResult,
-      AsyncOk<Awaited<TMappedValue>>,
-      AsyncErr<ValueFromErr<TResult>>
+    type Return = AsyncResult<
+      ResultTernary<TResult, Ok<Awaited<TMappedValue>>, Err<ValueFromErr<TResult>>>
     >;
     const promise = this.then(async (res) => (await res.map(fn)) as AnySyncResult);
     return new AsyncResult(promise) as Return;
   }
 
   mapErr<TMappedError>(fn: (error: ValueFromErr<TResult>) => TMappedError) {
-    type Return = ResultTernary<
-      TResult,
-      AsyncOk<ValueFromOk<TResult>>,
-      AsyncErr<Awaited<TMappedError>>
+    type Return = AsyncResult<
+      ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Err<Awaited<TMappedError>>>
     >;
     const promise = this.then(async (res) => (await res.mapErr(fn)) as AnySyncResult);
     return new AsyncResult(promise) as Return;

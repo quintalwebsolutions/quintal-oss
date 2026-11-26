@@ -150,19 +150,23 @@ export function renderPlugin<TRow extends Row, TPlugins extends Plugins>(
       //   TableBase<TRow, RenderPluginArgs<TRow, TPlugins>> & Table<TRow, TPlugins>
       // >;
       // Fixes it, but it's not a good solution
+      // @ts-expect-error Same generic mismatch as the FIXME above (surfaced by TypeScript 7).
       return { ...table, render: () => renderTable(table) };
     },
     transformHead: (head) => {
       const renderHead = options.renderHead ?? defaultRenderHead;
+      // @ts-expect-error Same generic mismatch as the FIXME above (surfaced by TypeScript 7).
       return { ...head, render: () => renderHead(head) };
     },
     transformHeadRow: (headRow) => {
       const renderHeadRow = options.renderHeadRow ?? defaultRenderHeadRow;
+      // @ts-expect-error Same generic mismatch as the FIXME above (surfaced by TypeScript 7).
       return { ...headRow, render: () => renderHeadRow(headRow) };
     },
     transformHeadCell: (headCell, _state, _setState, { column }) => {
       const renderHeadCell =
         column.renderHeadCell ?? options.renderHeadCell ?? defaultRenderHeadCell;
+      // @ts-expect-error Same generic mismatch as the FIXME above (surfaced by TypeScript 7).
       return { ...headCell, render: () => renderHeadCell(headCell) };
     },
     transformBody: (body) => {

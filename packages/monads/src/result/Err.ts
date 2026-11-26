@@ -36,9 +36,21 @@ export class Err<TError> implements ResultDocs<TError, 'err'> {
     return this;
   }
 
-  inspectErr(fn: (error: TError) => MaybePromise<void>) {
-    fn(this.error);
-    return this;
+  inspectErr<TReturn extends MaybePromise<void>>(fn: (error: TError) => TReturn) {
+    type Return = TReturn extends Promise<void> ? AsyncErr<TError> : Err<TError>;
+    const inspected = err(this.error);
+    try {
+      const result = fn(this.error);
+      if (result instanceof Promise)
+        return new AsyncResult(
+          result.then(
+            () => inspected,
+            () => inspected,
+          ),
+        ) as Return;
+      // biome-ignore lint/suspicious/noEmptyBlockStatements: Failing inspect callbacks are silently swallowed
+    } catch {}
+    return inspected as Return;
   }
 
   expect(message: string): never {

@@ -18,6 +18,7 @@ export type {
   AnySyncResult,
   AsyncErr,
   AsyncOk,
+  AsyncResultOf,
   Result,
   ResultFromResults,
   ResultFromSerialized,

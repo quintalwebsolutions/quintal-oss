@@ -50,9 +50,21 @@ export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
     return false as const;
   }
 
-  inspect(fn: (value: TValue) => MaybePromise<void>) {
-    fn(this.value);
-    return this;
+  inspect<TReturn extends MaybePromise<void>>(fn: (value: TValue) => TReturn) {
+    type Return = TReturn extends Promise<void> ? AsyncOk<TValue> : Ok<TValue>;
+    const inspected = ok(this.value);
+    try {
+      const result = fn(this.value);
+      if (result instanceof Promise)
+        return new AsyncResult(
+          result.then(
+            () => inspected,
+            () => inspected,
+          ),
+        ) as Return;
+      // biome-ignore lint/suspicious/noEmptyBlockStatements: Failing inspect callbacks are silently swallowed
+    } catch {}
+    return inspected as Return;
   }
 
   inspectErr(_fn: (error: never) => MaybePromise<void>) {

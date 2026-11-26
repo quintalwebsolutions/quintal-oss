@@ -5,7 +5,9 @@ import {
   type AsyncErr,
   type AsyncNone,
   type AsyncOk,
+  type AsyncOption,
   type AsyncResult,
+  type AsyncResultOf,
   type AsyncSome,
   type Err,
   type None,
@@ -612,7 +614,7 @@ describe('Result', () => {
       expectTypeOf(value).toEqualTypeOf<'value'>();
       await Promise.resolve(okValAsyncMock(value));
     });
-    eu(okValAsyncInspected).toBe<'value', never>(true, 'value');
+    await eua(okValAsyncInspected).toBe<P<'value'>, P<never>>(true, 'value');
     expect(okValAsyncMock).toHaveBeenCalledWith('value');
 
     const errValMock = vi.fn();
@@ -644,7 +646,7 @@ describe('Result', () => {
       expectTypeOf(value).toEqualTypeOf<'value'>();
       await Promise.resolve(okResAsyncMock(value));
     });
-    eu(okResAsyncInspected).toBe<'value', unknown>(true, 'value');
+    await eua(okResAsyncInspected).toBe<P<'value'>, unknown>(true, 'value');
     expect(okResAsyncMock).toHaveBeenCalledWith('value');
 
     const errResMock = vi.fn();
@@ -660,7 +662,7 @@ describe('Result', () => {
       expectTypeOf(value).toEqualTypeOf<'value'>();
       await Promise.resolve(errResAsyncMock(value));
     });
-    eu(errResAsyncInspected).toBe<'value', unknown>(false, error);
+    eu(errResAsyncInspected).toBe<P<'value'>, unknown>(false, error);
     expect(errResAsyncMock).not.toHaveBeenCalled();
 
     const asyncOkValMock = vi.fn();
@@ -766,7 +768,7 @@ describe('Result', () => {
       expectTypeOf(value).toEqualTypeOf<'error'>();
       await Promise.resolve(errValAsyncMock(value));
     });
-    eu(errValAsyncInspected).toBe<never, 'error'>(false, 'error');
+    await eua(errValAsyncInspected).toBe<P<never>, P<'error'>>(false, 'error');
     expect(errValAsyncMock).toHaveBeenCalledWith('error');
 
     const okResMock = vi.fn();
@@ -782,7 +784,7 @@ describe('Result', () => {
       expectTypeOf(value).toEqualTypeOf<unknown>();
       await Promise.resolve(okResAsyncMock(value));
     });
-    eu(okResAsyncInspected).toBe<'value', unknown>(true, 'value');
+    eu(okResAsyncInspected).toBe<'value' | P<never>, P<unknown>>(true, 'value');
     expect(okResAsyncMock).not.toHaveBeenCalled();
 
     const errResMock = vi.fn();
@@ -798,7 +800,7 @@ describe('Result', () => {
       expectTypeOf(value).toEqualTypeOf<unknown>();
       await Promise.resolve(errResAsyncMock(value));
     });
-    eu(errResAsyncInspected).toBe<'value', unknown>(false, error);
+    await eua(errResAsyncInspected).toBe<'value' | P<never>, P<unknown>>(false, error);
     expect(errResAsyncMock).toHaveBeenCalledWith(error);
 
     const asyncOkValMock = vi.fn();
@@ -1184,13 +1186,13 @@ describe('Result', () => {
     await expect(() => asyncErrValOk.unwrap()).rejects.toThrow();
 
     const asyncOkResValOk = asyncOkResVal.ok();
-    expectTypeOf(asyncOkResValOk).toEqualTypeOf<AsyncNone | AsyncSome<'value'>>();
+    expectTypeOf(asyncOkResValOk).toEqualTypeOf<AsyncOption<Option<'value'>>>();
     await expect(asyncOkResValOk.isSome).resolves.toBe(true);
     await expect(asyncOkResValOk.isNone).resolves.toBe(false);
     await expect(asyncOkResValOk.unwrap()).resolves.toBe('value');
 
     const asyncErrResValOk = asyncErrResVal.ok();
-    expectTypeOf(asyncErrResValOk).toEqualTypeOf<AsyncNone | AsyncSome<'value'>>();
+    expectTypeOf(asyncErrResValOk).toEqualTypeOf<AsyncOption<Option<'value'>>>();
     await expect(asyncErrResValOk.isSome).resolves.toBe(false);
     await expect(asyncErrResValOk.isNone).resolves.toBe(true);
     await expect(() => asyncErrResValOk.unwrap()).rejects.toThrow();
@@ -1234,13 +1236,13 @@ describe('Result', () => {
     await expect(asyncErrValErr.unwrap()).resolves.toBe('error');
 
     const asyncOkResValErr = asyncOkResVal.err();
-    expectTypeOf(asyncOkResValErr).toEqualTypeOf<AsyncNone | AsyncSome<unknown>>();
+    expectTypeOf(asyncOkResValErr).toEqualTypeOf<AsyncOption<Option<unknown>>>();
     await expect(asyncOkResValErr.isSome).resolves.toBe(false);
     await expect(asyncOkResValErr.isNone).resolves.toBe(true);
     await expect(() => asyncOkResValErr.unwrap()).rejects.toThrow();
 
     const asyncErrResValErr = asyncErrResVal.err();
-    expectTypeOf(asyncErrResValErr).toEqualTypeOf<AsyncNone | AsyncSome<unknown>>();
+    expectTypeOf(asyncErrResValErr).toEqualTypeOf<AsyncOption<Option<unknown>>>();
     await expect(asyncErrResValErr.isSome).resolves.toBe(true);
     await expect(asyncErrResValErr.isNone).resolves.toBe(false);
     await expect(asyncErrResValErr.unwrap()).resolves.toStrictEqual(error);
@@ -1370,6 +1372,14 @@ describe('Result', () => {
       'isNone',
       true,
     );
+
+    // A union result transposes to exactly one variant per possible outcome
+    const asyncOptionRes = asyncOk(some('x')) as AsyncResultOf<Option<'x'>, 'e'>;
+    const asyncOptionResTransposed = asyncOptionRes.transpose();
+    expectTypeOf(asyncOptionResTransposed).toEqualTypeOf<
+      AsyncOption<None | Some<Ok<'x'>> | Some<Err<'e'>>>
+    >();
+    await expect(asyncOptionResTransposed.unwrap()).resolves.toStrictEqual(ok('x'));
   });
 
   test('flatten', async () => {
@@ -1382,14 +1392,8 @@ describe('Result', () => {
     eu(errResVal.flatten()).toBe<'value', unknown>(false, error);
     await eua(asyncOkVal.flatten()).toBe<P<'value'>, P<never>>(true, 'value');
     await eua(asyncErrVal.flatten()).toBe<P<never>, P<'error'>>(false, 'error');
-    await eua(asyncOkResVal.flatten()).toBe<P<'value'> | P<never>, P<unknown> | P<never>>(
-      true,
-      'value',
-    );
-    await eua(asyncErrResVal.flatten()).toBe<P<'value'> | P<never>, P<unknown> | P<never>>(
-      false,
-      error,
-    );
+    await eua(asyncOkResVal.flatten()).toBe<P<'value'>, P<unknown>>(true, 'value');
+    await eua(asyncErrResVal.flatten()).toBe<P<'value'>, P<unknown>>(false, error);
 
     eu(ok(okVal).flatten()).toBe<'value', never>(true, 'value');
     eu(ok(errVal).flatten()).toBe<never, 'error'>(false, 'error');
@@ -1501,39 +1505,29 @@ describe('Result', () => {
     });
     await eua(asyncErrValAsyncMapped).toBe<P<never>, P<'error'>>(false, 'error');
 
-    // TODO Why doesn't this simplify? `P<never> | P<string>` => `P<never | string>` => `P<string>`
     const asyncOkResValMapped = asyncOkResVal.map((v) => {
       expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
-    await eua(asyncOkResValMapped).toBe<P<never> | P<Mapped>, P<never> | P<unknown>>(
-      true,
-      mappedValue,
-    );
+    await eua(asyncOkResValMapped).toBe<P<Mapped>, P<unknown>>(true, mappedValue);
 
     const asyncOkResValAsyncMapped = asyncOkResVal.map(async (v) => {
       expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
-    await eua(asyncOkResValAsyncMapped).toBe<P<never> | P<Mapped>, P<never> | P<unknown>>(
-      true,
-      mappedValue,
-    );
+    await eua(asyncOkResValAsyncMapped).toBe<P<Mapped>, P<unknown>>(true, mappedValue);
 
     const asyncErrResValMapped = asyncErrResVal.map((v) => {
       expectTypeOf(v).toEqualTypeOf<'value'>();
       return mappedValue;
     });
-    await eua(asyncErrResValMapped).toBe<P<never> | P<Mapped>, P<never> | P<unknown>>(false, error);
+    await eua(asyncErrResValMapped).toBe<P<Mapped>, P<unknown>>(false, error);
 
     const asyncErrResValAsyncMapped = asyncErrResVal.map(async (v) => {
       expectTypeOf(v).toEqualTypeOf<'value'>();
       return await asyncMappedValue;
     });
-    await eua(asyncErrResValAsyncMapped).toBe<P<never> | P<Mapped>, P<never> | P<unknown>>(
-      false,
-      error,
-    );
+    await eua(asyncErrResValAsyncMapped).toBe<P<Mapped>, P<unknown>>(false, error);
   });
 
   test('mapErr', async () => {
@@ -1613,37 +1607,25 @@ describe('Result', () => {
       expectTypeOf(e).toEqualTypeOf<unknown>();
       return mappedValue;
     });
-    await eua(asyncOkResValMappedErr).toBe<P<'value'> | P<never>, P<Mapped> | P<never>>(
-      true,
-      'value',
-    );
+    await eua(asyncOkResValMappedErr).toBe<P<'value'>, P<Mapped>>(true, 'value');
 
     const asyncOkResValAsyncMappedErr = asyncOkResVal.mapErr(async (e) => {
       expectTypeOf(e).toEqualTypeOf<unknown>();
       return await asyncMappedValue;
     });
-    await eua(asyncOkResValAsyncMappedErr).toBe<P<'value'> | P<never>, P<Mapped> | P<never>>(
-      true,
-      'value',
-    );
+    await eua(asyncOkResValAsyncMappedErr).toBe<P<'value'>, P<Mapped>>(true, 'value');
 
     const asyncErrResValMappedErr = asyncErrResVal.mapErr((e) => {
       expectTypeOf(e).toEqualTypeOf<unknown>();
       return mappedValue;
     });
-    await eua(asyncErrResValMappedErr).toBe<P<'value'> | P<never>, P<Mapped> | P<never>>(
-      false,
-      mappedValue,
-    );
+    await eua(asyncErrResValMappedErr).toBe<P<'value'>, P<Mapped>>(false, mappedValue);
 
     const asyncErrResValAsyncMappedErr = asyncErrResVal.mapErr(async (e) => {
       expectTypeOf(e).toEqualTypeOf<unknown>();
       return await asyncMappedValue;
     });
-    await eua(asyncErrResValAsyncMappedErr).toBe<P<'value'> | P<never>, P<Mapped> | P<never>>(
-      false,
-      mappedValue,
-    );
+    await eua(asyncErrResValAsyncMappedErr).toBe<P<'value'>, P<Mapped>>(false, mappedValue);
   });
 
   test('mapOr', async () => {
@@ -2864,5 +2846,98 @@ describe('Result', () => {
     await expect(asyncErrResSerialized).resolves.toEqual({ type: 'err', error });
     const asyncErrResParsed = asyncResultFromSerialized(asyncErrResSerialized);
     await eua(asyncErrResParsed).toBe<P<'value'>, P<unknown>>(false, error);
+  });
+
+  test('asyncResultFromThrowable captures synchronous throws', async () => {
+    const syncThrowingFn = (() => {
+      throw error;
+    }) as () => Promise<'value'>;
+
+    const res = asyncResultFromThrowable(syncThrowingFn);
+    await expect(res.isErr).resolves.toBe(true);
+    await expect(res.unwrapErr()).resolves.toBe(error);
+  });
+
+  test('resultFromThrowable maps the caught error with `mapError`', () => {
+    const mapError = (e: unknown) => ({ type: 'custom' as const, cause: e });
+
+    const okMapped = resultFromThrowable(returns, mapError);
+    expectTypeOf(okMapped).toEqualTypeOf<Result<'value', { type: 'custom'; cause: unknown }>>();
+    expect(okMapped.unwrap()).toBe('value');
+
+    const errMapped = resultFromThrowable(throws, mapError);
+    expectTypeOf(errMapped).toEqualTypeOf<Result<'value', { type: 'custom'; cause: unknown }>>();
+    expect(errMapped.unwrapErr()).toEqual({ type: 'custom', cause: error });
+  });
+
+  test('asyncResultFromThrowable maps the caught error with `mapError`', async () => {
+    const mapError = (e: unknown) => ({ type: 'custom' as const, cause: e });
+    const syncThrowingFn = (() => {
+      throw error;
+    }) as () => Promise<'value'>;
+
+    const okMapped = asyncResultFromThrowable(returnsAsync, mapError);
+    expectTypeOf(okMapped).toEqualTypeOf<
+      AsyncResult<Result<'value', { type: 'custom'; cause: unknown }>>
+    >();
+    await expect(okMapped.unwrap()).resolves.toBe('value');
+
+    const errMapped = asyncResultFromThrowable(throwsAsync, mapError);
+    await expect(errMapped.unwrapErr()).resolves.toEqual({ type: 'custom', cause: error });
+
+    const syncErrMapped = asyncResultFromThrowable(syncThrowingFn, mapError);
+    await expect(syncErrMapped.unwrapErr()).resolves.toEqual({ type: 'custom', cause: error });
+  });
+
+  test('async result alias expands to an async Result', async () => {
+    expectTypeOf<AsyncResultOf<'v', 'e'>>().toEqualTypeOf<AsyncResult<Result<'v', 'e'>>>();
+
+    // Usable as a function return type, with both variants assignable to it
+    const fromOk = (): AsyncResultOf<'value', 'error'> => asyncOk('value');
+    const fromErr = (): AsyncResultOf<'value', 'error'> => asyncErr('error');
+    await expect(fromOk().unwrap()).resolves.toBe('value');
+    await expect(fromErr().unwrapErr()).resolves.toBe('error');
+  });
+
+  test('inspect and inspectErr silently swallow callback failures', async () => {
+    const failSync = (): void => {
+      throw new Error('callback');
+    };
+    const failAsync = () => Promise.reject(new Error('callback'));
+
+    expect(okVal.inspect(failSync)).toStrictEqual(okVal);
+    expect(errVal.inspectErr(failSync)).toStrictEqual(errVal);
+    await expect(okVal.inspect(failAsync).unwrap()).resolves.toBe('value');
+    await expect(errVal.inspectErr(failAsync).unwrapErr()).resolves.toBe('error');
+
+    await expect(asyncOkVal.inspect(failSync).unwrap()).resolves.toBe('value');
+    await expect(asyncOkVal.inspect(failAsync).unwrap()).resolves.toBe('value');
+    await expect(asyncErrVal.inspectErr(failSync).unwrapErr()).resolves.toBe('error');
+    await expect(asyncErrVal.inspectErr(failAsync).unwrapErr()).resolves.toBe('error');
+
+    // Give a would-be unhandled rejection the chance to surface (vitest fails the run on one)
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+
+  test('inspect and inspectErr wait for an async callback before continuing', async () => {
+    const done: string[] = [];
+    const slow = (label: string) => async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      done.push(label);
+    };
+
+    await asyncOkVal.inspect(slow('async ok'));
+    expect(done).toEqual(['async ok']);
+    await asyncErrVal.inspectErr(slow('async err'));
+    expect(done).toEqual(['async ok', 'async err']);
+    await okVal.inspect(slow('sync ok'));
+    expect(done).toEqual(['async ok', 'async err', 'sync ok']);
+    await errVal.inspectErr(slow('sync err'));
+    expect(done).toEqual(['async ok', 'async err', 'sync ok', 'sync err']);
+
+    // Callbacks for the other variant are skipped, not waited for
+    await asyncOkVal.inspectErr(slow('skipped'));
+    await asyncErrVal.inspect(slow('skipped'));
+    expect(done).toHaveLength(4);
   });
 });

@@ -2865,4 +2865,14 @@ describe('Result', () => {
     const asyncErrResParsed = asyncResultFromSerialized(asyncErrResSerialized);
     await eua(asyncErrResParsed).toBe<P<'value'>, P<unknown>>(false, error);
   });
+
+  test('asyncResultFromThrowable captures synchronous throws', async () => {
+    const syncThrowingFn = (() => {
+      throw error;
+    }) as () => Promise<'value'>;
+
+    const res = asyncResultFromThrowable(syncThrowingFn);
+    await expect(res.isErr).resolves.toBe(true);
+    await expect(res.unwrapErr()).resolves.toBe(error);
+  });
 });

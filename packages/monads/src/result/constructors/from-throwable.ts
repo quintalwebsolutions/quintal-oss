@@ -33,7 +33,8 @@ export function asyncResultFromThrowable<TValue>(
   fn: () => Promise<TValue>,
 ): AsyncResult<Result<TValue, unknown>> {
   return new AsyncResult(
-    fn()
+    // Wrapping in a promise executor also catches synchronous throws from `fn`
+    new Promise<TValue>((resolve) => resolve(fn()))
       .then((value) => ok(value))
       .catch((error) => err(error)),
   );

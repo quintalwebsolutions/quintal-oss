@@ -216,7 +216,7 @@ There are a few ways to initialize a `Result`, each with a different set of use 
 
 - `isOk` and `isErr` are `true` if the `Result` is `ok` or `err`, respectively.
 - `isOkAnd` and `isErrAnd` return `true` if the `Result` is `ok` or `err`, respectively, and the value inside of it matches a predicate.
-- `inspect` and `inspectErr` peek into the `Result` if it is `ok` or `err`, respectively.
+- `inspect` and `inspectErr` peek into the `Result` if it is `ok` or `err`, respectively. Errors thrown inside the callback are swallowed and never affect the result, so you have to handle possible errors thrown inside the callback yourself.
 
 #### Extracting the contained value
 

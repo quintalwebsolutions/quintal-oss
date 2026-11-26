@@ -66,16 +66,30 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
     return this.then(async (res) => (await res.isErrAnd(fn)) as Return);
   }
 
-  inspect(fn: (value: ValueFromOk<TResult>) => MaybePromise<void>) {
-    // biome-ignore lint/nursery/noFloatingPromises: Handled asynchronously
-    this.then((res) => res.inspect(fn));
-    return this;
+  inspect<TReturn extends MaybePromise<void>>(fn: (value: ValueFromOk<TResult>) => TReturn) {
+    type Return = ResultTernary<
+      TResult,
+      AsyncOk<ValueFromOk<TResult>>,
+      AsyncErr<ValueFromErr<TResult>>
+    >;
+    const promise = this.then(async (res) => {
+      await res.inspect(fn);
+      return res;
+    });
+    return new AsyncResult(promise) as Return;
   }
 
-  inspectErr(fn: (error: ValueFromErr<TResult>) => MaybePromise<void>) {
-    // biome-ignore lint/nursery/noFloatingPromises: Handled asynchronously
-    this.then((res) => res.inspectErr(fn));
-    return this;
+  inspectErr<TReturn extends MaybePromise<void>>(fn: (error: ValueFromErr<TResult>) => TReturn) {
+    type Return = ResultTernary<
+      TResult,
+      AsyncOk<ValueFromOk<TResult>>,
+      AsyncErr<ValueFromErr<TResult>>
+    >;
+    const promise = this.then(async (res) => {
+      await res.inspectErr(fn);
+      return res;
+    });
+    return new AsyncResult(promise) as Return;
   }
 
   expect(message: string) {

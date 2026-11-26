@@ -613,7 +613,7 @@ describe('Result', () => {
       expectTypeOf(value).toEqualTypeOf<'value'>();
       await Promise.resolve(okValAsyncMock(value));
     });
-    eu(okValAsyncInspected).toBe<'value', never>(true, 'value');
+    await eua(okValAsyncInspected).toBe<P<'value'>, P<never>>(true, 'value');
     expect(okValAsyncMock).toHaveBeenCalledWith('value');
 
     const errValMock = vi.fn();
@@ -645,7 +645,7 @@ describe('Result', () => {
       expectTypeOf(value).toEqualTypeOf<'value'>();
       await Promise.resolve(okResAsyncMock(value));
     });
-    eu(okResAsyncInspected).toBe<'value', unknown>(true, 'value');
+    await eua(okResAsyncInspected).toBe<P<'value'>, unknown>(true, 'value');
     expect(okResAsyncMock).toHaveBeenCalledWith('value');
 
     const errResMock = vi.fn();
@@ -661,7 +661,7 @@ describe('Result', () => {
       expectTypeOf(value).toEqualTypeOf<'value'>();
       await Promise.resolve(errResAsyncMock(value));
     });
-    eu(errResAsyncInspected).toBe<'value', unknown>(false, error);
+    eu(errResAsyncInspected).toBe<P<'value'>, unknown>(false, error);
     expect(errResAsyncMock).not.toHaveBeenCalled();
 
     const asyncOkValMock = vi.fn();
@@ -706,7 +706,10 @@ describe('Result', () => {
       asyncOkResMock(value);
     });
     expect(asyncOkResMock).not.toHaveBeenCalled();
-    await eua(asyncOkResInspected).toBe<P<'value'>, P<unknown>>(true, 'value');
+    await eua(asyncOkResInspected).toBe<P<'value'> | P<never>, P<never> | P<unknown>>(
+      true,
+      'value',
+    );
     expect(asyncOkResMock).toHaveBeenCalledWith('value');
 
     const asyncOkResAsyncMock = vi.fn();
@@ -715,7 +718,10 @@ describe('Result', () => {
       await Promise.resolve(asyncOkResAsyncMock(value));
     });
     expect(asyncOkResAsyncMock).not.toHaveBeenCalled();
-    await eua(asyncOkResAsyncInspected).toBe<P<'value'>, P<unknown>>(true, 'value');
+    await eua(asyncOkResAsyncInspected).toBe<P<'value'> | P<never>, P<never> | P<unknown>>(
+      true,
+      'value',
+    );
     expect(asyncOkResAsyncMock).toHaveBeenCalledWith('value');
 
     const asyncErrResMock = vi.fn();
@@ -724,7 +730,10 @@ describe('Result', () => {
       asyncErrResMock(value);
     });
     expect(asyncErrResMock).not.toHaveBeenCalled();
-    await eua(asyncErrResInspected).toBe<P<'value'>, P<unknown>>(false, error);
+    await eua(asyncErrResInspected).toBe<P<'value'> | P<never>, P<never> | P<unknown>>(
+      false,
+      error,
+    );
     expect(asyncErrResMock).not.toHaveBeenCalled();
 
     const asyncErrResAsyncMock = vi.fn();
@@ -733,7 +742,10 @@ describe('Result', () => {
       await Promise.resolve(asyncErrResAsyncMock(value));
     });
     expect(asyncErrResAsyncMock).not.toHaveBeenCalled();
-    await eua(asyncErrResAsyncInspected).toBe<P<'value'>, P<unknown>>(false, error);
+    await eua(asyncErrResAsyncInspected).toBe<P<'value'> | P<never>, P<never> | P<unknown>>(
+      false,
+      error,
+    );
     expect(asyncErrResAsyncMock).not.toHaveBeenCalled();
   });
 
@@ -767,7 +779,7 @@ describe('Result', () => {
       expectTypeOf(value).toEqualTypeOf<'error'>();
       await Promise.resolve(errValAsyncMock(value));
     });
-    eu(errValAsyncInspected).toBe<never, 'error'>(false, 'error');
+    await eua(errValAsyncInspected).toBe<P<never>, P<'error'>>(false, 'error');
     expect(errValAsyncMock).toHaveBeenCalledWith('error');
 
     const okResMock = vi.fn();
@@ -783,7 +795,7 @@ describe('Result', () => {
       expectTypeOf(value).toEqualTypeOf<unknown>();
       await Promise.resolve(okResAsyncMock(value));
     });
-    eu(okResAsyncInspected).toBe<'value', unknown>(true, 'value');
+    eu(okResAsyncInspected).toBe<'value' | P<never>, P<unknown>>(true, 'value');
     expect(okResAsyncMock).not.toHaveBeenCalled();
 
     const errResMock = vi.fn();
@@ -799,7 +811,7 @@ describe('Result', () => {
       expectTypeOf(value).toEqualTypeOf<unknown>();
       await Promise.resolve(errResAsyncMock(value));
     });
-    eu(errResAsyncInspected).toBe<'value', unknown>(false, error);
+    await eua(errResAsyncInspected).toBe<'value' | P<never>, P<unknown>>(false, error);
     expect(errResAsyncMock).toHaveBeenCalledWith(error);
 
     const asyncOkValMock = vi.fn();
@@ -844,7 +856,10 @@ describe('Result', () => {
       asyncOkResMock(value);
     });
     expect(asyncOkResMock).not.toHaveBeenCalled();
-    await eua(asyncOkResInspected).toBe<P<'value'>, P<unknown>>(true, 'value');
+    await eua(asyncOkResInspected).toBe<P<'value'> | P<never>, P<never> | P<unknown>>(
+      true,
+      'value',
+    );
     expect(asyncOkResMock).not.toHaveBeenCalled();
 
     const asyncOkResAsyncMock = vi.fn();
@@ -853,7 +868,10 @@ describe('Result', () => {
       await Promise.resolve(asyncOkResAsyncMock(value));
     });
     expect(asyncOkResAsyncMock).not.toHaveBeenCalled();
-    await eua(asyncOkResAsyncInspected).toBe<P<'value'>, P<unknown>>(true, 'value');
+    await eua(asyncOkResAsyncInspected).toBe<P<'value'> | P<never>, P<never> | P<unknown>>(
+      true,
+      'value',
+    );
     expect(asyncOkResAsyncMock).not.toHaveBeenCalled();
 
     const asyncErrResMock = vi.fn();
@@ -862,7 +880,10 @@ describe('Result', () => {
       asyncErrResMock(value);
     });
     expect(asyncErrResMock).not.toHaveBeenCalled();
-    await eua(asyncErrResInspected).toBe<P<'value'>, P<unknown>>(false, error);
+    await eua(asyncErrResInspected).toBe<P<'value'> | P<never>, P<never> | P<unknown>>(
+      false,
+      error,
+    );
     expect(asyncErrResMock).toHaveBeenCalledWith(error);
 
     const asyncErrResAsyncMock = vi.fn();
@@ -871,7 +892,10 @@ describe('Result', () => {
       await Promise.resolve(asyncErrResAsyncMock(value));
     });
     expect(asyncErrResAsyncMock).not.toHaveBeenCalled();
-    await eua(asyncErrResAsyncInspected).toBe<P<'value'>, P<unknown>>(false, error);
+    await eua(asyncErrResAsyncInspected).toBe<P<'value'> | P<never>, P<never> | P<unknown>>(
+      false,
+      error,
+    );
     expect(asyncErrResAsyncMock).toHaveBeenCalledWith(error);
   });
 
@@ -2916,5 +2940,47 @@ describe('Result', () => {
     const fromErr = (): AsyncResultOf<'value', 'error'> => asyncErr('error');
     await expect(fromOk().unwrap()).resolves.toBe('value');
     await expect(fromErr().unwrapErr()).resolves.toBe('error');
+  });
+
+  test('inspect and inspectErr silently swallow callback failures', async () => {
+    const failSync = (): void => {
+      throw new Error('callback');
+    };
+    const failAsync = () => Promise.reject(new Error('callback'));
+
+    expect(okVal.inspect(failSync)).toStrictEqual(okVal);
+    expect(errVal.inspectErr(failSync)).toStrictEqual(errVal);
+    await expect(okVal.inspect(failAsync).unwrap()).resolves.toBe('value');
+    await expect(errVal.inspectErr(failAsync).unwrapErr()).resolves.toBe('error');
+
+    await expect(asyncOkVal.inspect(failSync).unwrap()).resolves.toBe('value');
+    await expect(asyncOkVal.inspect(failAsync).unwrap()).resolves.toBe('value');
+    await expect(asyncErrVal.inspectErr(failSync).unwrapErr()).resolves.toBe('error');
+    await expect(asyncErrVal.inspectErr(failAsync).unwrapErr()).resolves.toBe('error');
+
+    // Give a would-be unhandled rejection the chance to surface (vitest fails the run on one)
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+
+  test('inspect and inspectErr wait for an async callback before continuing', async () => {
+    const done: string[] = [];
+    const slow = (label: string) => async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      done.push(label);
+    };
+
+    await asyncOkVal.inspect(slow('async ok'));
+    expect(done).toEqual(['async ok']);
+    await asyncErrVal.inspectErr(slow('async err'));
+    expect(done).toEqual(['async ok', 'async err']);
+    await okVal.inspect(slow('sync ok'));
+    expect(done).toEqual(['async ok', 'async err', 'sync ok']);
+    await errVal.inspectErr(slow('sync err'));
+    expect(done).toEqual(['async ok', 'async err', 'sync ok', 'sync err']);
+
+    // Callbacks for the other variant are skipped, not waited for
+    await asyncOkVal.inspectErr(slow('skipped'));
+    await asyncErrVal.inspect(slow('skipped'));
+    expect(done).toHaveLength(4);
   });
 });

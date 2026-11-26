@@ -121,27 +121,43 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
     }
   >;
   /**
-   * Calls the provided closure with the contained value (if `ok`).
+   * Calls the provided observing closure with the contained value (if `ok`). Any error it throws is swallowed and never changes the result.
    *
    * @example
    * ok('value').inspect((value) => console.log(value)); // logs 'value' to the console
-   * ok('value').inspect(async (value) => console.log(value)); // logs 'value' to the console asynchronously
+   * await ok('value').inspect(async (value) => console.log(value)); // logs 'value' to the console, resolves to `ok('value')` once done
+   * ok('value').inspect(() => { throw new Error('oops'); }); // Still `ok('value')`, the error is swallowed
    * err('error').inspect((value) => console.log(value)); // Doesn't do anything
    */
-  inspect: (
-    fn: (value: ResultValue<TValue, TResultVariant>) => MaybePromise<void>,
-  ) => ResultDocs<TValue, TResultVariant>;
+  inspect: <TReturn extends MaybePromise<void>>(
+    fn: (value: ResultValue<TValue, TResultVariant>) => TReturn,
+  ) => EvaluateResultVariant<
+    TResultVariant,
+    {
+      ok: TReturn extends Promise<void> ? AsyncOk<TValue> : Ok<TValue>;
+      err: Err<TValue>;
+      async: ResultTernary<TValue, AsyncOk<ValueFromOk<TValue>>, AsyncErr<ValueFromErr<TValue>>>;
+    }
+  >;
   /**
-   * Calls the provided closure with the contained error (if `err`).
+   * Calls the provided observing closure with the contained error (if `err`). Any error it throws is swallowed and never changes the result.
    *
    * @example
    * ok('value').inspectErr((value) => console.log(value)); // Doesn't do anything
    * err('error').inspectErr((value) => console.log(value)); // Logs 'error' to the console
-   * err('error').inspectErr(async (value) => console.log(value)); // Logs 'error' to the console asynchronously
+   * await err('error').inspectErr(async (value) => console.log(value)); // Logs 'error' to the console, resolves to `err('error')` once done
+   * err('error').inspectErr(() => { throw new Error('oops'); }); // Still `err('error')`, the thrown error is swallowed
    */
-  inspectErr: (
-    fn: (error: ResultError<TValue, TResultVariant>) => MaybePromise<void>,
-  ) => ResultDocs<TValue, TResultVariant>;
+  inspectErr: <TReturn extends MaybePromise<void>>(
+    fn: (error: ResultError<TValue, TResultVariant>) => TReturn,
+  ) => EvaluateResultVariant<
+    TResultVariant,
+    {
+      ok: Ok<TValue>;
+      err: TReturn extends Promise<void> ? AsyncErr<TValue> : Err<TValue>;
+      async: ResultTernary<TValue, AsyncOk<ValueFromOk<TValue>>, AsyncErr<ValueFromErr<TValue>>>;
+    }
+  >;
   // #endregion
 
   // #region Extracting the contained value

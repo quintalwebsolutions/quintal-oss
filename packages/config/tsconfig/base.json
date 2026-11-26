@@ -15,7 +15,6 @@
     "strict": true,
 
     "allowImportingTsExtensions": true,
-    "baseUrl": "${configDir}",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noUncheckedSideEffectImports": true,
@@ -24,6 +23,7 @@
       "~/*": ["${configDir}/src/*"]
     },
     "resolveJsonModule": true,
+    "types": ["node"],
     "rootDir": "${configDir}",
 
     "emitDeclarationOnly": true,

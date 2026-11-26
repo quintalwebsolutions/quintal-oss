@@ -134,7 +134,6 @@ describe('defaultValuePlugin', () => {
       vi.fn(),
       {
         defaultUndefined: { defaultValue: undefined },
-        // @ts-expect-error // TODO fix this error
         defaultUndefinedFunc: { defaultValue: () => {} },
         noDefault: {},
       },

@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -38,10 +38,10 @@ jobs:
 
       - name: Create release pull request or publish to npm
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
-          publish: pnpm changeset publish
-          version: pnpm changeset version
+          publish-script: pnpm changeset publish
+          version-script: pnpm changeset version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

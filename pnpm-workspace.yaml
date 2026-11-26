@@ -1,2 +1,7 @@
 packages:
   - "packages/*"
+allowBuilds:
+  esbuild: true
+  sharp: false
+overrides:
+  "@microsoft/api-extractor": 7.59.4

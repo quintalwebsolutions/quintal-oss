@@ -41,6 +41,10 @@ jobs:
       - name: Authenticate with npm
         run: echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> ~/.npmrc
 
+      # Fails early with a clear 401 if the token is missing, expired or revoked.
+      - name: Verify npm authentication
+        run: npm whoami
+
       - name: Create release pull request or publish to npm
         id: changesets
         uses: changesets/action@v2

@@ -24,6 +24,7 @@
   "homepage": "https://github.com/quintalwebsolutions/quintal-oss/tree/main/packages/monads#readme",
   "bugs": "https://github.com/quintalwebsolutions/quintal-oss/labels/%40quintal%2Fmonads",
   "type": "module",
+  "main": "./.dist/index.js",
   "types": "./.dist/index.d.ts",
   "exports": {
     ".": {

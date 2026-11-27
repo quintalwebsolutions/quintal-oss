@@ -1,10 +1,14 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalPassThroughEnv": ["GITHUB_*"],
+  "globalPassThroughEnv": [
+    "GITHUB_*"
+  ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "inputs": [
         "src/**",
         "package.json",
@@ -13,8 +17,12 @@
         "$TURBO_ROOT$/packages/config/tsdown.mjs",
         "$TURBO_ROOT$/packages/config/tsconfig/**"
       ],
-      "outputs": [".dist/**"],
-      "env": ["CODECOV_TOKEN"]
+      "outputs": [
+        ".dist/**"
+      ],
+      "env": [
+        "CODECOV_TOKEN"
+      ]
     },
     "clean": {
       "cache": false
@@ -37,12 +45,18 @@
         "tests/**",
         "package.json",
         "tsconfig.json",
-        "vite.config.mjs",
-        "$TURBO_ROOT$/packages/config/vite.mjs",
+        "vitest.config.mjs",
+        "$TURBO_ROOT$/packages/config/vitest.mjs",
         "$TURBO_ROOT$/packages/config/tsconfig/**"
       ],
-      "env": ["CI"],
-      "outputs": [".coverage/**", ".coverage-ts/**", "junit.xml"]
+      "env": [
+        "CI"
+      ],
+      "outputs": [
+        ".coverage/**",
+        ".coverage-ts/**",
+        "junit.xml"
+      ]
     }
   }
 }

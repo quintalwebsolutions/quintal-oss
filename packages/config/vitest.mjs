@@ -1,8 +1,7 @@
-import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 // Test configuration. Library builds are configured in `./tsdown.mjs`.
-export default function getViteConfig() {
+export default function getVitestConfig() {
   return defineConfig({
     test: {
       // TODO
@@ -19,6 +18,5 @@ export default function getViteConfig() {
       },
       environment: 'happy-dom',
     },
-    plugins: [react()],
   });
 }

@@ -326,6 +326,7 @@ async function makePackageJson(packageDir: string, name: string, p: Package): Pr
     homepage: `${githubRoot}/tree/main/packages/${name}#readme`,
     bugs: `${githubRoot}/labels/%40quintal%2F${name}`,
     type: 'module',
+    main: './.dist/index.js',
     types: './.dist/index.d.ts',
     exports: { '.': { types: './.dist/index.d.ts', default: './.dist/index.js' } },
     files: ['.dist'],
@@ -348,11 +349,11 @@ async function makePackageJson(packageDir: string, name: string, p: Package): Pr
   await writeFile([filePath], [`${JSON.stringify(content, null, 2)}\n`]);
 }
 
-async function makePackageViteConfig(packageDir: string): Promise<void> {
+async function makePackageVitestConfig(packageDir: string): Promise<void> {
   await writeFile(
-    [packageDir, 'vite.config.mjs'],
+    [packageDir, 'vitest.config.mjs'],
     [
-      "import getRecommended from '@quintal/config/vite';",
+      "import getRecommended from '@quintal/config/vitest.mjs';",
       '',
       'export default getRecommended();',
       '',
@@ -392,7 +393,7 @@ async function makePackage(packageDir: string, name: string, p: Package): Promis
 
   await makePackageJson(packageDir, name, p);
   await makePackageReadme(packageDir, name, p);
-  await makePackageViteConfig(packageDir);
+  await makePackageVitestConfig(packageDir);
   await makePackageTsdownConfig(`@quintal/${name}`, packageDir);
   await makePackageTsConfig(packageDir, p);
 

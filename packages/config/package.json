@@ -24,20 +24,21 @@
   "files": [
     "tsconfig/**",
     "nextjs.js",
-    "vite.mjs"
+    "vite.mjs",
+    "tsdown.mjs"
   ],
   "scripts": {
     "clean": "shx rm -rf .turbo node_modules"
   },
   "dependencies": {
-    "@codecov/vite-plugin": "2.0.1",
-    "@typescript/typescript6": "6.0.2",
+    "@arethetypeswrong/core": "0.18.5",
+    "@codecov/rollup-plugin": "2.0.1",
     "@vitejs/plugin-react": "6.3.0",
     "next": "15.5.4",
+    "publint": "0.3.25",
     "react": "19.3.1",
     "shx": "0.4.0",
-    "vite": "8.3.8",
-    "vite-plugin-dts": "5.1.2",
-    "vite-plugin-externalize-deps": "0.10.0"
+    "tsdown": "0.23.7",
+    "vite": "8.3.8"
   }
 }

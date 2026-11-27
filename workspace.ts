@@ -1,4 +1,4 @@
-import type { Workspace } from './scripts';
+import type { Workspace } from './scripts/index.ts';
 
 export const workspace: Workspace = {
   labels: [
@@ -75,11 +75,12 @@ export const workspace: Workspace = {
       description:
         'Framework-agnostic environment variable validation for TypeScript powered by Zod',
       keywords: ['environment', 'validation', 'typescript', 'zod'],
+      types: ['node'],
       features: [
         { icon: '🔍', text: 'Use Zod to validate and transform environment variables' },
         { icon: '🔒', text: 'Secure environment variables by marking them as server-only' },
         { icon: '📦', text: 'Nest environment variables into groups' },
-        { icon: '✅', text: 'CommonJS and ES Modules support' },
+        { icon: '✅', text: 'ES Modules support' },
         { icon: '⚖️', text: 'Super lightweight (only ~10kb gzipped)' },
         { icon: '🧪', text: '100% test coverage' },
         { icon: '🛡️', text: 'Enjoy full type-safety in every step of the process' },
@@ -102,7 +103,7 @@ export const workspace: Workspace = {
       features: [
         { icon: '🛡️', text: 'Easy type-safe error- and empty-value handling' },
         { icon: '🦀', text: 'Implements all relevant stable utility methods from Rust' },
-        { icon: '✅', text: 'CommonJS and ES Modules support' },
+        { icon: '✅', text: 'ES Modules support' },
         { icon: '📖', text: 'Extensive documentation' },
         { icon: '⚖️', text: 'Super lightweight (only ~1kb gzipped)' },
         { icon: '🙅', text: '0 dependencies' },

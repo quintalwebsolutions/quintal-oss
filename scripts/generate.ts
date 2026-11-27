@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { workspace } from '../workspace';
+
+import { workspace } from '../workspace.ts';
 
 export type Label = {
   name: string;
@@ -14,6 +15,8 @@ export type Package = {
   title: string;
   description: string;
   keywords: string[];
+  /** `@types/*` packages to expose to the package's TypeScript config (TypeScript 7 includes none by default) */
+  types?: string[];
   // TODO https://docs.npmjs.com/cli/v10/configuring-npm/package-json#peerdependenciesmeta
   // peerDependencies?: {name: string, version: string, isOptional?: boolean}[];
   features?: { icon: string; text: string }[];
@@ -317,19 +320,18 @@ async function makePackageJson(packageDir: string, name: string, p: Package): Pr
     },
     repository: {
       type: 'git',
-      url: `${githubRoot}.git`,
+      url: `git+${githubRoot}.git`,
       directory: `packages/${name}`,
     },
     homepage: `${githubRoot}/tree/main/packages/${name}#readme`,
     bugs: `${githubRoot}/labels/%40quintal%2F${name}`,
-    main: './.dist/index.cjs',
-    module: './.dist/index.mjs',
+    type: 'module',
     types: './.dist/index.d.ts',
+    exports: { '.': { types: './.dist/index.d.ts', default: './.dist/index.js' } },
     files: ['.dist'],
+    sideEffects: false,
     scripts: {
-      build: 'run-s build:*',
-      'build:clean': 'shx rm -rf .dist',
-      'build:code': 'vite build',
+      build: 'tsdown',
       clean: `shx rm -rf ${ignoreDirs.join(' ')}`,
       dev: 'vitest --watch',
       lint: 'pnpm lint:fix && pnpm lint:types',
@@ -346,24 +348,37 @@ async function makePackageJson(packageDir: string, name: string, p: Package): Pr
   await writeFile([filePath], [`${JSON.stringify(content, null, 2)}\n`]);
 }
 
-async function makePackageViteConfig(packageName: string, packageDir: string): Promise<void> {
+async function makePackageViteConfig(packageDir: string): Promise<void> {
   await writeFile(
     [packageDir, 'vite.config.mjs'],
     [
       "import getRecommended from '@quintal/config/vite';",
       '',
-      `export default getRecommended(\'${packageName}\');`,
+      'export default getRecommended();',
       '',
     ],
   );
 }
 
-async function makePackageTsConfig(packageDir: string): Promise<void> {
+async function makePackageTsdownConfig(packageName: string, packageDir: string): Promise<void> {
+  await writeFile(
+    [packageDir, 'tsdown.config.mjs'],
+    [
+      "import getRecommended from '@quintal/config/tsdown.mjs';",
+      '',
+      `export default getRecommended('${packageName}');`,
+      '',
+    ],
+  );
+}
+
+async function makePackageTsConfig(packageDir: string, p: Package): Promise<void> {
   await writeFile(
     [packageDir, 'tsconfig.json'],
     [
       '{',
       '  "extends": "@quintal/config/tsconfig/base.json",',
+      ...(p.types ? [`  "compilerOptions": { "types": ${JSON.stringify(p.types)} },`] : []),
       // TODO while @microsoft/api-extractor does not support the tsconfig configDir template literal, we need to add this line
       '  "include": ["**/*.ts", "**/*.tsx"]',
       '}',
@@ -377,8 +392,9 @@ async function makePackage(packageDir: string, name: string, p: Package): Promis
 
   await makePackageJson(packageDir, name, p);
   await makePackageReadme(packageDir, name, p);
-  await makePackageViteConfig(`@quintal/${name}`, packageDir);
-  await makePackageTsConfig(packageDir);
+  await makePackageViteConfig(packageDir);
+  await makePackageTsdownConfig(`@quintal/${name}`, packageDir);
+  await makePackageTsConfig(packageDir, p);
 
   if (dirExists) return;
 

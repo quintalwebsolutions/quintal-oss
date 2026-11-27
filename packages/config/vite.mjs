@@ -1,28 +1,9 @@
-import { resolve } from 'node:path';
-import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
-import dts from 'vite-plugin-dts';
-import { externalizeDeps } from 'vite-plugin-externalize-deps';
 
-const fileName = {
-  es: 'index.mjs',
-  cjs: 'index.cjs',
-};
-
-const formats = Object.keys(fileName);
-
-export default function getViteConfig(bundleName) {
+// Test configuration. Library builds are configured in `./tsdown.mjs`.
+export default function getViteConfig() {
   return defineConfig({
-    build: {
-      lib: {
-        entry: resolve(process.cwd(), 'src', 'index.ts'),
-        name: bundleName,
-        formats,
-        fileName: (format) => fileName[format],
-      },
-      outDir: '.dist',
-    },
     test: {
       // TODO
       // benchmark
@@ -38,15 +19,6 @@ export default function getViteConfig(bundleName) {
       },
       environment: 'happy-dom',
     },
-    plugins: [
-      react(),
-      dts({ rollupTypes: true }),
-      externalizeDeps(),
-      codecovVitePlugin({
-        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
-        bundleName,
-        uploadToken: process.env.CODECOV_TOKEN,
-      }),
-    ],
+    plugins: [react()],
   });
 }

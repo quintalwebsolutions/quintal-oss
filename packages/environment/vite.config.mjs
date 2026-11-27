@@ -5,4 +5,4 @@
 
 import getRecommended from '@quintal/config/vite';
 
-export default getRecommended('@quintal/environment');
+export default getRecommended();

@@ -1,5 +1,11 @@
 # @quintal/monads
 
+## 0.7.0
+
+### Minor Changes
+
+- c2639b6: Ship as ESM-only and bundle with tsdown
+
 ## 0.6.0
 
 ### Minor Changes

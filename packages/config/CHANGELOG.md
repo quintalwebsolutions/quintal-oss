@@ -1,5 +1,11 @@
 # @quintal/config
 
+## 0.5.0
+
+### Minor Changes
+
+- c2639b6: Ship as ESM-only and bundle with tsdown
+
 ## 0.4.0
 
 ### Minor Changes

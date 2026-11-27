@@ -1,5 +1,11 @@
 # @quintal/environment
 
+## 2.2.0
+
+### Minor Changes
+
+- c2639b6: Ship as ESM-only and bundle with tsdown
+
 ## 2.1.1
 
 ### Patch Changes

@@ -36,6 +36,11 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+      # changesets/action v2 no longer writes the npm auth token (v1 did).
+      # Single quotes: npm expands ${NPM_TOKEN} itself, so the token is never written to disk.
+      - name: Authenticate with npm
+        run: echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> ~/.npmrc
+
       - name: Create release pull request or publish to npm
         id: changesets
         uses: changesets/action@v2

@@ -1,5 +1,11 @@
 # @quintal/config
 
+## 0.4.0
+
+### Minor Changes
+
+- 932614d: Support typescript 7
+
 ## 0.3.0
 
 ### Minor Changes

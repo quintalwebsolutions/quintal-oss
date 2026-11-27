@@ -11,7 +11,7 @@ export function getVitestConfig() {
         provider: 'v8',
         include: ['src/**/*.ts'],
         reportsDirectory: '.coverage',
-        reporter: ['json', 'text'],
+        reporter: process.env.CI ? ['json', 'text'] : ['text'],
       },
       environment: 'happy-dom',
     },

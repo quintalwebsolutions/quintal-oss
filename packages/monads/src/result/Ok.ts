@@ -18,6 +18,7 @@ import {
   type AnyResult,
   type AnySyncResult,
   type AsyncOk,
+  type ResultInput,
   type ResultMatch,
   type SerializedOk,
   isAnyResult,
@@ -149,7 +150,7 @@ export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
     return fn(this.value);
   }
 
-  and<TResultB extends AnyResult | Promise<AnySyncResult>>(resultB: TResultB) {
+  and<TResultB extends ResultInput>(resultB: TResultB) {
     type Return = TResultB extends Promise<infer TInternalResultB extends AnySyncResult>
       ? AsyncResult<TInternalResultB>
       : TResultB;
@@ -157,11 +158,11 @@ export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
     return resultB as Return;
   }
 
-  or<TResultB extends AnyResult | Promise<AnySyncResult>>(_resultB: TResultB) {
+  or<TResultB extends ResultInput>(_resultB: TResultB) {
     return this;
   }
 
-  andThen<TResultB extends AnyResult | Promise<AnySyncResult>>(fn: (value: TValue) => TResultB) {
+  andThen<TResultB extends ResultInput>(fn: (value: TValue) => TResultB) {
     type Return = TResultB extends Promise<infer TInternalResultB extends AnySyncResult>
       ? AsyncResult<TInternalResultB>
       : TResultB;
@@ -170,7 +171,7 @@ export class Ok<TValue> implements ResultDocs<TValue, 'ok'> {
     return result as Return;
   }
 
-  orElse<TResultB extends AnyResult | Promise<AnySyncResult>>(_fn: (error: never) => TResultB) {
+  orElse<TResultB extends ResultInput>(_fn: (error: never) => TResultB) {
     return this;
   }
 

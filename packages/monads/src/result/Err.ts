@@ -3,7 +3,7 @@ import type { MaybePromise } from '../util.ts';
 import { AsyncResult } from './AsyncResult.ts';
 import { err } from './constructors/err.ts';
 import type { ResultDocs } from './ResultDocs.ts';
-import type { AnyResult, AnySyncResult, AsyncErr, ResultMatch, SerializedErr } from './types.ts';
+import type { AnySyncResult, AsyncErr, ResultInput, ResultMatch, SerializedErr } from './types.ts';
 
 export class Err<TError> implements ResultDocs<TError, 'err'> {
   private readonly _error: TError;
@@ -120,11 +120,11 @@ export class Err<TError> implements ResultDocs<TError, 'err'> {
     return defaultFn(this.error);
   }
 
-  and<TResultB extends AnyResult | Promise<AnySyncResult>>(_resultB: TResultB) {
+  and<TResultB extends ResultInput>(_resultB: TResultB) {
     return this;
   }
 
-  or<TResultB extends AnyResult | Promise<AnySyncResult>>(resultB: TResultB) {
+  or<TResultB extends ResultInput>(resultB: TResultB) {
     type Return = TResultB extends Promise<infer TInternalResultB extends AnySyncResult>
       ? AsyncResult<TInternalResultB>
       : TResultB;
@@ -132,11 +132,11 @@ export class Err<TError> implements ResultDocs<TError, 'err'> {
     return resultB as Return;
   }
 
-  andThen<TResultB extends AnyResult | Promise<AnySyncResult>>(_fn: (value: never) => TResultB) {
+  andThen<TResultB extends ResultInput>(_fn: (value: never) => TResultB) {
     return this;
   }
 
-  orElse<TResultB extends AnyResult | Promise<AnySyncResult>>(fn: (error: TError) => TResultB) {
+  orElse<TResultB extends ResultInput>(fn: (error: TError) => TResultB) {
     type Return = TResultB extends Promise<infer TInternalResultB extends AnySyncResult>
       ? AsyncResult<TInternalResultB>
       : TResultB;

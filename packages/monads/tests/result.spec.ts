@@ -6,7 +6,7 @@ import {
   type AsyncNone,
   type AsyncOk,
   type AsyncOption,
-  type AsyncResult,
+  AsyncResult,
   type AsyncResultOf,
   type AsyncSome,
   type Err,
@@ -2939,5 +2939,141 @@ describe('Result', () => {
     await asyncOkVal.inspectErr(slow('skipped'));
     await asyncErrVal.inspect(slow('skipped'));
     expect(done).toHaveLength(4);
+  });
+
+  test('a throwing `mapError` is not caught', async () => {
+    const mapperThrows = (): never => {
+      throw new Error('mapper');
+    };
+
+    expect(() => resultFromThrowable(throws, mapperThrows)).toThrow('mapper');
+    await expect(asyncResultFromThrowable(throwsAsync, mapperThrows).unwrap()).rejects.toThrow(
+      'mapper',
+    );
+  });
+
+  test('merges an array of sync results into one', () => {
+    // biome-ignore lint/correctness/noConstantCondition lint/nursery/noUnnecessaryConditions: allow for test
+    if (false) {
+      // @ts-expect-error async results can't be part of an array, wait for them first
+      resultFromResults([asyncOk1]);
+      // @ts-expect-error promises can't be part of an array, wait for them first
+      resultFromResults([Promise.resolve(ok1)]);
+      // @ts-expect-error values must be results
+      resultFromResults([1]);
+    }
+
+    eu(resultFromResults([ok1, ok2])).toBe<('v1' | 'v2')[], never>(true, ['v1', 'v2']);
+    eu(resultFromResults([okRes1, okRes2])).toBe<('v1' | 'v2')[], 'e1' | 'e2'>(true, ['v1', 'v2']);
+    eu(resultFromResults([okRes1, errRes2])).toBe<('v1' | 'v2')[], 'e1' | 'e2'>(false, 'e2');
+    // The first error by position wins
+    eu(resultFromResults([err1, err2])).toBe<never[], 'e1' | 'e2'>(false, 'e1');
+    eu(resultFromResults([err2, err1])).toBe<never[], 'e1' | 'e2'>(false, 'e2');
+    eu(resultFromResults([])).toBe<never[], never>(true, []);
+
+    // Lists of unknown length
+    const okList: Result<'v1', 'e1'>[] = [okRes1, okRes1, okRes1];
+    eu(resultFromResults(okList)).toBe<'v1'[], 'e1'>(true, ['v1', 'v1', 'v1']);
+    const emptyList: Result<'v1', 'e1'>[] = [];
+    eu(resultFromResults(emptyList)).toBe<'v1'[], 'e1'>(true, []);
+    const failingList: Result<'v1', 'e1'>[] = [okRes1, errRes1];
+    eu(resultFromResults(failingList)).toBe<'v1'[], 'e1'>(false, 'e1');
+  });
+
+  test('merges a record of results into one', async () => {
+    // biome-ignore lint/correctness/noConstantCondition lint/nursery/noUnnecessaryConditions: allow for test
+    if (false) {
+      // @ts-expect-error values must be results
+      resultFromResults({ a: 1 });
+      // @ts-expect-error async results can only be used under known keys
+      resultFromResults({} as Record<string, typeof asyncOk1>);
+      // @ts-expect-error a single result is not a record
+      resultFromResults(okVal);
+    }
+
+    eu(resultFromResults({})).toBe<Record<never, never>, never>(true, {});
+    eu(resultFromResults({ a: ok1, b: ok2 })).toBe<{ a: 'v1'; b: 'v2' }, never>(true, {
+      a: 'v1',
+      b: 'v2',
+    });
+    eu(resultFromResults({ a: okRes1, b: okRes2 })).toBe<{ a: 'v1'; b: 'v2' }, 'e1' | 'e2'>(true, {
+      a: 'v1',
+      b: 'v2',
+    });
+    eu(resultFromResults({ a: ok1, b: errRes2 })).toBe<{ a: 'v1'; b: 'v2' }, 'e2'>(false, 'e2');
+    // A definite error means the ok variant is impossible
+    eu(resultFromResults({ a: ok1, b: err2 })).toBe<never, 'e2'>(false, 'e2');
+    // The first error by key order wins
+    eu(resultFromResults({ x: err1, a: err2 })).toBe<never, 'e1' | 'e2'>(false, 'e1');
+    eu(resultFromResults({ x: err2, a: err1 })).toBe<never, 'e1' | 'e2'>(false, 'e2');
+
+    // Async members make the result async
+    await eua(resultFromResults({ a: ok1, b: asyncOk2 })).toBe<P<{ a: 'v1'; b: 'v2' }>, P<never>>(
+      true,
+      { a: 'v1', b: 'v2' },
+    );
+    await eua(resultFromResults({ a: okRes1, b: asyncOkRes2 })).toBe<
+      P<{ a: 'v1'; b: 'v2' }>,
+      P<'e1' | 'e2'>
+    >(true, { a: 'v1', b: 'v2' });
+    await eua(resultFromResults({ a: ok1, b: asyncErr2 })).toBe<P<never>, P<'e2'>>(false, 'e2');
+    await eua(resultFromResults({ a: asyncErr1, b: err2 })).toBe<P<never>, P<'e1' | 'e2'>>(
+      false,
+      'e1',
+    );
+    // Promises of results are allowed, just like async results
+    await eua(resultFromResults({ a: ok1, b: Promise.resolve(ok2) })).toBe<
+      P<{ a: 'v1'; b: 'v2' }>,
+      P<never>
+    >(true, { a: 'v1', b: 'v2' });
+    await eua(resultFromResults({ a: ok1, b: Promise.resolve(err2) })).toBe<P<never>, P<'e2'>>(
+      false,
+      'e2',
+    );
+
+    // Records with unknown keys can only hold sync results
+    const dictionary: Record<string, Result<'v1', 'e1'>> = { a: okRes1, b: okRes1 };
+    eu(resultFromResults(dictionary)).toBe<{ [key: string]: 'v1' }, 'e1'>(true, {
+      a: 'v1',
+      b: 'v1',
+    });
+  });
+
+  test('merges promises of results into one', async () => {
+    // biome-ignore lint/correctness/noConstantCondition lint/nursery/noUnnecessaryConditions: allow for test
+    if (false) {
+      // @ts-expect-error values must be results
+      resultFromResults(ok1, 1);
+    }
+
+    // A promise of a result is typed exactly like the equivalent async result
+    const viaAsync = resultFromResults(ok1, asyncOk2, ok1);
+    const viaPromise = resultFromResults(ok1, Promise.resolve(ok2), ok1);
+    expectTypeOf(viaPromise).toEqualTypeOf<typeof viaAsync>();
+    const viaAsyncRes = resultFromResults(okRes1, asyncOkRes2);
+    const viaPromiseRes = resultFromResults(okRes1, Promise.resolve(okRes2));
+    expectTypeOf(viaPromiseRes).toEqualTypeOf<typeof viaAsyncRes>();
+
+    await eua(viaPromise).toBe<P<['v1', 'v2', 'v1']>, P<never>>(true, ['v1', 'v2', 'v1']);
+    await eua(resultFromResults(ok1, Promise.resolve(err2))).toBe<P<never>, P<'e2'>>(false, 'e2');
+    // Just like for async results, a definite error makes later errors unreachable
+    await eua(resultFromResults(Promise.resolve(err1), asyncErr2)).toBe<P<never>, P<'e1'>>(
+      false,
+      'e1',
+    );
+    // An earlier sync error wins without waiting
+    eu(resultFromResults(err1, Promise.resolve(ok2))).toBe<never, 'e1'>(false, 'e1');
+  });
+
+  test('the first error is chosen by position, not by time', async () => {
+    const delayed = <TResult extends AnyResult>(result: TResult, ms: number) =>
+      new AsyncResult(
+        new Promise<Awaited<TResult>>((resolve) => setTimeout(() => resolve(result as never), ms)),
+      );
+    const slowErr = delayed(err1, 20);
+    const fastErr = delayed(err2, 1);
+
+    await expect(resultFromResults(slowErr, fastErr).unwrapErr()).resolves.toBe('e1');
+    await expect(resultFromResults({ a: slowErr, b: fastErr }).unwrapErr()).resolves.toBe('e1');
   });
 });

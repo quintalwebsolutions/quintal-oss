@@ -9,14 +9,12 @@ export type AsyncResultOf<TValue, TError> = AsyncResult<Result<TValue, TError>>;
 export type AsyncOk<TValue> = AsyncResult<Ok<TValue>>;
 export type AsyncErr<TError> = AsyncResult<Err<TError>>;
 
-// biome-ignore lint/suspicious/noExplicitAny: This type exists solely for generic parameters to extend
+// biome-ignore-start lint/suspicious/noExplicitAny: These types exist solely for generic parameters to extend
 export type AnyOk = Ok<any>;
-// biome-ignore lint/suspicious/noExplicitAny: This type exists solely for generic parameters to extend
 export type AnyAsyncOk = AsyncOk<any>;
-// biome-ignore lint/suspicious/noExplicitAny: This type exists solely for generic parameters to extend
 export type AnyErr = Err<any>;
-// biome-ignore lint/suspicious/noExplicitAny: This type exists solely for generic parameters to extend
 export type AnyAsyncErr = AsyncErr<any>;
+// biome-ignore-end lint/suspicious/noExplicitAny: These types exist solely for generic parameters to extend
 
 export type AnySyncResult = AnyOk | AnyErr;
 export type AnyAsyncResult = AsyncResult<AnySyncResult>;
@@ -56,31 +54,55 @@ export type ResultFromSerialized<TSerializedResult extends AnySerializedResult> 
       ? Err<TError>
       : never;
 
+export type ResultInput = AnyResult | Promise<AnySyncResult>;
+
 export type ResultFromResults<
-  TResults extends AnyResult[],
+  TResults extends ResultInput[],
   TIsAsync extends boolean = false,
   TValues extends unknown[] = [],
   TErrors extends unknown[] = [],
-> = TResults extends [infer THead extends AnyResult, ...infer TTail extends AnyResult[]]
-  ? THead extends AnyAsyncErr
-    ? [...TErrors, THead][number]
-    : THead extends AnyErr
-      ? [...TErrors, Ternary<TIsAsync, AsyncResult<THead>, THead>][number]
-      : THead extends Ok<infer TValue>
-        ? ResultFromResults<TTail, TIsAsync, [...TValues, TValue], TErrors>
-        : THead extends AsyncOk<infer TValue>
-          ? ResultFromResults<TTail, true, [...TValues, TValue], TErrors>
-          : THead extends Result<infer TValue, infer TError>
-            ? ResultFromResults<
-                TTail,
-                TIsAsync,
-                [...TValues, TValue],
-                [...TErrors, Ternary<TIsAsync, AsyncErr<TError>, Err<TError>>]
-              >
-            : THead extends AsyncResult<Result<infer TValue, infer TError>>
-              ? ResultFromResults<TTail, true, [...TValues, TValue], [...TErrors, AsyncErr<TError>]>
-              : never
+> = TResults extends [infer THead extends ResultInput, ...infer TTail extends ResultInput[]]
+  ? THead extends Promise<infer TResult extends AnySyncResult>
+    ? ResultFromResults<[AsyncResult<TResult>, ...TTail], TIsAsync, TValues, TErrors>
+    : THead extends AnyAsyncErr
+      ? [...TErrors, THead][number]
+      : THead extends AnyErr
+        ? [...TErrors, Ternary<TIsAsync, AsyncResult<THead>, THead>][number]
+        : THead extends Ok<infer TValue>
+          ? ResultFromResults<TTail, TIsAsync, [...TValues, TValue], TErrors>
+          : THead extends AsyncOk<infer TValue>
+            ? ResultFromResults<TTail, true, [...TValues, TValue], TErrors>
+            : THead extends Result<infer TValue, infer TError>
+              ? ResultFromResults<
+                  TTail,
+                  TIsAsync,
+                  [...TValues, TValue],
+                  [...TErrors, Ternary<TIsAsync, AsyncErr<TError>, Err<TError>>]
+                >
+              : THead extends AsyncResult<Result<infer TValue, infer TError>>
+                ? ResultFromResults<
+                    TTail,
+                    true,
+                    [...TValues, TValue],
+                    [...TErrors, AsyncErr<TError>]
+                  >
+                : never
   : Ternary<TIsAsync, AsyncOk<TValues>, Ok<TValues>> | TErrors[number];
+
+export type ResultFromRecord<TRecord extends Record<string, ResultInput>> =
+  // The ok variant is impossible as soon as one of the values can't be ok
+    | (true extends {
+        [TKey in keyof TRecord]: [ValueFromOk<Awaited<TRecord[TKey]>>] extends [never]
+          ? true
+          : false;
+      }[keyof TRecord]
+        ? never
+        : Ok<{ -readonly [TKey in keyof TRecord]: ValueFromOk<Awaited<TRecord[TKey]>> }>)
+    | Extract<Awaited<TRecord[keyof TRecord]>, AnyErr> extends infer TResult extends AnySyncResult
+    ? [Extract<TRecord[keyof TRecord], AnyAsyncResult | Promise<AnySyncResult>>] extends [never]
+      ? TResult
+      : AsyncResult<TResult>
+    : never;
 
 export type ResultTernary<TResult, TIfOk, TIfErr> = TResult extends AnyOk ? TIfOk : TIfErr;
 

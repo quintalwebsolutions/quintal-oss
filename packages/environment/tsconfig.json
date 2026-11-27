@@ -1,5 +1,4 @@
 {
   "extends": "@quintal/config/tsconfig/base.json",
-  "compilerOptions": { "types": ["node"] },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "compilerOptions": { "types": ["node"] }
 }

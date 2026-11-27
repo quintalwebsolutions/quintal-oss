@@ -6,19 +6,30 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+# Reset permissions, every job declares the ones it needs.
+permissions: {}
+
+# Never run two releases for the same branch at once.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+# The release is split in separate jobs so that only the final `publish` job
+# can obtain npm credentials (trusted publishing via OIDC). The jobs before it
+# (which install and build code) never get `id-token: write`.
 
 jobs:
-  release:
-    name: Release
+  check:
+    name: Check
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
       - name: Checkout repo
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -31,26 +42,141 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  select-mode:
+    name: Select mode
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      mode: ${{ steps.select-mode.outputs.mode }}
+      publish-plan-artifact-id: ${{ steps.select-mode.outputs.publish-plan-artifact-id }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Install Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Select Changesets mode
+        id: select-mode
+        uses: changesets/action/select-mode@v2
+
+  version:
+    name: Version
+    if: needs.select-mode.outputs.mode == 'version'
+    needs: [check, select-mode]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # commit version changes
+      pull-requests: write # create or update the Version Packages pull request
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Install Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Version packages
+        uses: changesets/action/version@v2
+        with:
+          script: pnpm changeset version
+
+  pack:
+    name: Pack
+    if: needs.select-mode.outputs.mode == 'publish'
+    needs: [check, select-mode]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # No cache here: these tarballs are what gets published.
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Install Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Build
         run: pnpm turbo run build
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      # changesets/action v2 no longer writes the npm auth token (v1 did).
-      # Single quotes: npm expands ${NPM_TOKEN} itself, so the token is never written to disk.
-      - name: Authenticate with npm
-        run: echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> ~/.npmrc
-
-      # Fails early with a clear 401 if the token is missing, expired or revoked.
-      - name: Verify npm authentication
-        run: npm whoami
-
-      - name: Create release pull request or publish to npm
-        id: changesets
-        uses: changesets/action@v2
+      - name: Pack packages
+        id: pack
+        uses: changesets/action/pack@v2
         with:
-          publish-script: pnpm changeset publish
-          version-script: pnpm changeset version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          publish-plan-artifact-id: ${{ needs.select-mode.outputs.publish-plan-artifact-id }}
+    outputs:
+      pack-dir-artifact-id: ${{ steps.pack.outputs.pack-dir-artifact-id }}
+
+  publish:
+    name: Publish
+    needs: pack
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # push git tags and create GitHub releases
+      id-token: write # npm trusted publishing (OIDC), no NPM_TOKEN needed
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Only publishes the tarballs from `pack`, so no cache and no install scripts.
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Install Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Publish packages
+        uses: changesets/action/publish@v2
+        with:
+          pack-dir-artifact-id: ${{ needs.pack.outputs.pack-dir-artifact-id }}

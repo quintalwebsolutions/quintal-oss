@@ -2940,4 +2940,15 @@ describe('Result', () => {
     await asyncErrVal.inspect(slow('skipped'));
     expect(done).toHaveLength(4);
   });
+
+  test('a throwing `mapError` is not caught', async () => {
+    const mapperThrows = (): never => {
+      throw new Error('mapper');
+    };
+
+    expect(() => resultFromThrowable(throws, mapperThrows)).toThrow('mapper');
+    await expect(asyncResultFromThrowable(throwsAsync, mapperThrows).unwrap()).rejects.toThrow(
+      'mapper',
+    );
+  });
 });

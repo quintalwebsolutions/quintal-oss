@@ -9,6 +9,7 @@ import type {
   AsyncErr,
   AsyncOk,
   FlattenedResult,
+  ResultInput,
   ResultMatch,
   ResultTernary,
   SerializedErr,
@@ -488,7 +489,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * err('early error').and(Promise.resolve(ok('late value'))).unwrapErr(); // 'early error'
    * err('early error').and(Promise.resolve(err('late error'))).unwrapErr(); // 'early error'
    */
-  and: <TResultB extends AnyResult | Promise<AnySyncResult>>(
+  and: <TResultB extends ResultInput>(
     resultB: TResultB,
   ) => EvaluateResultVariant<
     TResultVariant,
@@ -517,7 +518,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * await err('early error').or(Promise.resolve(ok('late value'))).unwrap(); // 'late value'
    * await err('early error').or(Promise.resolve(err('late error'))).unwrapErr(); // 'late error'
    */
-  or: <TResultB extends AnyResult | Promise<AnySyncResult>>(
+  or: <TResultB extends ResultInput>(
     resultB: TResultB,
   ) => EvaluateResultVariant<
     TResultVariant,
@@ -546,7 +547,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * err('early error').andThen(async () => ok('late value')).unwrapErr(); // 'early error'
    * err('early error').andThen(async () => err('late error')).unwrapErr(); // 'early error'
    */
-  andThen: <TResultB extends AnyResult | Promise<AnySyncResult>>(
+  andThen: <TResultB extends ResultInput>(
     fn: (value: ResultValue<TValue, TResultVariant>) => TResultB,
   ) => EvaluateResultVariant<
     TResultVariant,
@@ -575,7 +576,7 @@ export type ResultDocs<TValue, TResultVariant extends ResultVariant> = {
    * await err('early error').orElse(async () => ok('late value')).unwrap(); // 'late value'
    * await err('early error').orElse(async () => err('late error')).unwrapErr(); // 'late error'
    */
-  orElse: <TResultB extends AnyResult | Promise<AnySyncResult>>(
+  orElse: <TResultB extends ResultInput>(
     fn: (error: ResultError<TValue, TResultVariant>) => TResultB,
   ) => EvaluateResultVariant<
     TResultVariant,

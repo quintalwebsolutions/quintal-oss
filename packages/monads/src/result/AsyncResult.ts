@@ -12,9 +12,9 @@ import type { Err } from './Err.ts';
 import type { Ok } from './Ok.ts';
 import type { ResultDocs } from './ResultDocs.ts';
 import type {
-  AnyResult,
   AnySyncResult,
   FlattenedResult,
+  ResultInput,
   ResultMatch,
   ResultTernary,
   SerializedErr,
@@ -183,7 +183,7 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
     return this.then(async (res) => await res.mapOrElse(defaultFn, fn)) as Return;
   }
 
-  and<TResultB extends AnyResult | Promise<AnySyncResult>>(
+  and<TResultB extends ResultInput>(
     resultB: TResultB,
   ): AsyncResult<ResultTernary<TResult, Awaited<TResultB>, Err<ValueFromErr<TResult>>>> {
     type Return = AsyncResult<
@@ -192,14 +192,14 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
     return new AsyncResult(this.then((res) => res.and(resultB))) as Return;
   }
 
-  or<TResultB extends AnyResult | Promise<AnySyncResult>>(
+  or<TResultB extends ResultInput>(
     resultB: TResultB,
   ): AsyncResult<ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Awaited<TResultB>>> {
     type Return = AsyncResult<ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Awaited<TResultB>>>;
     return new AsyncResult(this.then((res) => res.or(resultB))) as Return;
   }
 
-  andThen<TResultB extends AnyResult | Promise<AnySyncResult>>(
+  andThen<TResultB extends ResultInput>(
     fn: (value: ValueFromOk<TResult>) => TResultB,
   ): AsyncResult<ResultTernary<TResult, Awaited<TResultB>, Err<ValueFromErr<TResult>>>> {
     type Return = AsyncResult<
@@ -208,7 +208,7 @@ export class AsyncResult<TResult extends AnySyncResult> implements ResultDocs<TR
     return new AsyncResult(this.then((res) => res.andThen(fn))) as Return;
   }
 
-  orElse<TResultB extends AnyResult | Promise<AnySyncResult>>(
+  orElse<TResultB extends ResultInput>(
     fn: (error: ValueFromErr<TResult>) => TResultB,
   ): AsyncResult<ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Awaited<TResultB>>> {
     type Return = AsyncResult<ResultTernary<TResult, Ok<ValueFromOk<TResult>>, Awaited<TResultB>>>;

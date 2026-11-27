@@ -23,7 +23,6 @@
       "~/*": ["${configDir}/src/*"]
     },
     "resolveJsonModule": true,
-    "types": ["node"],
     "rootDir": "${configDir}",
 
     "emitDeclarationOnly": true,

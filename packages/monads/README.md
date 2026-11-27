@@ -18,7 +18,7 @@ A collection of monads (Result, Option) for TypeScript, inspired by [the Rust pr
 
 - 🛡️ Easy type-safe error- and empty-value handling,
 - 🦀 Implements all relevant stable utility methods from Rust,
-- ✅ CommonJS and ES Modules support,
+- ✅ ES Modules support,
 - 📖 Extensive documentation,
 - ⚖️ Super lightweight (only ~1kb gzipped),
 - 🙅 0 dependencies,

@@ -9,14 +9,18 @@
   },
   "packageManager": "pnpm@12.23.0+sha512.02da94ffaf133f46074322afe552f90d40b5f71ae259aefbccdacc5085b1d617e98d65e0131f5748b9b67445978ee5055d7d59a473f1eef0d504854fefcd5975",
   "devDependencies": {
+    "@arethetypeswrong/core": "0.18.5",
     "@biomejs/biome": "2.2.5",
     "@changesets/cli": "3.0.3",
     "@types/node": "24.7.0",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "publint": "0.3.25",
     "sherif": "1.13.0",
     "shx": "0.4.0",
     "syncpack": "13.0.4",
+    "tsdown": "0.23.7",
     "tsx": "4.23.15",
     "turbo": "2.11.13",
-    "typescript": "7.0.2"
+    "typescript": "npm:@typescript/typescript6@6.0.2"
   }
 }

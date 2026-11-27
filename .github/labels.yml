@@ -11,17 +11,9 @@
   color: '#FBCA04'
   description: 'Issues or pull requests related to the @quintal/environment package'
 
-- name: '@quintal/form-engine-react'
-  color: '#FBCA04'
-  description: 'Issues or pull requests related to the @quintal/form-engine-react package'
-
 - name: '@quintal/monads'
   color: '#FBCA04'
   description: 'Issues or pull requests related to the @quintal/monads package'
-
-- name: '@quintal/table-engine-react'
-  color: '#FBCA04'
-  description: 'Issues or pull requests related to the @quintal/table-engine-react package'
 
 - name: 'good first issue'
   color: '#7057ff'

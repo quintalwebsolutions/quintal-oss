@@ -89,12 +89,6 @@ export const workspace: Workspace = {
         { title: 'Kitchen sink', href: 'https://codesandbox.io/p/sandbox/x2slnv?file=%2Findex.ts' },
       ],
     },
-    'form-engine-react': {
-      title: 'Quintal React Form Engine',
-      description:
-        'A headless, declarative, lightweight form engine for React apps with first-class TypeScript support.',
-      keywords: ['react', 'form', 'hook', 'validation', 'headless', 'typescript'],
-    },
     monads: {
       title: 'Quintal Monads',
       description:
@@ -119,11 +113,6 @@ export const workspace: Workspace = {
           text: "Write docs on [Rust's must-use property](https://doc.rust-lang.org/std/result/#results-must-be-used)",
         },
       ],
-    },
-    'table-engine-react': {
-      title: 'Quintal React Table Engine',
-      description: 'A headless, declarative, lightweight, type-safe table engine for React apps.',
-      keywords: ['react', 'table', 'hook', 'headless', 'typescript'],
     },
   },
 };

@@ -1,8 +1,6 @@
 ---
 "@quintal/monads": minor
 "@quintal/environment": minor
-"@quintal/form-engine-react": minor
-"@quintal/table-engine-react": minor
 "@quintal/config": minor
 ---
 

@@ -5,14 +5,6 @@
       "path": ".."
     },
     {
-      "name": "@quintal/form-engine-react",
-      "path": "../packages/form-engine-react"
-    },
-    {
-      "name": "@quintal/table-engine-react",
-      "path": "../packages/table-engine-react"
-    },
-    {
       "name": "@quintal/config",
       "path": "../packages/config"
     },

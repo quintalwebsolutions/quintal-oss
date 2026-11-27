@@ -3,6 +3,6 @@
  * TO EDIT THE CONTENT, PLEASE MODIFY `/workspace.ts` OR `/scripts/generate.ts`
  */
 
-import getRecommended from '@quintal/config/vitest.mjs';
+import { getVitestConfig } from '@quintal/config/vitest.mjs';
 
-export default getRecommended();
+export default getVitestConfig();

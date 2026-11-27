@@ -9,7 +9,7 @@ const base = {
   fixedExtension: false,
 };
 
-export default function getTsdownConfig(bundleName) {
+export function getTsdownConfig(bundleName) {
   return defineConfig([
     {
       ...base,

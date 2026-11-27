@@ -3,6 +3,6 @@
  * TO EDIT THE CONTENT, PLEASE MODIFY `/workspace.ts` OR `/scripts/generate.ts`
  */
 
-import getRecommended from '@quintal/config/tsdown.mjs';
+import { getTsdownConfig } from '@quintal/config/tsdown.mjs';
 
-export default getRecommended('@quintal/environment');
+export default getTsdownConfig('@quintal/environment');

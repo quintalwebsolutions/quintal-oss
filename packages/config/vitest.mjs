@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config';
 
-export default function getVitestConfig() {
+export function getVitestConfig() {
   return defineConfig({
     test: {
       watch: false,

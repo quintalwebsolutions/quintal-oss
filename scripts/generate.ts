@@ -353,9 +353,9 @@ async function makePackageVitestConfig(packageDir: string): Promise<void> {
   await writeFile(
     [packageDir, 'vitest.config.mjs'],
     [
-      "import getRecommended from '@quintal/config/vitest.mjs';",
+      "import { getVitestConfig } from '@quintal/config/vitest.mjs';",
       '',
-      'export default getRecommended();',
+      'export default getVitestConfig();',
       '',
     ],
   );
@@ -365,9 +365,9 @@ async function makePackageTsdownConfig(packageName: string, packageDir: string):
   await writeFile(
     [packageDir, 'tsdown.config.mjs'],
     [
-      "import getRecommended from '@quintal/config/tsdown.mjs';",
+      "import { getTsdownConfig } from '@quintal/config/tsdown.mjs';",
       '',
-      `export default getRecommended('${packageName}');`,
+      `export default getTsdownConfig('${packageName}');`,
       '',
     ],
   );
